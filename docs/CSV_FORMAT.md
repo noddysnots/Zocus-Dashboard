@@ -1,0 +1,66 @@
+# Zocus dashboard CSV format
+
+One row per recorded conversation. UTF-8, comma-separated, header row required (column order does not matter, names are case-insensitive). Download a ready example from the **Data** menu (top right) or `data/template.csv`. A full 646-row example is `data/sample.csv`.
+
+Upload validates the whole file first. If any row is bad, nothing is loaded and the first 25 problems are listed.
+
+## Required columns
+
+| Column | Format | Example | Used for |
+|---|---|---|---|
+| `captured_at` | `YYYY-MM-DD HH:MM`, store local time | `2026-11-04 17:32` | 7 / 30 day periods, trends, follow-up due dates. "Today" = the latest row. |
+| `rep_name` | text | `Priya Sharma` | Team, coaching, filters |
+| `outcome` | `sold` / `followup` / `lost` | `followup` | conversion, funnel, follow-ups |
+| `value_inr` | whole rupees, blank = 0 | `85000` | sales closed, money at stake |
+| `product` | text | `Lightweight 22K bangles` | What they want, restock action |
+| `score` | 0-100 | `67` | score rings, ranking |
+
+## Strongly recommended
+
+| Column | Format | Used for |
+|---|---|---|
+| `score_need`, `score_budget`, `score_pitch`, `score_objection`, `score_close` | 0-100 | Team skill table, coaching focus. If missing, `score` is used for all five and coaching shows no skill gaps. |
+| `reason` | `browse` `stock` `design` `making` `budget` `competitor` `family`, or free text. Blank on sold rows. | "Why they did not buy". Free text appears as its own reason. Blank on a not-sold row becomes "No clear reason". |
+| `stage_reached` | `talked` `need_understood` `product_shown` `price_quoted`. Blank on sold rows. | Funnel. Defaults from the reason if blank. |
+| `conversation_id` | text, unique | reference only |
+
+## Coaching columns (personalised plans)
+
+Coaching works without these, using built-in example answers. With them, every rep's plan shows how reps who score high on the same skill resolved the same objection.
+
+| Column | Format | Notes |
+|---|---|---|
+| `objection` | same codes as `reason`, or free text | The objection raised in the conversation, **sold or not**. |
+| `objection_resolved` | `yes` / `no` | Only resolved ones count as "what works". |
+| `objection_quote`, `objection_quote_en` | text (original language + English) | What the customer said. |
+| `objection_reply`, `objection_reply_en` | text (original language + English) | The rep's answer. This is what other reps see. |
+| `objection_at_sec` | seconds from start | "Hear it" jumps here in the player. |
+
+## Optional columns
+
+`customer_name`, `customer_phone`, `duration_min`, `customer_type` (e.g. Wedding shopping), `in_stock` (`yes`/`no`), `competitor`, `competitor_offer`, `keywords` (`a|b|c`), `customer_quote`, `customer_quote_en`, `summary_wanted`, `summary_happened`, `summary_why`, `summary_next`, `followup_due` (`YYYY-MM-DD`, default visit + 2 days), `followup_done` (`yes`/`no`), `rep_tenure`, `store_name` and `owner_name` (same on every row; used in the greeting).
+
+Accepted aliases: `interaction_id`, `employee`, `store`. If there is no `outcome` column but there is `sale_recorded` (the existing backend export), `yes` becomes `sold` and anything else `lost`.
+
+## Where each value comes from in the Zocus backend
+
+The repo already has `GET /api/v1/organizations/:orgId/interactions/export?format=csv` (`backend/src/modules/intelligence/interactions.ts`). It already carries `interaction_id`, `captured_at`, `employee`, `store`, `customer_name`, `customer_phone`, `summary`, `sale_recorded`, `score` and `score_dimensions`. Ask the engineer to extend it with:
+
+| Column | Backend source |
+|---|---|
+| `outcome` | `sale_recorded`; otherwise `sessions.outcome.stage` (`lost`, or `follow_up`/`considering`/`committed`/`interested`) |
+| `value_inr` | `sessions.outcome.amountMinor / 100`, else AI `revenueRecovery.value` |
+| `product` | normalised category `product_type` (relation `requested`) |
+| `score_*` | `score_dimensions`: `pitch_knowledge`, `objection_handling`, `sop_closing`. See gap 1. |
+| `reason` | `outcome.lossReason` or `revenueRecovery.rootCause` |
+| `stage_reached` | scoring `stages[]` (`discovery`, `presentation`, `commercials`, `closing`); last one `reached` |
+| `objection*` | analysis `objections[]` (`theme`, `resolution`, evidence quote and segment start time) |
+| `duration_min` | `ended_at - captured_at` |
+| `followup_due`, `followup_done` | `followup_opportunities.wake_up_at` / status, or `tasks.due_at` / state |
+
+### Gaps in the backend today
+
+1. **Skills:** the backend scores 4 dimensions (discovery, pitch and product knowledge, objection handling, SOP and closing). The dashboard splits discovery into "Understanding the need" and "Asking the budget". Needs per-check results (D1-D4) to split.
+2. **Loss reason** is free text; the dashboard wants it grouped into the 7 reasons above (or accepts free text).
+3. **Not captured by analysis yet:** `customer_type`, `in_stock`, `competitor_offer`, `keywords`, and English translations of quotes. The matching Insights tabs stay thin until the analysis adds them.
+4. Export only conversations that are analysed and included.

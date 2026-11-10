@@ -1,0 +1,203 @@
+/* Zocus data layer: CSV parse + validate + build the dataset the dashboard reads, plus the Data menu
+   (upload / export / template / reset). The dashboard never touches the CSV directly; it reads window.ZD.
+   To switch to the backend later, replace load() so it builds the same dataset from an API response. */
+(function(){
+'use strict';
+const DAY=864e5;
+const SAMPLE_URL='data/sample.csv',TEMPLATE_URL='data/template.csv';
+const REQUIRED=['captured_at','rep_name','outcome','value_inr','product','score'];
+const SKILL_COLS={need:'score_need',budget:'score_budget',pitch:'score_pitch',objection:'score_objection',close:'score_close'};
+const ALIAS={interaction_id:'conversation_id',employee:'rep_name',rep:'rep_name',store:'store_name',amount:'value_inr',value:'value_inr',sale_value:'value_inr',
+  date:'captured_at',datetime:'captured_at',product_name:'product',customer:'customer_name',phone:'customer_phone',duration:'duration_min'};
+const REASON_DEF={browse:['Just browsing, need not found',0],stock:['Lightweight piece not in stock',1],design:['Did not like the designs',2],making:['Making charges too high',3],
+  budget:['Over budget',3],competitor:['Comparing with another store',3],family:['Needs family approval',3],other:['No clear reason',3]};
+const REASON_LABEL=Object.fromEntries(Object.entries(REASON_DEF).map(([k,v])=>[v[0].toLowerCase(),k]));
+const STAGE_CODE={talked:0,need_understood:1,product_shown:2,price_quoted:3};
+const COMP_HI={'Shree Gold Palace':'Shree Gold Palace mein making sirf 8% hai.','Nakshatra Online':'Nakshatra Online pe 1 lakh pe gold coin free mil raha hai.','Ratna Jewellers':'Ratna Jewellers mein exchange rate zyada de rahe hain.'};
+
+/* ---------- CSV ---------- */
+function parseCSV(text){
+  if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
+  const rows=[];let row=[],f='',inQ=false;
+  for(let i=0;i<text.length;i++){const ch=text[i];
+    if(inQ){if(ch==='"'){if(text[i+1]==='"'){f+='"';i++}else inQ=false}else f+=ch}
+    else if(ch==='"')inQ=true;
+    else if(ch===','){row.push(f);f=''}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(f);f='';if(row.some(x=>x.trim()!==''))rows.push(row);row=[]}
+    else f+=ch}
+  row.push(f);if(row.some(x=>x.trim()!==''))rows.push(row);
+  return rows}
+const normHeader=h=>{h=String(h).trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');return ALIAS[h]||h};
+const slug=s=>String(s).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'x';
+function uniqueId(base,used){let id=base,n=2;while(used.has(id))id=base+'-'+n++;used.add(id);return id}
+const yes=v=>/^(y|yes|true|1|done)$/i.test(String(v||'').trim());
+const no=v=>/^(n|no|false|0)$/i.test(String(v||'').trim());
+function parseDate(s){s=String(s||'').trim();
+  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if(m){const d=new Date(+m[1],+m[2]-1,+m[3],m[4]!==undefined?+m[4]:12,m[5]!==undefined?+m[5]:0);return d.getMonth()===+m[2]-1?d:null}
+  m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if(m){const d=new Date(+m[3],+m[2]-1,+m[1],m[4]!==undefined?+m[4]:12,m[5]!==undefined?+m[5]:0);return d.getMonth()===+m[2]-1?d:null}
+  const t=Date.parse(s);return isNaN(t)?null:new Date(t)}
+function outcomeOf(v){v=String(v||'').trim().toLowerCase().replace(/[\s-]+/g,'_');
+  if(/^(sold|won|sale|bought|yes)$/.test(v))return 'sold';
+  if(/^(followup|follow_up|will_return|return|open|considering)$/.test(v))return 'followup';
+  if(/^(lost|not_sold|did_not_buy|no)$/.test(v))return 'lost';
+  return null}
+
+/* ---------- Build the dataset ---------- */
+function build(text,name){
+  const table=parseCSV(text);
+  if(table.length<2)return {errors:[{row:1,msg:'The file has no data rows. It needs a header row and at least one conversation.'}]};
+  const head=table[0].map(normHeader),idx={};head.forEach((h,i)=>{if(!(h in idx))idx[h]=i});
+  const errors=[],warnings=[];
+  if(!('outcome' in idx)&&('sale_recorded' in idx)){idx.outcome=idx.sale_recorded;warnings.push('No "outcome" column; used "sale_recorded" (yes = sold, otherwise lost).')}
+  const missing=REQUIRED.filter(c=>!(c in idx));
+  if(missing.length)return {errors:[{row:1,msg:'Missing required column'+(missing.length>1?'s':'')+': '+missing.join(', ')+'. Download the template from the Data menu to see the format.'}]};
+  const skillMissing=Object.values(SKILL_COLS).filter(c=>!(c in idx));
+  if(skillMissing.length)warnings.push('Skill columns missing ('+skillMissing.join(', ')+'). The overall score is used in their place, so Team and Coaching show no skill differences.');
+  const get=(r,c)=>c in idx?String(r[idx[c]]===undefined?'':r[idx[c]]).trim():'';
+  const num=(v)=>v===''?NaN:Number(String(v).replace(/[₹,\s]|rs\.?/gi,''));
+
+  const raw=[];
+  for(let i=1;i<table.length;i++){
+    const r=table[i],line=i+1,bad=m=>{if(errors.length<25)errors.push({row:line,msg:m})};
+    const at=parseDate(get(r,'captured_at'));if(!at){bad('captured_at "'+get(r,'captured_at')+'" is not a date. Use YYYY-MM-DD HH:MM.');continue}
+    const rep=get(r,'rep_name');if(!rep){bad('rep_name is empty.');continue}
+    let oc=get(r,'outcome');oc=('sale_recorded' in idx&&idx.outcome===idx.sale_recorded)?(yes(oc)?'sold':'lost'):outcomeOf(oc);
+    if(!oc){bad('outcome "'+get(r,'outcome')+'" must be sold, followup or lost.');continue}
+    let value=get(r,'value_inr')===''?0:num(get(r,'value_inr'));if(isNaN(value)){bad('value_inr "'+get(r,'value_inr')+'" is not a number.');continue}
+    const sk={};let bad2=false;
+    let score=num(get(r,'score'));
+    const given=Object.entries(SKILL_COLS).map(([k,col])=>[k,num(get(r,col))]);
+    if(isNaN(score)){const ok=given.filter(g=>!isNaN(g[1]));if(ok.length===5)score=Math.round(ok.reduce((a,g)=>a+g[1],0)/5);else{bad('score "'+get(r,'score')+'" is not a number from 0 to 100.');continue}}
+    if(score<0||score>100){bad('score '+score+' is outside 0 to 100.');continue}
+    for(const [k,v] of given){if(isNaN(v)){sk[k]=Math.round(score)}else if(v<0||v>100){bad(SKILL_COLS[k]+' '+v+' is outside 0 to 100.');bad2=true;break}else sk[k]=Math.round(v)}
+    if(bad2)continue;
+    raw.push({r,at,rep,oc,value:Math.round(value),sk,score:Math.round(score)});
+  }
+  if(errors.length)return {errors};
+  if(!raw.length)return {errors:[{row:1,msg:'No usable rows found.'}]};
+
+  /* lookups */
+  const customReasons=[],reasonByText={};
+  function reasonCode(txt,row,stageHint){
+    const t=String(txt||'').trim();if(!t)return null;const low=t.toLowerCase();
+    if(REASON_DEF[low])return low;if(REASON_LABEL[low])return REASON_LABEL[low];
+    if(reasonByText[low])return reasonByText[low];
+    const code='x-'+slug(t);reasonByText[low]=code;
+    customReasons.push({code,label:t.charAt(0).toUpperCase()+t.slice(1),stage:stageHint==null?3:stageHint,hi:get(row,'customer_quote')||get(row,'objection_quote'),en:get(row,'customer_quote_en')||get(row,'objection_quote_en')});
+    return code}
+  const repUsed=new Set(),prodUsed=new Set(),perUsed=new Set(),compUsed=new Set();
+  const repMap={},prodMap={},perMap={},compMap={};
+  const REPS=[],PRODUCTS={},PERSONAS=[],COMPS=[];
+  let noReason=0,hasObjection=false;
+
+  raw.sort((a,b)=>b.at-a.at);
+  const today=raw[0].at,todayMid=new Date(today.getFullYear(),today.getMonth(),today.getDate()).getTime();
+  const CONVS=raw.map((x,i)=>{
+    const r=x.r;
+    if(!repMap[x.rep]){const id=uniqueId(slug(x.rep),repUsed);const parts=x.rep.split(/\s+/);repMap[x.rep]=id;REPS.push({id,name:x.rep,tenure:get(r,'rep_tenure'),first:parts[0],ini:parts.map(p=>p[0]).join('').slice(0,2).toUpperCase()})}
+    else if(!REPS.find(p=>p.id===repMap[x.rep]).tenure&&get(r,'rep_tenure'))REPS.find(p=>p.id===repMap[x.rep]).tenure=get(r,'rep_tenure');
+    const pl=get(r,'product')||'Not recorded';
+    if(!prodMap[pl]){const id=uniqueId(slug(pl),prodUsed);prodMap[pl]=id;PRODUCTS[id]={label:pl}}
+    const cl=get(r,'customer_type')||'Not recorded';
+    if(!perMap[cl]){const id=uniqueId(slug(cl),perUsed);perMap[cl]=id;PERSONAS.push({id,label:cl})}
+    let comp=null;const cn=get(r,'competitor');
+    if(cn){if(!compMap[cn]){const id=uniqueId(slug(cn),compUsed);compMap[cn]=id;COMPS.push({id,label:cn,offer:get(r,'competitor_offer'),hi:COMP_HI[cn]||''})}
+      else if(!COMPS.find(c=>c.id===compMap[cn]).offer&&get(r,'competitor_offer'))COMPS.find(c=>c.id===compMap[cn]).offer=get(r,'competitor_offer');
+      comp=compMap[cn]}
+    let stageIn=get(r,'stage_reached').toLowerCase().replace(/[\s-]+/g,'_'),stageHint=null;
+    if(stageIn in STAGE_CODE)stageHint=STAGE_CODE[stageIn];else if(/^[0-3]$/.test(stageIn))stageHint=+stageIn;
+    let reason=null,stage=4;
+    if(x.oc!=='sold'){
+      reason=reasonCode(get(r,'reason'),r,stageHint);
+      if(!reason){reason='other';noReason++}
+      stage=stageHint!=null?stageHint:(REASON_DEF[reason]?REASON_DEF[reason][1]:((customReasons.find(c=>c.code===reason)||{}).stage??3));
+    }
+    let obj=null;const ot=get(r,'objection');
+    if(ot){obj=reasonCode(ot,r,null);hasObjection=true}
+    const resv=get(r,'objection_resolved');
+    const dur=num(get(r,'duration_min'));
+    const due=parseDate(get(r,'followup_due'));
+    return {id:i+1,ref:get(r,'conversation_id')||('row-'+(i+2)),rep:repMap[x.rep],at:x.at,d:Math.round((todayMid-new Date(x.at.getFullYear(),x.at.getMonth(),x.at.getDate()).getTime())/DAY),
+      persona:perMap[cl],product:prodMap[pl],inStock:!no(get(r,'in_stock')),skills:x.sk,score:x.score,competitor:comp,outcome:x.oc,reason,stage,value:x.value,
+      dur:isNaN(dur)||dur<=0?15:Math.round(dur),customer:get(r,'customer_name')||'Customer',phone:get(r,'customer_phone')||null,
+      kw:get(r,'keywords').split('|').map(s=>s.trim()).filter(Boolean),done:false,
+      cq:get(r,'customer_quote'),cqEn:get(r,'customer_quote_en'),
+      sum:{wanted:get(r,'summary_wanted'),happened:get(r,'summary_happened'),why:get(r,'summary_why'),next:get(r,'summary_next')},
+      objection:obj,objResolved:yes(resv)?true:no(resv)?false:null,objQuote:get(r,'objection_quote'),objQuoteEn:get(r,'objection_quote_en'),
+      reply:get(r,'objection_reply'),replyEn:get(r,'objection_reply_en'),objAt:get(r,'objection_at_sec')===''?null:num(get(r,'objection_at_sec')),
+      due:due||new Date(x.at.getTime()+2*DAY),fuDone:yes(get(r,'followup_done')),url:/^https?:\/\//i.test(get(r,'zocus_url'))?get(r,'zocus_url'):''}});
+  if(noReason)warnings.push(noReason+' not-sold conversation'+(noReason>1?'s have':' has')+' no reason. They are grouped as "No clear reason".');
+  REPS.sort((a,b)=>CONVS.filter(c=>c.rep===b.id).length-CONVS.filter(c=>c.rep===a.id).length||a.name.localeCompare(b.name));
+  const first=raw[0].r;
+  return {ok:true,name,warnings,
+    ds:{today,store:get(first,'store_name')||'Your store',owner:get(first,'owner_name')||'',REPS,PRODUCTS,PERSONAS,COMPS,CONVS,customReasons,hasObjection,rawText:text,file:name}}}
+
+/* ---------- Storage (IndexedDB, falls back to memory) ---------- */
+let mem=null;
+function idb(){return new Promise((res,rej)=>{try{const q=indexedDB.open('zocus-dashboard',1);q.onupgradeneeded=()=>q.result.createObjectStore('kv');q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)}catch(e){rej(e)}})}
+async function kvGet(k){try{const db=await idb();return await new Promise((res,rej)=>{const q=db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>rej(q.error)})}catch(e){return mem}}
+async function kvSet(k,v){mem=v;try{const db=await idb();await new Promise((res,rej)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)})}catch(e){}}
+async function kvDel(k){mem=null;try{const db=await idb();await new Promise((res,rej)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').delete(k);t.oncomplete=res;t.onerror=()=>rej(t.error)})}catch(e){}}
+
+/* ---------- UI: Data menu, modal, drag-drop ---------- */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(t){const r=document.getElementById('toastRoot');if(!r)return;r.innerHTML='<div class="toast" role="status">'+esc(t)+'</div>';clearTimeout(toast.t);toast.t=setTimeout(()=>r.innerHTML='',3200)}
+function modal(title,body){const root=document.getElementById('modalRoot');
+  root.innerHTML='<div class="pal-scrim" data-zact="mclose"></div><div class="zmodal" role="dialog" aria-modal="true" aria-label="'+esc(title)+'"><h3>'+esc(title)+'</h3><div class="zbody">'+body+'</div><div class="zfoot"><button class="btn primary sm" data-zact="mclose">Close</button></div></div>';
+  const b=root.querySelector('button');if(b)b.focus()}
+function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function menuHtml(){const ds=window.ZD;
+  const info=ds.isSample?'Showing sample data (fictional store)':esc(ds.file)+' · '+ds.CONVS.length+' conversations';
+  return '<div class="dm-info"><b>Data</b><span>'+info+'</span></div>'+
+   '<button data-zact="upload"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>Upload CSV</button>'+
+   '<button data-zact="export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></svg>Export current data (CSV)</button>'+
+   '<button data-zact="template"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Download CSV template</button>'+
+   (ds.isSample?'':'<button data-zact="reset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg>Reset to sample data</button>')+
+   '<p class="dm-note">Uploaded files stay in this browser only.</p>'}
+function toggleMenu(force){const m=document.getElementById('dataMenu'),b=document.querySelector('[data-zact="menu"]');if(!m)return;
+  const open=force===undefined?m.hidden:force;if(open)m.innerHTML=menuHtml();m.hidden=!open;if(b)b.setAttribute('aria-expanded',String(open))}
+async function handleFile(file){
+  if(!file)return;toggleMenu(false);
+  if(file.size>25*1024*1024){modal('File too large','<p>The file is over 25 MB. Export a shorter period and try again.</p>');return}
+  const text=await file.text(),res=build(text,file.name);
+  if(!res.ok){modal('This file was not loaded','<p>Nothing was changed. Fix these and upload again:</p><ul class="zerr">'+res.errors.map(e=>'<li><b>Line '+e.row+'</b> '+esc(e.msg)+'</li>').join('')+'</ul>'+(res.errors.length>=25?'<p class="hint">Showing the first 25 problems.</p>':''));return}
+  await kvSet('csv',{name:file.name,text,savedAt:Date.now()});
+  try{sessionStorage.setItem('zocus-skip-splash','1');sessionStorage.setItem('zocus-loaded-msg',JSON.stringify({n:res.ds.CONVS.length,name:file.name,w:res.warnings}))}catch(e){}
+  location.reload()}
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('[data-zact]');
+  if(!t){const m=document.getElementById('dataMenu');if(m&&!m.hidden&&!e.target.closest('#dataMenu'))toggleMenu(false);return}
+  const a=t.dataset.zact;
+  if(a==='menu'){toggleMenu()}
+  else if(a==='mclose'){document.getElementById('modalRoot').innerHTML=''}
+  else if(a==='upload'){document.getElementById('zfile').click()}
+  else if(a==='export'){download((window.ZD.isSample?'zocus-sample':'zocus-data')+'.csv',window.ZD.rawText);toggleMenu(false)}
+  else if(a==='template'){toggleMenu(false);try{const r=await fetch(TEMPLATE_URL);download('zocus-template.csv',await r.text())}catch(err){toast('Could not load the template.')}}
+  else if(a==='reset'){await kvDel('csv');try{sessionStorage.setItem('zocus-skip-splash','1')}catch(e){}location.reload()}
+});
+document.addEventListener('change',e=>{if(e.target.id==='zfile'){handleFile(e.target.files[0]);e.target.value=''}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){toggleMenu(false);const m=document.getElementById('modalRoot');if(m&&m.innerHTML)m.innerHTML=''}});
+let dragN=0;
+addEventListener('dragenter',e=>{if(e.dataTransfer&&[...e.dataTransfer.types].includes('Files')){dragN++;document.getElementById('dropHint').hidden=false}});
+addEventListener('dragleave',()=>{dragN=Math.max(0,dragN-1);if(!dragN)document.getElementById('dropHint').hidden=true});
+addEventListener('dragover',e=>e.preventDefault());
+addEventListener('drop',e=>{e.preventDefault();dragN=0;document.getElementById('dropHint').hidden=true;if(e.dataTransfer.files&&e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])});
+
+/* ---------- Boot ---------- */
+function fatal(msg){document.body.insertAdjacentHTML('beforeend','<div class="zfatal"><div><h2>Could not load the data</h2><p>'+msg+'</p></div></div>')}
+async function load(){
+  let res=null;
+  const rec=await kvGet('csv');
+  if(rec&&rec.text){const b=build(rec.text,rec.name);if(b.ok){res=b;res.ds.isSample=false}}
+  if(!res){
+    let text;try{const r=await fetch(SAMPLE_URL);if(!r.ok)throw new Error(r.status);text=await r.text()}
+    catch(e){fatal('The sample data could not be read. Open this page through a web server (for example <code>npx serve</code>), not by double-clicking the file.');throw e}
+    res=build(text,'sample.csv');if(!res.ok)throw new Error('sample.csv invalid: '+res.errors[0].msg);res.ds.isSample=true}
+  window.ZD=res.ds;
+  try{const m=JSON.parse(sessionStorage.getItem('zocus-loaded-msg')||'null');if(m){sessionStorage.removeItem('zocus-loaded-msg');
+    setTimeout(()=>toast('Loaded '+m.n+' conversations from '+m.name+(m.w&&m.w.length?'. '+m.w[0]:'')),700)}}catch(e){}
+  return res.ds}
+window.ZocusData={load,build,parseCSV};
+})();
