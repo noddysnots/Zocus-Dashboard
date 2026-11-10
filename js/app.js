@@ -286,7 +286,7 @@ function repOverview(id,row,store,rows){
  const rep=row.rep,s=row.s,L=cur(),mine=row.L,p=stats(prev().filter(c=>c.rep===id));
  if(!s.n)return `<section class="card" style="text-align:center;padding:40px"><b>No recordings ${inTxt()}</b><p class="hint">Switch to 30 days, or check that ${esc(rep.first)} is recording.</p></section>`;
  const RW=weekly(CONVS.filter(c=>c.rep===id)),SW=weekly(CONVS),rs=wk(RW,x=>x.score),first=rs.find(v=>v!=null),last=[...rs].reverse().find(v=>v!=null),ch=first!=null?last-first:0;
- const tiles=ZC.tile({label:'Conversation score',value:s.score,spark:ZC.spark(rs),sub:`Store ${store.score} · ${delta(s.score,p.score)} vs ${cmpTxt()}`})+
+ const tiles=ZC.tile({label:'Conversation score',value:s.score,spark:ZC.spark(rs),sub:`Store ${store.score} · ${delta(s.score,p.score)}`})+
   ZC.tile({label:'Sale conversion',value:pct(s.conv),spark:ZC.spark(wk(RW,x=>x.conv*100)),sub:`Store ${pct(store.conv)} · ${delta(s.conv,p.conv,{pts:true})}`})+
   ZC.tile({label:'Conversations recorded',value:s.n,spark:ZC.spark(wk(RW,x=>x.n)),sub:`${(s.n/rangeDays()).toFixed(1)} a day · ${delta(s.n,p.n)}`})+
   ZC.tile({label:'Sales closed',value:inr(s.soldValue),spark:ZC.spark(wk(RW,x=>x.soldValue)),sub:`${plural(s.sold,'sale')} · ${delta(s.soldValue,p.soldValue)}`});
