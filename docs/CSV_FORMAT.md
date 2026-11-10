@@ -40,6 +40,10 @@ Coaching works without these, using built-in example answers. With them, every r
 
 `customer_name`, `customer_phone`, `duration_min`, `customer_type` (e.g. Wedding shopping), `in_stock` (`yes`/`no`), `competitor`, `competitor_offer`, `keywords` (`a|b|c`), `customer_quote`, `customer_quote_en`, `summary_wanted`, `summary_happened`, `summary_why`, `summary_next`, `followup_due` (`YYYY-MM-DD`, default visit + 2 days), `followup_done` (`yes`/`no`), `rep_tenure`, `store_name` and `owner_name` (same on every row; used in the greeting).
 
+`zocus_url`: a full `https://` link to the conversation in the Zocus app. When present, the conversation panel shows "Open recording in Zocus".
+
+**Audio is not part of the CSV.** Recordings stay in Zocus (private storage, played only to logged-in users, deleted after 6 months). The dashboard shows transcript moments and timestamps; `zocus_url` is the way to reach the recording.
+
 Accepted aliases: `interaction_id`, `employee`, `store`. If there is no `outcome` column but there is `sale_recorded` (the existing backend export), `yes` becomes `sold` and anything else `lost`.
 
 ## Where each value comes from in the Zocus backend

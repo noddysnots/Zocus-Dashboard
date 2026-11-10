@@ -5,7 +5,7 @@
    Assign / reviewed / drill progress is kept in this browser (localStorage) until the backend has coaching_assignments. */
 window.ZocusCoach=function(X){
 'use strict';
-const {S,REPS,REP,SKILLS,REASONS,COACH,CONVS,BEST,ZD,esc,ic,ring,inr,plural,fdate,sumv,cur,prev,stats,repRows,periodTxt,phead,render,toast,Q,scoreCol,groupBy}=X;
+const {inTxt,baseTxt,S,REPS,REP,SKILLS,REASONS,COACH,CONVS,BEST,ZD,esc,ic,ring,inr,plural,fdate,sumv,cur,prev,stats,repRows,periodTxt,phead,render,toast,Q,scoreCol,groupBy}=X;
 const LS='zocus-coach-v1';
 let st={assign:{},drills:{},base:{}};
 try{const r=JSON.parse(localStorage.getItem(LS)||'null');if(r&&typeof r==='object')st=Object.assign(st,r)}catch(e){}
@@ -79,7 +79,7 @@ let hubSkill=null;const tabs={};
 function skillBar(g){return `<div class="bar" style="margin:8px 0 6px"><i style="width:${g.mine}%;background:${scoreCol(g.mine)}"></i><span class="tick" style="left:${g.store}%"></span></div>
   <div class="hint num">${g.mine} · Store ${g.store} · Best rep ${g.best}</div>`}
 const see=(c,at)=>c?`<button class="tbtn" data-conv="${c.id}" ${at!=null?`data-at="${at}"`:''}>See moment${ic('right',10)}</button>`:'';
-function peerHtml(g){return g.peers.length?g.peers.map(pr=>`<div class="quote">${Q(pr.hi,pr.en)}<div class="by">${pr.fallback?'Suggested answer':'What works'} · ${esc(pr.rep.name)}${pr.skill!=null?` · scores ${pr.skill} here`:''}</div>
+function peerHtml(g){return g.peers.length?g.peers.map(pr=>`<div class="quote">${Q(pr.hi,pr.en)}<div class="by">${pr.fallback?'Suggested answer':'What works'} · <span class="rlink" role="link" tabindex="0" data-go="#rep-${pr.rep.id}">${esc(pr.rep.name)}</span>${pr.skill!=null?` · scores ${pr.skill} here`:''}</div>
     ${pr.c?`<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">${see(pr.c,pr.c.objAt)}<span class="hint">${esc(pr.c.customer)} · ${fdate(pr.c.at)} · ${pr.c.outcome==='sold'?'sold':'objection resolved'}</span></div>`:''}</div>`).join(''):
     `<p class="hint" style="margin:0">No resolved example from a high scorer yet. ${esc(COACH[g.skillId]||'')}</p>`}
 function groupBlock(rep,f,g){return `<div class="cols2"><div><span class="mono">Where ${esc(rep.first)} lost it</span><div class="quote bad" style="margin-top:6px">${Q(g.hi,g.en)}<div class="by">${esc(g.worst.customer)} · ${fdate(g.worst.at)} · ${esc(rep.first)} scored ${g.worst.skills[f.id]}</div>
@@ -101,7 +101,7 @@ function renderHub(){
   const money=ZC.barList(bySkill.filter(x=>x.v).map(x=>({label:x.k.label,value:x.v,text:inr(x.v),on:hubSkill===x.k.id,attr:`data-act="coach-skill" data-key="${x.k.id}" aria-pressed="${hubSkill===x.k.id}"`,tip:`${x.k.label}|${plural(x.n,'customer')} left at this step|${inr(x.v)} not closed`})),{empty:'No lost sales tied to a skill in this period.'});
   const ready=ZC.barList([...all].sort((a,b)=>b.readiness-a.readiness).map(p=>({label:p.rep.first,value:p.readiness,text:String(p.readiness),attr:`data-go="#coach-${p.rep.id}"`,tip:`${p.rep.name}|Readiness ${p.readiness}|Score ${p.s.score} · ${p.done} of ${p.drills.length} drills`})),{max:100,ref:avgR});
   const grid=ZC.heatGrid({cols:SKILLS.map(k=>SHORT[k.id]),rows:[...all].sort((a,b)=>b.s.score-a.s.score).map(p=>({label:p.rep.first,attr:`data-go="#coach-${p.rep.id}"`,cells:SKILLS.map(k=>{const g=p.s.skill[k.id]-store.skill[k.id];return {text:(g>0?'+':'')+g,cls:g>=5?'g':g<=-5?'b':'n',tip:`${p.rep.name}|${k.label}: ${p.s.skill[k.id]}|Store ${store.skill[k.id]}`}})}))});
-  return phead('Coaching',`A plan for every rep, built from the skills they score low on and how your best reps answer the same customers. Based on the ${periodTxt()}.`)+
+  return phead('Coaching',`A plan for every rep, built from the skills they score low on and how your best reps answer the same customers. Based on ${baseTxt()}.`)+
   `<div class="lead"><span class="orb" aria-hidden="true"></span><p style="margin:0">${lead}</p></div>
   ${ZD.hasObjection?'':`<p class="hint" style="margin:-8px 0 0">This file has no objection columns, so suggested answers are Zocus's built-in examples, not your best reps' words. Add <b>objection</b>, <b>objection_resolved</b> and <b>objection_reply</b> to personalise them.</p>`}
   <div class="ktiles">${tiles}</div>
@@ -115,18 +115,19 @@ function renderHub(){
     return `<details class="xrow"><summary class="crow2">${ring(p.readiness,36)}<span class="nm"><b>${esc(p.rep.name)}</b></span><span class="fc">${f?esc(f.label):'Above store on every skill'}</span><span class="num gp">${f?`<span class="pill bad">${f.gap} vs store</span>`:''}</span><span class="num mv">${f&&f.lostV?inr(f.lostV):''}</span><span><span class="pill ${stt[0]}">${stt[1]}</span></span>${ic('chev',16)}</summary>
     <div class="xr-b">${f?`<div class="cols2"><div><span class="mono">${g?'Loses it when customers say':'Focus'}</span>${g?`<div class="quote bad" style="margin-top:6px">${Q(g.hi,g.en)}<div class="by">${esc(g.label)} · ${plural(g.n,'time')}${g.lostV?' · '+inr(g.lostV)+' lost':''}</div></div>`:`<p style="margin:6px 0 0">${esc(COACH[f.id])}</p>`}</div>
       <div><span class="mono">${pr?(pr.fallback?'Suggested answer':'What '+esc(pr.rep.first)+' says'):'Tip'}</span>${pr?`<div class="quote" style="margin-top:6px">${Q(pr.hi,pr.en)}<div class="by">${esc(pr.rep.name)}${pr.skill!=null?' · scores '+pr.skill+' here':''}</div></div>`:`<p style="margin:6px 0 0">${esc(COACH[f.id])}</p>`}</div></div>`:`<p class="hint" style="margin:0">Their answers are what the rest of the team learns from.</p>`}
-    <div class="xr-f"><span class="hint">${f&&p.focus[1]?`Then: ${esc(p.focus[1].label)} (${p.focus[1].mine} vs ${p.focus[1].store}). `:''}${p.drills.length?`${p.done} of ${plural(p.drills.length,'drill')} done.`:''}</span><div class="btnrow"><button class="btn primary sm" data-go="#coach-${p.rep.id}">Open full plan${ic('right',14)}</button>${f&&st.assign[p.rep.id]!=='assigned'?`<button class="btn sm" data-act="coach-assign" data-id="${p.rep.id}">Assign plan</button>`:''}</div></div></div></details>`}).join(''):'<p class="hint">No rep has this as a focus area.</p>'}
+    <div class="xr-f"><span class="hint">${f&&p.focus[1]?`Then: ${esc(p.focus[1].label)} (${p.focus[1].mine} vs ${p.focus[1].store}). `:''}${p.drills.length?`${p.done} of ${plural(p.drills.length,'drill')} done.`:''}</span><div class="btnrow"><button class="btn primary sm" data-go="#rep-${p.rep.id}/coaching">Open full plan${ic('right',14)}</button><button class="btn sm" data-go="#rep-${p.rep.id}">Profile</button>${f&&st.assign[p.rep.id]!=='assigned'?`<button class="btn sm" data-act="coach-assign" data-id="${p.rep.id}">Assign plan</button>`:''}</div></div></div></details>`}).join(''):'<p class="hint">No rep has this as a focus area.</p>'}
   </section>
   <p class="hint">Readiness is the conversation score (70%), the change since the previous period (15%) and practice drills done (15%).</p>`}
 
+function noteFor(p){const rep=p.rep;return `Coaching plan for ${rep.name} (${periodTxt()})\nReadiness ${p.readiness}\n`+(p.focus.length?p.focus.map((f,i)=>`${i+1}. ${f.label}: ${f.mine} vs store ${f.store}. ${COACH[f.id]}${f.groups[0]&&f.groups[0].peers[0]?`\n   Try: "${f.groups[0].peers[0].en}" (${f.groups[0].peers[0].rep.first})`:''}`).join('\n'):'On track. No focus area.');}
 function renderPlan(id){
-  const p=plan(id);if(!p)return phead('Coaching','No recordings for this rep in the '+periodTxt()+'.');
+  const p=plan(id);if(!p)return phead('Coaching','No recordings for this rep '+inTxt()+'.');
   ensureBase(p);
   const rep=p.rep,stt=statusOf(p),f0=p.focus[0],cleared=clearedSkills(id);
   const top=f0&&f0.groups[0]&&f0.groups[0].peers[0];
   const lead=f0?`${esc(rep.first)} loses most sales at <b>${esc(lc(f0.label))}</b>: ${f0.mine} against the store's ${f0.store}.${f0.lostN?` ${plural(f0.lostN,'customer')} (${inr(f0.lostV)}) left at this step.`:''}${top?` ${esc(top.rep.first)} has an answer that worked on the same objection.`:''}`:
     `${esc(rep.first)} is at or above the store average on every skill. Their answers are what the rest of the team learns from.`;
-  const note=`Coaching plan for ${rep.name} (${periodTxt()})\nReadiness ${p.readiness}\n`+(p.focus.length?p.focus.map((f,i)=>`${i+1}. ${f.label}: ${f.mine} vs store ${f.store}. ${COACH[f.id]}${f.groups[0]&&f.groups[0].peers[0]?`\n   Try: "${f.groups[0].peers[0].en}" (${f.groups[0].peers[0].rep.first})`:''}`).join('\n'):'On track. No focus area.');
+  const note=noteFor(p);
   const best=p.gaps[p.gaps.length-1],improved=st.base[id]?p.s.skill[st.base[id].skill]-st.base[id].val:0;
   const sk=(f0||best).id,w=weekly(id,sk),labels=w.rep.map((_,i)=>i===7?'This week':(7-i)+' wk ago');
   const focusCards=p.focus.map((f,i)=>{const key=id+'|'+f.id,ti=Math.min(tabs[key]||0,Math.max(0,f.groups.length-1)),g=f.groups[ti];
@@ -147,12 +148,8 @@ function renderPlan(id){
   const review=ZC.xcard('cr-'+id,'This week\'s review',`Did well: ${esc(SHORT[best.id])} · Work on: ${f0?esc(SHORT[f0.id]):'sharing'}`,
     `<div class="review"><div><span class="mono" style="color:var(--good)">Did well</span><p>${esc(best.label)}: <b class="num">${best.mine}</b> against the store's <b class="num">${best.store}</b>${best.gap>=0?'':', the closest to the store average'}.${improved>0?` Up ${improved} pts on ${esc(SKILLS.find(k=>k.id===st.base[id].skill).label.toLowerCase())} since the plan started.`:''}</p></div>
       <div><span class="mono" style="color:var(--warn)">Work on</span><p>${f0?`${esc(f0.label)}. ${esc(COACH[f0.id])}`:'Keep sharing your approach with newer reps.'}</p></div></div>`,{open:false});
-  return `<button class="link back" data-go="#coaching">${ic('left',15)}Coaching</button>
-  <div class="rephead"><span class="av">${esc(rep.ini)}</span><div class="grow"><h1>${esc(rep.name)}</h1><p><span class="pill ${stt[0]}">${stt[1]}</span> · Readiness <b class="num">${p.readiness}</b> · ${plural(p.s.n,'conversation')} in the ${periodTxt()}</p></div>
-    <div class="btnrow"><button class="btn sm" data-act="coach-assign" data-id="${id}">${ic('check',14)}${st.assign[id]==='assigned'?'Assigned':'Assign plan'}</button><button class="btn sm" data-act="coach-review" data-id="${id}">${st.assign[id]==='reviewed'?'Reviewed':'Mark reviewed'}</button><button class="btn primary sm" data-act="copy" data-text="${esc(note)}">${ic('copy',14)}Copy 1:1 note</button></div></div>
-  <div class="lead"><span class="orb" aria-hidden="true"></span><p style="margin:0">${lead}</p></div>
-  ${ZD.hasObjection?'':`<p class="hint" style="margin:-6px 0 0">No objection columns in this file, so suggested answers are Zocus's built-in examples.</p>`}
-  ${ZC.xtools()}
+  return `<div class="ctool"><span class="pill ${stt[0]}">${stt[1]}</span><button class="btn sm" data-act="coach-assign" data-id="${id}">${ic('check',14)}${st.assign[id]==='assigned'?'Assigned':'Assign plan'}</button><button class="btn sm" data-act="coach-review" data-id="${id}">${st.assign[id]==='reviewed'?'Reviewed':'Mark reviewed'}</button><span style="flex:1"></span>${ZC.xtools()}</div>
+  ${ZD.hasObjection?'':`<p class="hint" style="margin:0">No objection columns in this file, so suggested answers are Zocus's built-in examples.</p>`}
   ${focusCards}
   ${!p.focus.length?mentorHtml(id):''}
   ${drills}
@@ -174,5 +171,5 @@ function act(a,t){
   else if(a==='coach-drill'&&key){st.drills[key]=!st.drills[key];if(!st.drills[key])delete st.drills[key];save();render()}}
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.coachTa;if(k)typed[k]=e.target.value});
 
-return {renderHub,renderPlan,act,plan};
+return {renderHub,renderPlan,act,plan,noteFor:id=>{const p=plan(id);return p?noteFor(p):''},status:id=>{const p=plan(id);return p?statusOf(p):['neutral','']}};
 };

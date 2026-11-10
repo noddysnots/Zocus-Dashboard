@@ -155,6 +155,7 @@ function menuHtml(){const ds=window.ZD;
    '<button data-zact="export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></svg>Export current data (CSV)</button>'+
    '<button data-zact="template"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Download CSV template</button>'+
    (ds.isSample?'':'<button data-zact="reset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg>Reset to sample data</button>')+
+   '<button data-zact="tour"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 3.9"/></svg>Show me around</button>'+
    '<p class="dm-note">Uploaded files stay in this browser only.</p>'}
 function toggleMenu(force){const m=document.getElementById('dataMenu'),b=document.querySelector('[data-zact="menu"]');if(!m)return;
   const open=force===undefined?m.hidden:force;if(open)m.innerHTML=menuHtml();m.hidden=!open;if(b)b.setAttribute('aria-expanded',String(open))}
@@ -171,6 +172,7 @@ document.addEventListener('click',async e=>{
   if(!t){const m=document.getElementById('dataMenu');if(m&&!m.hidden&&!e.target.closest('#dataMenu'))toggleMenu(false);return}
   const a=t.dataset.zact;
   if(a==='menu'){toggleMenu()}
+  else if(a==='tour'){toggleMenu(false);const h=document.querySelector('[data-act="tour"]');if(h)h.click()}
   else if(a==='mclose'){document.getElementById('modalRoot').innerHTML=''}
   else if(a==='upload'){document.getElementById('zfile').click()}
   else if(a==='export'){download((window.ZD.isSample?'zocus-sample':'zocus-data')+'.csv',window.ZD.rawText);toggleMenu(false)}
