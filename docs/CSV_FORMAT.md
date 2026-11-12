@@ -38,11 +38,29 @@ Coaching works without these, using built-in example answers. With them, every r
 
 ## Optional columns
 
-`customer_name`, `customer_phone`, `duration_min`, `customer_type` (e.g. Wedding shopping), `in_stock` (`yes`/`no`), `competitor`, `competitor_offer`, `keywords` (`a|b|c`), `customer_quote`, `customer_quote_en`, `summary_wanted`, `summary_happened`, `summary_why`, `summary_next`, `followup_due` (`YYYY-MM-DD`, default visit + 2 days), `followup_done` (`yes`/`no`), `rep_tenure`, `store_name` and `owner_name` (same on every row; used in the greeting).
+`customer_name`, `customer_phone`, `duration_min`, `customer_type` (e.g. Wedding shopping), `in_stock` (`yes`/`no`), `competitor`, `competitor_offer`, `keywords` (`a|b|c`), `customer_quote`, `customer_quote_en`, `summary_wanted`, `summary_happened`, `summary_why`, `summary_next`, `followup_due` (`YYYY-MM-DD`, default visit + 2 days), `followup_done` (`yes`/`no`), `rep_tenure`, `store_name` and `owner_name` (same on every row; they set the store name, greeting and browser tab title, so uploading another store's CSV re-brands the whole dashboard).
 
-`zocus_url`: a full `https://` link to the conversation in the Zocus app. When present, the conversation panel shows "Open recording in Zocus".
+## AI commentary columns (what the AI said about each conversation)
 
-**Audio is not part of the CSV.** Recordings stay in Zocus (private storage, played only to logged-in users, deleted after 6 months). The dashboard shows transcript moments and timestamps; `zocus_url` is the way to reach the recording.
+Optional. When present, the conversation panel shows a "What the AI said" card and the rep coaching tab lists the AI's most frequent tips.
+
+| Column | Format | Backend source |
+|---|---|---|
+| `ai_coaching` | `title: suggestion`, several joined by ` \| ` | analysis `coaching[]` |
+| `ai_coaching_quote` | text | `coaching[0].evidence[0].quote` |
+| `ai_commitments` | what the rep promised, joined by ` \| ` | analysis `commitments[].text` |
+| `ai_next_action` | text | `revenueRecovery.recommendedAction` |
+| `ai_notes` | AI notes on missed skills, joined by ` \| ` | analysis `sop[].note` |
+
+| `ai_checks` | rubric results, ` \| ` between items, each `MET: <label> (D3). <reason>` or `NOT_MET: ...` | `execution_scoring.observations` (MET / NOT_MET only) |
+| `transcript` | the conversation, one turn per line as `[mm:ss] Speaker: text` (plain text also accepted) | `transcript_versions.text` |
+| `vertical` | `jewellery`, `car`, `two-wheeler`, ... (same on every row) | `data/cases.json` |
+| `talk_rep_pct` | 0-100, share of words spoken by staff | `speaker_role_assessments.result.speakers[].words` |
+| `segments_n` | number of transcript turns | derived |
+
+`ai_checks` fills the "Skill checks" card and the coaching tab's "Skill checks missed most"; `transcript` fills the collapsed "Transcript" card.
+
+**Recordings are coming soon.** The dashboard does not play or link audio for now. `zocus_url` and `objection_at_sec` are accepted but ignored; they are reserved for when recordings ship (audio stays in private storage, played only to logged-in users, deleted after 6 months).
 
 Accepted aliases: `interaction_id`, `employee`, `store`. If there is no `outcome` column but there is `sale_recorded` (the existing backend export), `yes` becomes `sold` and anything else `lost`.
 

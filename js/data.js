@@ -127,12 +127,24 @@ function build(text,name){
       sum:{wanted:get(r,'summary_wanted'),happened:get(r,'summary_happened'),why:get(r,'summary_why'),next:get(r,'summary_next')},
       objection:obj,objResolved:yes(resv)?true:no(resv)?false:null,objQuote:get(r,'objection_quote'),objQuoteEn:get(r,'objection_quote_en'),
       reply:get(r,'objection_reply'),replyEn:get(r,'objection_reply_en'),objAt:get(r,'objection_at_sec')===''?null:num(get(r,'objection_at_sec')),
-      due:due||new Date(x.at.getTime()+2*DAY),fuDone:yes(get(r,'followup_done')),url:/^https?:\/\//i.test(get(r,'zocus_url'))?get(r,'zocus_url'):''}});
+      due:due||new Date(x.at.getTime()+2*DAY),fuDone:yes(get(r,'followup_done')),url:/^https?:\/\//i.test(get(r,'zocus_url'))?get(r,'zocus_url'):'',
+      aiCoach:get(r,'ai_coaching').split('|').map(t=>t.trim()).filter(Boolean),aiQuote:get(r,'ai_coaching_quote'),
+      aiPromises:get(r,'ai_commitments').split('|').map(t=>t.trim()).filter(Boolean),aiNext:get(r,'ai_next_action'),
+      aiNotes:get(r,'ai_notes').split('|').map(t=>t.trim()).filter(Boolean),
+      aiChecks:get(r,'ai_checks').split(' | ').map(t=>{const m=t.trim().match(/^(MET|NOT_MET):\s*(.*?)\s*\((\w+)\)\.?\s*(.*)$/);return m?{ok:m[1]==='MET',label:m[2],id:m[3],why:m[4]}:null}).filter(Boolean),
+      transcript:get(r,'transcript'),talkRep:get(r,'talk_rep_pct')===''?null:num(get(r,'talk_rep_pct')),
+      turns:(()=>{const t=get(r,'transcript');if(!/^\[\d+:\d\d\] /.test(t))return null;return t.split('\n').map(l=>{const m=l.match(/^\[(\d+):(\d\d)\] ([^:]{0,40}): ([\s\S]*)$/);return m?{t:+m[1]*60+ +m[2],who:m[3],text:m[4]}:null}).filter(Boolean)})()}});
   if(noReason)warnings.push(noReason+' not-sold conversation'+(noReason>1?'s have':' has')+' no reason. They are grouped as "No clear reason".');
   REPS.sort((a,b)=>CONVS.filter(c=>c.rep===b.id).length-CONVS.filter(c=>c.rep===a.id).length||a.name.localeCompare(b.name));
   const first=raw[0].r;
+  /* which optional columns actually carry data; sections that need one say so instead of drawing an empty chart */
+  const rr=raw.map(x=>x.r),share=f=>rr.length?rr.filter(f).length/rr.length:0,filled=c=>share(r=>get(r,c)!=='')>=.2;
+  const ns=rr.filter(r=>!/^(sold|yes|won)$/i.test(get(r,'outcome'))),nsFilled=c=>ns.length?ns.filter(r=>get(r,c)!=='').length/ns.length>=.3:false;
+  const has={stock:filled('in_stock'),competitor:filled('competitor'),offer:filled('competitor_offer'),reason:nsFilled('reason'),stage:nsFilled('stage_reached'),
+    followups:filled('followup_due'),replies:filled('objection_reply'),types:filled('customer_type'),
+    ai:CONVS.some(c=>c.aiCoach.length||c.aiPromises.length||c.aiNext||c.aiNotes.length),checks:CONVS.some(c=>c.aiChecks.length),transcript:CONVS.some(c=>c.transcript)};
   return {ok:true,name,warnings,
-    ds:{today,store:get(first,'store_name')||'Your store',owner:get(first,'owner_name')||'',REPS,PRODUCTS,PERSONAS,COMPS,CONVS,customReasons,hasObjection,rawText:text,file:name}}}
+    ds:{has,vertical:(get(first,'vertical')||'').toLowerCase(),today,store:get(first,'store_name')||'Your store',owner:get(first,'owner_name')||'',REPS,PRODUCTS,PERSONAS,COMPS,CONVS,customReasons,hasObjection,rawText:text,file:name}}}
 
 /* ---------- Storage (IndexedDB, falls back to memory) ---------- */
 let mem=null;
@@ -150,7 +162,8 @@ function modal(title,body){const root=document.getElementById('modalRoot');
 function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function menuHtml(){const ds=window.ZD;
   const info=ds.isSample?'Showing sample data (fictional store)':esc(ds.file)+' · '+ds.CONVS.length+' conversations';
-  return '<div class="dm-info"><b>Data</b><span>'+info+'</span></div>'+
+  const storeList=ds.stores&&ds.stores.length?'<div class="dm-sec">Store</div>'+storeOptions().map(o=>'<button data-zact="store" data-id="'+esc(o.id)+'"'+(o.id===ds.storeId?' aria-current="true"':'')+'><span class="dm-dot"></span>'+esc(o.label)+'</button>').join('')+'<div class="dm-sec">Data</div>':'';
+  return '<div class="dm-info"><b>'+(ds.isSample?'Data':esc(ds.store))+'</b><span>'+info+'</span></div>'+storeList+
    '<button data-zact="upload"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>Upload CSV</button>'+
    '<button data-zact="export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></svg>Export current data (CSV)</button>'+
    '<button data-zact="template"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Download CSV template</button>'+
@@ -164,7 +177,7 @@ async function handleFile(file){
   if(file.size>25*1024*1024){modal('File too large','<p>The file is over 25 MB. Export a shorter period and try again.</p>');return}
   const text=await file.text(),res=build(text,file.name);
   if(!res.ok){modal('This file was not loaded','<p>Nothing was changed. Fix these and upload again:</p><ul class="zerr">'+res.errors.map(e=>'<li><b>Line '+e.row+'</b> '+esc(e.msg)+'</li>').join('')+'</ul>'+(res.errors.length>=25?'<p class="hint">Showing the first 25 problems.</p>':''));return}
-  await kvSet('csv',{name:file.name,text,savedAt:Date.now()});
+  await kvSet('csv',{name:file.name,text,savedAt:Date.now()});setChoice('upload');
   try{sessionStorage.setItem('zocus-skip-splash','1');sessionStorage.setItem('zocus-loaded-msg',JSON.stringify({n:res.ds.CONVS.length,name:file.name,w:res.warnings}))}catch(e){}
   location.reload()}
 document.addEventListener('click',async e=>{
@@ -172,12 +185,13 @@ document.addEventListener('click',async e=>{
   if(!t){const m=document.getElementById('dataMenu');if(m&&!m.hidden&&!e.target.closest('#dataMenu'))toggleMenu(false);return}
   const a=t.dataset.zact;
   if(a==='menu'){toggleMenu()}
+  else if(a==='store'){setStore(t.dataset.id)}
   else if(a==='tour'){toggleMenu(false);const h=document.querySelector('[data-act="tour"]');if(h)h.click()}
   else if(a==='mclose'){document.getElementById('modalRoot').innerHTML=''}
   else if(a==='upload'){document.getElementById('zfile').click()}
   else if(a==='export'){download((window.ZD.isSample?'zocus-sample':'zocus-data')+'.csv',window.ZD.rawText);toggleMenu(false)}
   else if(a==='template'){toggleMenu(false);try{const r=await fetch(TEMPLATE_URL);download('zocus-template.csv',await r.text())}catch(err){toast('Could not load the template.')}}
-  else if(a==='reset'){await kvDel('csv');try{sessionStorage.setItem('zocus-skip-splash','1')}catch(e){}location.reload()}
+  else if(a==='reset'){await kvDel('csv');setChoice('sample');try{sessionStorage.setItem('zocus-skip-splash','1')}catch(e){}location.reload()}
 });
 document.addEventListener('change',e=>{if(e.target.id==='zfile'){handleFile(e.target.files[0]);e.target.value=''}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){toggleMenu(false);const m=document.getElementById('modalRoot');if(m&&m.innerHTML)m.innerHTML=''}});
@@ -189,17 +203,34 @@ addEventListener('drop',e=>{e.preventDefault();dragN=0;document.getElementById('
 
 /* ---------- Boot ---------- */
 function fatal(msg){document.body.insertAdjacentHTML('beforeend','<div class="zfatal"><div><h2>Could not load the data</h2><p>'+msg+'</p></div></div>')}
+const CASES_URL='data/cases.json',CHOICE_KEY='zocus-store';
+const choice=()=>{try{return localStorage.getItem(CHOICE_KEY)||''}catch(e){return ''}};
+function setChoice(v){try{localStorage.setItem(CHOICE_KEY,v)}catch(e){}}
+/* Stores = groups of real test conversations described in data/cases.json. A store is listed only if its CSV (data/cases/<id>.csv) is present. */
+async function loadStores(){
+  try{const r=await fetch(CASES_URL,{cache:'no-store'});if(!r.ok)return [];const j=await r.json(),out=[];
+    await Promise.all((j.stores||[]).map(async st=>{try{const c=await fetch('data/cases/'+st.id+'.csv',{cache:'no-store'});if(!c.ok)return;const text=await c.text();if(/^\s*<(!doctype|html)/i.test(text))return;let meta=null;try{const m=await fetch('data/cases/'+st.id+'.meta.json',{cache:'no-store'});if(m.ok)meta=await m.json()}catch(e){}out.push({id:st.id,name:st.name,vertical:st.vertical||'',featured:(st.featured||[]).map(n=>'ZC-'+n),text,meta,isDefault:!!st.default})}catch(e){}}));
+    const order=(j.stores||[]).map(x=>x.id);return out.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id))}catch(e){return []}}
+function setStore(id){setChoice(id);try{sessionStorage.setItem('zocus-skip-splash','1')}catch(e){}location.reload()}
 async function load(){
   let res=null;
-  const rec=await kvGet('csv');
-  if(rec&&rec.text){const b=build(rec.text,rec.name);if(b.ok){res=b;res.ds.isSample=false}}
+  const rec=await kvGet('csv'),stores=await loadStores(),pick=choice();
+  const st=stores.find(x=>x.id===pick)||(!pick?stores.find(x=>x.isDefault):null);
+  if(st){const b=build(st.text,st.id+'.csv');if(b.ok){res=b;res.ds.isSample=false;res.ds.storeId=st.id;res.ds.featured=st.featured;res.ds.meta=st.meta;if(!res.ds.vertical)res.ds.vertical=st.vertical}}
+  if(!res&&rec&&rec.text&&pick!=='sample'){const b=build(rec.text,rec.name);if(b.ok){res=b;res.ds.isSample=false;res.ds.storeId='upload'}}
   if(!res){
     let text;try{const r=await fetch(SAMPLE_URL);if(!r.ok)throw new Error(r.status);text=await r.text()}
     catch(e){fatal('The sample data could not be read. Open this page through a web server (for example <code>npx serve</code>), not by double-clicking the file.');throw e}
-    res=build(text,'sample.csv');if(!res.ok)throw new Error('sample.csv invalid: '+res.errors[0].msg);res.ds.isSample=true}
-  window.ZD=res.ds;
+    res=build(text,'sample.csv');if(!res.ok)throw new Error('sample.csv invalid: '+res.errors[0].msg);res.ds.isSample=true;res.ds.storeId='sample'}
+  res.ds.stores=stores.map(x=>({id:x.id,name:x.name,vertical:x.vertical}));res.ds.hasUpload=!!(rec&&rec.text);res.ds.uploadName=rec&&rec.name||'';
+  const days=new Set(res.ds.CONVS.map(c=>c.d));res.ds.spanDays=days.size?Math.max(...days)+1:0;res.ds.liveDay=!res.ds.isSample&&res.ds.spanDays<=2;
+  window.ZD=res.ds;fillStoreSelect();
   try{const m=JSON.parse(sessionStorage.getItem('zocus-loaded-msg')||'null');if(m){sessionStorage.removeItem('zocus-loaded-msg');
     setTimeout(()=>toast('Loaded '+m.n+' conversations from '+m.name+(m.w&&m.w.length?'. '+m.w[0]:'')),700)}}catch(e){}
   return res.ds}
-window.ZocusData={load,build,parseCSV};
+function storeOptions(){const d=window.ZD,o=d.stores.map(s=>({id:s.id,label:s.name}));if(d.hasUpload)o.push({id:'upload',label:'Uploaded: '+d.uploadName});o.push({id:'sample',label:'Sample store (fictional)'});return o}
+function fillStoreSelect(){const sel=document.getElementById('storeSel'),d=window.ZD;if(!sel||!d||!d.stores.length)return;
+  sel.innerHTML=storeOptions().map(o=>'<option value="'+esc(o.id)+'"'+(o.id===d.storeId?' selected':'')+'>'+esc(o.label)+'</option>').join('');sel.hidden=false}
+document.addEventListener('change',e=>{if(e.target.id==='storeSel')setStore(e.target.value)});
+window.ZocusData={load,build,parseCSV,setStore};
 })();

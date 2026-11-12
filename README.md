@@ -15,6 +15,8 @@ Open http://localhost:4173. Do not double-click `index.html`; the CSV is loaded 
 - Default: `data/sample.csv` (fictional store, 62 days, 646 conversations).
 - **Data** button (top right): upload a CSV, export the loaded data, download the template, reset to the sample. Uploaded files are stored in that browser only (IndexedDB).
 - Format and backend mapping: [docs/CSV_FORMAT.md](docs/CSV_FORMAT.md).
+- Export from the Zocus database (read-only, credentials in `.env`, never committed): `npm i pg`, then `node tools/export-from-db.mjs --list` and `node tools/export-from-db.mjs --org 2`. Writes `data/db-export-org<id>.csv` (git-ignored) and prints how complete each column is.
+- **Store switcher (real test conversations).** `data/cases.json` maps database conversation ids to the store or dealership they were about (the database stores no store name per conversation). `node tools/export-from-db.mjs --cases data/cases.json` writes `data/cases/<store>.csv` (git-ignored, contains real call text and customer details; add `--public` to drop them). The header dropdown (and the Data menu on phones) lists every store whose CSV is present, plus the sample store.
 - Regenerate the sample and template: `node tools/make-sample.mjs`.
 
 ## Layout

@@ -1,0 +1,81 @@
+{
+  "note": "Maps real test conversations (database session ids) to the store or dealership they were about. The database stores no store name per conversation, so this file is the source. Edit names and membership freely, then run: node tools/export-from-db.mjs --cases data/cases.json",
+  "org": 1,
+  "stores": [
+    {
+      "id": "pilot",
+      "name": "Pilot rehearsal (29 Oct tests)",
+      "org": 1,
+      "date": "2026-10-29",
+      "vertical": "car",
+      "default": true,
+      "note": "REHEARSAL. On Saturday set org to the dealership's company name, date to 2026-11-14, name to the dealership name, and remove this note."
+    },
+    {
+      "id": "tanishq",
+      "name": "Tanishq (test)",
+      "vertical": "jewellery",
+      "owner": "",
+      "featured": [
+        214,
+        237
+      ],
+      "sessions": [
+        208,
+        209,
+        210,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        225,
+        226,
+        227,
+        234,
+        235,
+        237,
+        240,
+        243,
+        245,
+        246,
+        249,
+        257
+      ]
+    },
+    {
+      "id": "two-wheeler",
+      "name": "TVS two-wheeler dealership (test)",
+      "vertical": "two-wheeler",
+      "owner": "",
+      "featured": [
+        248
+      ],
+      "sessions": [
+        238,
+        239,
+        241,
+        248,
+        255
+      ]
+    },
+    {
+      "id": "mahindra",
+      "name": "Mahindra car dealership (test)",
+      "vertical": "car",
+      "owner": "",
+      "featured": [
+        256
+      ],
+      "sessions": [
+        236,
+        250,
+        256
+      ]
+    }
+  ]
+}

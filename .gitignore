@@ -1,2 +1,12 @@
+.env
+.env.*
+!.env.example
+node_modules/
 .DS_Store
-.claude/
+data/db-export*.csv
+tools/node_modules/
+data/cases/*.csv
+data/cases/*.report.md
+data/cases/*.meta.json
+!data/cases/pilot.csv
+!data/cases/pilot.meta.json

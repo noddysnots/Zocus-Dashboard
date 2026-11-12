@@ -78,7 +78,7 @@ const SHORT={need:'Need',budget:'Budget',pitch:'Product',objection:'Price doubts
 let hubSkill=null;const tabs={};
 function skillBar(g){return `<div class="bar" style="margin:8px 0 6px"><i style="width:${g.mine}%;background:${scoreCol(g.mine)}"></i><span class="tick" style="left:${g.store}%"></span></div>
   <div class="hint num">${g.mine} · Store ${g.store} · Best rep ${g.best}</div>`}
-const see=(c,at)=>c?`<button class="tbtn" data-conv="${c.id}" ${at!=null?`data-at="${at}"`:''}>See moment${ic('right',10)}</button>`:'';
+const see=(c)=>c?`<button class="tbtn" data-conv="${c.id}">Open conversation${ic('right',10)}</button>`:'';
 function peerHtml(g){return g.peers.length?g.peers.map(pr=>`<div class="quote">${Q(pr.hi,pr.en)}<div class="by">${pr.fallback?'Suggested answer':'What works'} · <span class="rlink" role="link" tabindex="0" data-go="#rep-${pr.rep.id}">${esc(pr.rep.name)}</span>${pr.skill!=null?` · scores ${pr.skill} here`:''}</div>
     ${pr.c?`<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">${see(pr.c,pr.c.objAt)}<span class="hint">${esc(pr.c.customer)} · ${fdate(pr.c.at)} · ${pr.c.outcome==='sold'?'sold':'objection resolved'}</span></div>`:''}</div>`).join(''):
     `<p class="hint" style="margin:0">No resolved example from a high scorer yet. ${esc(COACH[g.skillId]||'')}</p>`}
@@ -121,7 +121,7 @@ function renderHub(){
 
 function noteFor(p){const rep=p.rep;return `Coaching plan for ${rep.name} (${periodTxt()})\nReadiness ${p.readiness}\n`+(p.focus.length?p.focus.map((f,i)=>`${i+1}. ${f.label}: ${f.mine} vs store ${f.store}. ${COACH[f.id]}${f.groups[0]&&f.groups[0].peers[0]?`\n   Try: "${f.groups[0].peers[0].en}" (${f.groups[0].peers[0].rep.first})`:''}`).join('\n'):'On track. No focus area.');}
 function renderPlan(id){
-  const p=plan(id);if(!p)return phead('Coaching','No recordings for this rep '+inTxt()+'.');
+  const p=plan(id);if(!p)return phead('Coaching','No conversations for this rep '+inTxt()+'.');
   ensureBase(p);
   const rep=p.rep,stt=statusOf(p),f0=p.focus[0],cleared=clearedSkills(id);
   const top=f0&&f0.groups[0]&&f0.groups[0].peers[0];
@@ -136,7 +136,15 @@ function renderPlan(id){
        `<p class="hint" style="margin:12px 0 0">No recorded objections tied to this skill in the period.</p>`)+
      `<div class="try"><span class="mono">Try this</span><p>${esc(COACH[f.id])}${f.groups[0]&&f.groups[0].peers[0]?` Start with: <b>"${esc(f.groups[0].peers[0].en)}"</b>`:''}</p></div>`,
      {open:i===0,right:`<span class="pill bad num">${f.gap} vs store</span>`})}).join('');
-  const drills=p.drills.length?ZC.xcard('cd-'+id,'Practice drills',`${p.done} of ${p.drills.length} done · real customer lines from ${esc(rep.first)}'s recordings`,
+  const flagged=(()=>{if(!ZD.has||!ZD.has.ai)return '';const all=cur().filter(c=>c.rep===id),L=all.filter(c=>c.aiCoach&&c.aiCoach.length);if(!L.length)return '';
+    const m={};L.forEach(c=>c.aiCoach.forEach(t=>{const i=t.indexOf(': '),title=i>0?t.slice(0,i):t;(m[title]||(m[title]={n:0,ex:c,sug:i>0?t.slice(i+2):''})).n++}));
+    const top=Object.entries(m).sort((a,b)=>b[1].n-a[1].n).slice(0,3);
+    return ZC.xcard('ca-'+id,'What the AI flagged',`${L.length} of ${plural(all.length,'conversation')} had coaching tips`,top.map(([t,v])=>`<div class="aitip"><b>${esc(t)}</b> <span class="pill neutral num">${v.n}x</span>${v.sug?`<br><span>${esc(v.sug)}</span>`:''}<div style="margin-top:6px">${see(v.ex)}</div></div>`).join(''),{open:false})})();
+  const missed=(()=>{const all=cur().filter(c=>c.rep===id&&c.aiChecks&&c.aiChecks.length);if(!all.length)return '';const m={};
+    all.forEach(c=>c.aiChecks.filter(x=>!x.ok).forEach(x=>{(m[x.label]||(m[x.label]={n:0,ex:c,why:x.why})).n++}));
+    const top=Object.entries(m).sort((a,b)=>b[1].n-a[1].n).slice(0,4);if(!top.length)return '';
+    return ZC.xcard('cm-'+id,'Skill checks missed most',`across ${plural(all.length,'scored conversation')}`,top.map(([t,v])=>`<div class="chk"><span class="pill bad num">${v.n}x</span><div>${esc(t)}${v.why?`<small>${esc(v.why)}</small>`:''}<div style="margin-top:6px">${see(v.ex)}</div></div></div>`).join(''),{open:false})})();
+  const drills=p.drills.length?ZC.xcard('cd-'+id,'Practice drills',`${p.done} of ${p.drills.length} done · real customer lines from ${esc(rep.first)}'s conversations`,
     p.drills.map((d,i)=>{const done=!!st.drills[d.key],o=!!open[d.key];return `<div class="drill ${done?'done':''}"><div class="dr-h"><span class="n">${i+1}</span><b>${esc(d.skill.label)}</b><span class="pill ${done?'good':'neutral'}">${done?'Done':'To do'}</span></div>
       <div class="quote bad">${Q(d.group.hi,d.group.en)}<div class="by">Customer says</div></div>
       <textarea rows="2" placeholder="How would you answer? (optional)" data-coach-ta="${esc(d.key)}" aria-label="Your answer">${esc(typed[d.key]||'')}</textarea>
@@ -151,6 +159,9 @@ function renderPlan(id){
   return `<div class="ctool"><span class="pill ${stt[0]}">${stt[1]}</span><button class="btn sm" data-act="coach-assign" data-id="${id}">${ic('check',14)}${st.assign[id]==='assigned'?'Assigned':'Assign plan'}</button><button class="btn sm" data-act="coach-review" data-id="${id}">${st.assign[id]==='reviewed'?'Reviewed':'Mark reviewed'}</button><span style="flex:1"></span>${ZC.xtools()}</div>
   ${ZD.hasObjection?'':`<p class="hint" style="margin:0">No objection columns in this file, so suggested answers are Zocus's built-in examples.</p>`}
   ${focusCards}
+  ${flagged}
+  ${missed}
+  ${REPS.length<2?`<p class="hint" style="margin:0">Comparing with other reps, and suggested answers from top reps, needs a second rep in the data.</p>`:''}
   ${!p.focus.length?mentorHtml(id):''}
   ${drills}
   <div class="cols">${progress}${review}</div>
@@ -158,7 +169,7 @@ function renderPlan(id){
 
 function mentorHtml(id){
   const mine=CONVS.filter(c=>c.rep===id&&isResolved(c)&&c.reply).sort((a,b)=>b.skills.objection-a.skills.objection||b.value-a.value).slice(0,3);
-  return mine.length?`<section class="card"><div class="card-h"><h2>Answers other reps learn from</h2></div>${mine.map(c=>`<div class="quote" style="margin-bottom:8px">${Q(c.reply,c.replyEn||c.reply)}<div class="by">${esc(REASONS[c.objection]?REASONS[c.objection].label:'Objection')} · ${esc(c.customer)}</div><div style="margin-top:8px">${see(c,c.objAt)}</div></div>`).join('')}</section>`:''}
+  return mine.length?`<section class="card"><div class="card-h"><h2>${REPS.length<2?'Answers worth reusing':'Answers other reps learn from'}</h2></div>${mine.map(c=>`<div class="quote" style="margin-bottom:8px">${Q(c.reply,c.replyEn||c.reply)}<div class="by">${esc(REASONS[c.objection]?REASONS[c.objection].label:'Objection')} · ${esc(c.customer)}</div><div style="margin-top:8px">${see(c,c.objAt)}</div></div>`).join('')}</section>`:''}
 
 /* ---------- Actions ---------- */
 function act(a,t){
