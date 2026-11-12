@@ -164,7 +164,7 @@ function renderPlan(id){
   ${REPS.length<2?`<p class="hint" style="margin:0">Comparing with other reps, and suggested answers from top reps, needs a second rep in the data.</p>`:''}
   ${!p.focus.length?mentorHtml(id):''}
   ${drills}
-  <div class="cols">${progress}${review}</div>
+  <div class="cols">${ZD.timeless?'':progress}${review}</div>
   <p class="hint">Assigned and reviewed status is saved in this browser until coaching is connected to the backend.</p>`}
 
 function mentorHtml(id){

@@ -1,0 +1,132 @@
+{
+ "store": "Mira Jewellery (fictional)",
+ "exportedAt": "2026-11-12T13:52:36.481Z",
+ "exportedLocal": "2026-11-12 19:22",
+ "date": null,
+ "recorded": 98,
+ "shown": 81,
+ "analysing": [],
+ "failed": [],
+ "unscored": [
+  {
+   "id": 96,
+   "at": "2026-05-13 19:29",
+   "rep": "Riya Shah",
+   "min": 5
+  },
+  {
+   "id": 94,
+   "at": "2026-05-25 19:29",
+   "rep": "Riya Shah",
+   "min": 5
+  },
+  {
+   "id": 83,
+   "at": "2026-07-18 19:29",
+   "rep": "Asha Menon",
+   "min": 5
+  },
+  {
+   "id": 77,
+   "at": "2026-08-05 19:29",
+   "rep": "Riya Shah",
+   "min": 5
+  },
+  {
+   "id": 72,
+   "at": "2026-08-20 19:29",
+   "rep": "Riya Shah",
+   "min": 5
+  },
+  {
+   "id": 70,
+   "at": "2026-08-26 19:29",
+   "rep": "Riya Shah",
+   "min": 5
+  },
+  {
+   "id": 61,
+   "at": "2026-09-13 09:53",
+   "rep": "Riya Shah",
+   "min": 5
+  },
+  {
+   "id": 60,
+   "at": "2026-09-14 14:41",
+   "rep": "Riya Shah",
+   "min": 5
+  },
+  {
+   "id": 57,
+   "at": "2026-09-18 05:05",
+   "rep": "Riya Shah",
+   "min": 5
+  },
+  {
+   "id": 50,
+   "at": "2026-09-26 14:41",
+   "rep": "Riya Shah",
+   "min": 5
+  },
+  {
+   "id": 44,
+   "at": "2026-09-30 08:41",
+   "rep": "Riya Shah",
+   "min": 5
+  },
+  {
+   "id": 43,
+   "at": "2026-09-30 17:05",
+   "rep": "Asha Menon",
+   "min": 5
+  },
+  {
+   "id": 39,
+   "at": "2026-10-02 17:05",
+   "rep": "Asha Menon",
+   "min": 5
+  },
+  {
+   "id": 197,
+   "at": "2026-10-04 21:32",
+   "rep": "Abhishek",
+   "min": 1
+  },
+  {
+   "id": 198,
+   "at": "2026-10-04 21:45",
+   "rep": "Manoj Administrator",
+   "min": 1
+  },
+  {
+   "id": 221,
+   "at": "2026-10-12 20:20",
+   "rep": "Manoj Administrator",
+   "min": 1
+  },
+  {
+   "id": 224,
+   "at": "2026-10-12 20:54",
+   "rep": "Manoj Administrator",
+   "min": 1
+  }
+ ],
+ "reps": [
+  {
+   "name": "Riya Shah",
+   "recorded": 70
+  },
+  {
+   "name": "Asha Menon",
+   "recorded": 22
+  },
+  {
+   "name": "Abhishek",
+   "recorded": 1
+  },
+  {
+   "name": "Manoj Administrator",
+   "recorded": 5
+  }
+ ]
+}

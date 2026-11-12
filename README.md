@@ -17,6 +17,7 @@ Open http://localhost:4173. Do not double-click `index.html`; the CSV is loaded 
 - Format and backend mapping: [docs/CSV_FORMAT.md](docs/CSV_FORMAT.md).
 - Export from the Zocus database (read-only, credentials in `.env`, never committed): `npm i pg`, then `node tools/export-from-db.mjs --list` and `node tools/export-from-db.mjs --org 2`. Writes `data/db-export-org<id>.csv` (git-ignored) and prints how complete each column is.
 - **Store switcher (real test conversations).** `data/cases.json` maps database conversation ids to the store or dealership they were about (the database stores no store name per conversation). `node tools/export-from-db.mjs --cases data/cases.json` writes `data/cases/<store>.csv` (git-ignored, contains real call text and customer details; add `--public` to drop them). The header dropdown (and the Data menu on phones) lists every store whose CSV is present, plus the sample store.
+- **Store groups:** Pilot (live), Real test calls (no trends, `"timeless": true` in `data/cases.json`), Demo (fictional: sample, Apex Motors pilot day from `node tools/make-pilot-demo.mjs`, and the backend's fictional Mira and Horizon companies). Pilot-day flow: [docs/PILOT.md](docs/PILOT.md). What each database table means: [docs/DB_MAP.md](docs/DB_MAP.md). Note: **"rep" = the account that recorded**, not the voice in the audio.
 - Regenerate the sample and template: `node tools/make-sample.mjs`.
 
 ## Layout

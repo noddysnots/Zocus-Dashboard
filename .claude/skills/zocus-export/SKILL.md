@@ -17,3 +17,6 @@ The user names a company (and optionally a day or range). Run everything yoursel
 5. To see it in the dashboard: Data menu (top right) > upload the CSV. Or serve it: it is in `data/`.
 
 Never write the password into a reply, never commit `.env` or `data/db-export*`. Customer names/phones are off by default.
+
+
+Before interpreting any database row read `docs/DB_MAP.md`: orgs 2 and 3 are fictional fixtures, `sessions.rep_id` is the recording account (not the speaker), and org 1 has no store name. Test stores in `data/cases.json` with `"timeless": true` must never be shown with trends or time-of-day views.

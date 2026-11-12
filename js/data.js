@@ -162,7 +162,7 @@ function modal(title,body){const root=document.getElementById('modalRoot');
 function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function menuHtml(){const ds=window.ZD;
   const info=ds.isSample?'Showing sample data (fictional store)':esc(ds.file)+' · '+ds.CONVS.length+' conversations';
-  const storeList=ds.stores&&ds.stores.length?'<div class="dm-sec">Store</div>'+storeOptions().map(o=>'<button data-zact="store" data-id="'+esc(o.id)+'"'+(o.id===ds.storeId?' aria-current="true"':'')+'><span class="dm-dot"></span>'+esc(o.label)+'</button>').join('')+'<div class="dm-sec">Data</div>':'';
+  const so=storeOptions(),storeList=ds.stores&&ds.stores.length?[...GROUPS,['upload','Your upload']].map(([g,l])=>{const a=so.filter(x=>x.group===g);return a.length?'<div class="dm-sec">'+esc(l)+'</div>'+a.map(o=>'<button data-zact="store" data-id="'+esc(o.id)+'"'+(o.id===ds.storeId?' aria-current="true"':'')+'><span class="dm-dot"></span>'+esc(o.label)+'</button>').join(''):''}).join('')+'<div class="dm-sec">Data</div>':'';
   return '<div class="dm-info"><b>'+(ds.isSample?'Data':esc(ds.store))+'</b><span>'+info+'</span></div>'+storeList+
    '<button data-zact="upload"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>Upload CSV</button>'+
    '<button data-zact="export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></svg>Export current data (CSV)</button>'+
@@ -209,28 +209,30 @@ function setChoice(v){try{localStorage.setItem(CHOICE_KEY,v)}catch(e){}}
 /* Stores = groups of real test conversations described in data/cases.json. A store is listed only if its CSV (data/cases/<id>.csv) is present. */
 async function loadStores(){
   try{const r=await fetch(CASES_URL,{cache:'no-store'});if(!r.ok)return [];const j=await r.json(),out=[];
-    await Promise.all((j.stores||[]).map(async st=>{try{const c=await fetch('data/cases/'+st.id+'.csv',{cache:'no-store'});if(!c.ok)return;const text=await c.text();if(/^\s*<(!doctype|html)/i.test(text))return;let meta=null;try{const m=await fetch('data/cases/'+st.id+'.meta.json',{cache:'no-store'});if(m.ok)meta=await m.json()}catch(e){}out.push({id:st.id,name:st.name,vertical:st.vertical||'',featured:(st.featured||[]).map(n=>'ZC-'+n),text,meta,isDefault:!!st.default})}catch(e){}}));
+    await Promise.all((j.stores||[]).map(async st=>{try{const file=st.file||'data/cases/'+st.id+'.csv',c=await fetch(file,{cache:'no-store'});if(!c.ok)return;const text=await c.text();if(/^\s*<(!doctype|html)/i.test(text))return;let meta=null;try{const m=await fetch(file.replace(/\.csv$/,'.meta.json'),{cache:'no-store'});if(m.ok)meta=await m.json()}catch(e){}out.push({id:st.id,name:st.name,vertical:st.vertical||'',featured:(st.featured||[]).map(n=>'ZC-'+n),text,meta,isDefault:!!st.default,timeless:!!st.timeless,group:st.group||(st.timeless?'test':'pilot')})}catch(e){}}));
     const order=(j.stores||[]).map(x=>x.id);return out.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id))}catch(e){return []}}
 function setStore(id){setChoice(id);try{sessionStorage.setItem('zocus-skip-splash','1')}catch(e){}location.reload()}
 async function load(){
   let res=null;
   const rec=await kvGet('csv'),stores=await loadStores(),pick=choice();
   const st=stores.find(x=>x.id===pick)||(!pick?stores.find(x=>x.isDefault):null);
-  if(st){const b=build(st.text,st.id+'.csv');if(b.ok){res=b;res.ds.isSample=false;res.ds.storeId=st.id;res.ds.featured=st.featured;res.ds.meta=st.meta;if(!res.ds.vertical)res.ds.vertical=st.vertical}}
+  if(st){const b=build(st.text,st.id+'.csv');if(b.ok){res=b;res.ds.isSample=false;res.ds.storeId=st.id;res.ds.featured=st.featured;res.ds.meta=st.meta;res.ds.timeless=st.timeless;res.ds.group=st.group;if(!res.ds.vertical)res.ds.vertical=st.vertical}}
   if(!res&&rec&&rec.text&&pick!=='sample'){const b=build(rec.text,rec.name);if(b.ok){res=b;res.ds.isSample=false;res.ds.storeId='upload'}}
   if(!res){
     let text;try{const r=await fetch(SAMPLE_URL);if(!r.ok)throw new Error(r.status);text=await r.text()}
     catch(e){fatal('The sample data could not be read. Open this page through a web server (for example <code>npx serve</code>), not by double-clicking the file.');throw e}
     res=build(text,'sample.csv');if(!res.ok)throw new Error('sample.csv invalid: '+res.errors[0].msg);res.ds.isSample=true;res.ds.storeId='sample'}
-  res.ds.stores=stores.map(x=>({id:x.id,name:x.name,vertical:x.vertical}));res.ds.hasUpload=!!(rec&&rec.text);res.ds.uploadName=rec&&rec.name||'';
-  const days=new Set(res.ds.CONVS.map(c=>c.d));res.ds.spanDays=days.size?Math.max(...days)+1:0;res.ds.liveDay=!res.ds.isSample&&res.ds.spanDays<=2;
+  res.ds.stores=stores.map(x=>({id:x.id,name:x.name,vertical:x.vertical,group:x.group}));res.ds.hasUpload=!!(rec&&rec.text);res.ds.uploadName=rec&&rec.name||'';
+  const days=new Set(res.ds.CONVS.map(c=>c.d));res.ds.spanDays=days.size?Math.max(...days)+1:0;res.ds.liveDay=!res.ds.isSample&&!res.ds.timeless&&res.ds.spanDays<=2;
   window.ZD=res.ds;fillStoreSelect();
   try{const m=JSON.parse(sessionStorage.getItem('zocus-loaded-msg')||'null');if(m){sessionStorage.removeItem('zocus-loaded-msg');
     setTimeout(()=>toast('Loaded '+m.n+' conversations from '+m.name+(m.w&&m.w.length?'. '+m.w[0]:'')),700)}}catch(e){}
   return res.ds}
-function storeOptions(){const d=window.ZD,o=d.stores.map(s=>({id:s.id,label:s.name}));if(d.hasUpload)o.push({id:'upload',label:'Uploaded: '+d.uploadName});o.push({id:'sample',label:'Sample store (fictional)'});return o}
+const GROUPS=[['pilot','Pilot (live)'],['test','Real test calls (no trends)'],['demo','Demo (fictional data)']];
+function storeOptions(){const d=window.ZD,o=d.stores.map(s=>({id:s.id,label:s.name,group:s.group}));if(d.hasUpload)o.push({id:'upload',label:'Uploaded: '+d.uploadName,group:'upload'});o.push({id:'sample',label:'Sample store (fictional)',group:'demo'});return o}
+function groupedOptions(sel){const o=storeOptions(),gs=[...GROUPS,['upload','Your upload']];return gs.map(([g,l])=>{const a=o.filter(x=>x.group===g);return a.length?{label:l,items:a}:null}).filter(Boolean).map(x=>'<optgroup label="'+esc(x.label)+'">'+x.items.map(i=>'<option value="'+esc(i.id)+'"'+(i.id===sel?' selected':'')+'>'+esc(i.label)+'</option>').join('')+'</optgroup>').join('')}
 function fillStoreSelect(){const sel=document.getElementById('storeSel'),d=window.ZD;if(!sel||!d||!d.stores.length)return;
-  sel.innerHTML=storeOptions().map(o=>'<option value="'+esc(o.id)+'"'+(o.id===d.storeId?' selected':'')+'>'+esc(o.label)+'</option>').join('');sel.hidden=false}
+  sel.innerHTML=groupedOptions(d.storeId);sel.hidden=false}
 document.addEventListener('change',e=>{if(e.target.id==='storeSel')setStore(e.target.value)});
 window.ZocusData={load,build,parseCSV,setStore};
 })();

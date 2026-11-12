@@ -10,3 +10,4 @@ data/cases/*.report.md
 data/cases/*.meta.json
 !data/cases/pilot.csv
 !data/cases/pilot.meta.json
+!data/demo/

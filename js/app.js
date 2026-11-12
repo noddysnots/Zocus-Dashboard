@@ -65,7 +65,7 @@ function greet(){const h=new Date().getHours();return (h<12?'Good morning':h<17?
 const lc=s=>s.charAt(0).toLowerCase()+s.slice(1);
 const fdate=dt=>dt.getDate()+' '+MON[dt.getMonth()];
 function ftime(dt){let h=dt.getHours();const m=dt.getMinutes(),ap=h>=12?'pm':'am';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+ap}
-function when(c){if(c.d===0)return 'Today, '+ftime(c.at);if(c.d===1)return 'Yesterday, '+ftime(c.at);return fdate(c.at)+', '+ftime(c.at)}
+function when(c){if(TL)return '#'+refNo(c)+' · '+fdate(c.at);if(c.d===0)return 'Today, '+ftime(c.at);if(c.d===1)return 'Yesterday, '+ftime(c.at);return fdate(c.at)+', '+ftime(c.at)}
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 const sumv=a=>a.reduce((s,c)=>s+c.value,0);
 const plural=(n,w)=>n+' '+w+(n===1?'':'s');
@@ -93,24 +93,26 @@ function delta(cur,prev,opt){opt=opt||{};let diff,txt;if(!hasBase())return '';
  return `<span class="delta ${good?'up':'down'}">${ic(diff>0?'up':'down',14)}${txt}</span>`}
 
 /* ---------- State ---------- */
-const RANGES={live:{days:1,lo:0,hi:0,plo:-1,phi:-1},today:{days:1,lo:0,hi:0,plo:7,phi:7},yesterday:{days:1,lo:1,hi:1,plo:8,phi:8},'7':{days:7,lo:0,hi:6,plo:7,phi:13},'30':{days:30,lo:0,hi:29,plo:30,phi:59}};
+const RANGES={all:{days:Math.max(ZD.spanDays||1,1),lo:0,hi:Math.max(ZD.spanDays||1,1)-1,plo:-1,phi:-1},live:{days:1,lo:0,hi:0,plo:-1,phi:-1},today:{days:1,lo:0,hi:0,plo:7,phi:7},yesterday:{days:1,lo:1,hi:1,plo:8,phi:8},'7':{days:7,lo:0,hi:6,plo:7,phi:13},'30':{days:30,lo:0,hi:29,plo:30,phi:59}};
 const S={from:'team',rcf:{},rcfFor:null,period:'30',tab:'drop',showAll:{},cf:{},page:0,sort:'date',ctype:'persona',drawer:null,drawerAt:null,block:null};
 const CF_KEYS=['rep','outcome','persona','product','reason','stage','comp','kw'];
-try{const p=localStorage.getItem('zocus-period');if(RANGES[p]&&p!=='live')S.period=p}catch(e){}
-if(ZD.liveDay)S.period='live';else if(ZD.spanDays<3)S.period='today';
+try{const p=localStorage.getItem('zocus-period');if(RANGES[p]&&p!=='live'&&p!=='all')S.period=p}catch(e){}
+if(ZD.timeless||(ZD.storeId&&ZD.storeId!=='sample'&&ZD.spanDays>30&&!ZD.liveDay))S.period='all';else if(ZD.liveDay)S.period='live';else if(ZD.spanDays<3)S.period='today';
+const TL=!!ZD.timeless,SP=v=>TL?'':ZC.spark(v);
+const refNo=c=>String(c.ref).replace(/\D/g,'')||String(c.ref);
 const R=()=>RANGES[S.period];
-const LIVE=()=>S.period==='live';
+const LIVE=()=>S.period==='live',ALL=()=>S.period==='all';
 const inBlock=(c,b)=>{const h=c.at.getHours();return h>=b&&h<b+2};
-const h12=h=>(h%24)%12||12,blockLabel=b=>`${h12(b)} to ${h12(b+2)} ${(b+2)%24<12?'am':'pm'}`;
+const h12=h=>(h%24)%12||12,ap=h=>(h%24)<12?'am':'pm',blockLabel=b=>`${h12(b)}${ap(b)!==ap(b+2)?' '+ap(b):''} to ${h12(b+2)} ${ap(b+2)}`;
 const cur=()=>{const r=R();const L=CONVS.filter(c=>c.d>=r.lo&&c.d<=r.hi);return LIVE()&&S.block!=null?L.filter(c=>inBlock(c,S.block)):L};
-const prev=()=>{if(LIVE())return S.block==null?[]:CONVS.filter(c=>c.d===0&&inBlock(c,S.block-2));const r=R();return CONVS.filter(c=>c.d>=r.plo&&c.d<=r.phi)};
+const prev=()=>{if(ALL())return [];if(LIVE())return S.block==null?[]:CONVS.filter(c=>c.d===0&&inBlock(c,S.block-2));const r=R();return CONVS.filter(c=>c.d>=r.plo&&c.d<=r.phi)};
 const hasBase=()=>prev().length>0;
 const VS=()=>hasBase()?' vs '+cmpTxt():'';
 const rangeDays=()=>R().days;
 const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const dayDate=()=>new Date(TODAY.getTime()-R().lo*DAY);
 const cmpTxt=()=>LIVE()?blockLabel(S.block-2):rangeDays()===1?'last '+WD[dayDate().getDay()]:'previous';
-function setPeriod(v){if(!RANGES[v]||v===S.period)return;S.period=v;S.block=null;S.page=0;delete S.cf.day;delete S.cf.hour;if(v!=='live'&&!ZD.liveDay)try{localStorage.setItem('zocus-period',v)}catch(e){}render();Waves.pulse()}
+function setPeriod(v){if(!RANGES[v]||v===S.period)return;S.period=v;S.block=null;S.page=0;delete S.cf.day;delete S.cf.hour;if(v!=='live'&&v!=='all'&&!ZD.liveDay)try{localStorage.setItem('zocus-period',v)}catch(e){}render();Waves.pulse()}
 function setBlock(b){S.block=b;S.page=0;delete S.cf.hour;render();Waves.pulse()}
 function stats(list){const n=list.length,sold=list.filter(c=>c.outcome==='sold'),lost=list.filter(c=>c.outcome!=='sold');
  const skill={};SKILLS.forEach(s=>skill[s.id]=n?Math.round(list.reduce((a,c)=>a+c.skills[s.id],0)/n):0);
@@ -127,15 +129,15 @@ function parseRep(){let h=(location.hash||'').slice(1);try{h=decodeURIComponent(
 function routeName(){const r=parseRep();if(r)return 'rep-'+r.id;const h=(location.hash||'#home').slice(1);return NAV.some(n=>n[0]===h)?h:'home'}
 function renderNav(){const rt=routeName(),base=rt.startsWith('rep-')?(S.from==='coaching'?'coaching':'team'):rt,due=followups().length;
  const item=(n,m)=>`<a href="#${n[0]}" ${n[0]===base?'aria-current="page"':''} ${n[0]==='insights'?'data-tour="nav-insights"':n[0]==='coaching'?'data-tour="nav-coaching"':''}>${m?ic(n[2],20):''}<span>${m&&n[0]==='conversations'?'Chats':n[1]}</span>${n[0]==='followups'&&due?`<span class="dot num">${due}</span>`:''}</a>`;
- document.getElementById('nav').innerHTML=NAV.map(n=>item(n,false)).join('');
- document.getElementById('bnav').innerHTML=NAV.map(n=>item(n,true)).join('');
+ document.getElementById('nav').innerHTML=NAV.filter(n=>!(TL&&n[0]==='followups')).map(n=>item(n,false)).join('');
+ document.getElementById('bnav').innerHTML=NAV.filter(n=>!(TL&&n[0]==='followups')).map(n=>item(n,true)).join('');
  document.querySelectorAll('[data-act="period"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.period)));const rs=document.getElementById('rangeSel');if(rs)rs.value=S.period;
- document.querySelectorAll('[data-act="period"],#rangeSel option').forEach(b=>{const v=b.dataset.v||b.value,hide=(ZD.spanDays<3&&(v==='7'||v==='30'))||(ZD.spanDays<2&&v==='yesterday')||(ZD.liveDay&&v==='today');b.hidden=hide;if(b.tagName==='OPTION')b.disabled=hide});
+ document.querySelectorAll('[data-act="period"],#rangeSel option').forEach(b=>{const v=b.dataset.v||b.value,hide=TL||(v==='all'&&(ZD.spanDays<=30||ZD.liveDay))||(v==='live'&&!ZD.liveDay)||(ZD.spanDays<3&&(v==='7'||v==='30'))||(ZD.spanDays<2&&v==='yesterday')||(ZD.liveDay&&v==='today');b.hidden=hide;if(b.tagName==='OPTION')b.disabled=hide});
  const seg=document.querySelector('.seg[data-tour="period"]'),one=[...document.querySelectorAll('[data-act="period"]')].filter(b=>!b.hidden).length<2;if(seg)seg.classList.toggle('solo',one);if(rs)rs.classList.toggle('solo',one)}
 function phead(title,sub){return `<div class="phead"><h1>${title}</h1><p>${sub}</p></div>`}
-const periodTxt=()=>LIVE()?(S.block==null?'today so far':'today, '+blockLabel(S.block)):({today:'today',yesterday:'yesterday','7':'last 7 days','30':'last 30 days'})[S.period];
-const inTxt=()=>rangeDays()===1?periodTxt():'in the '+periodTxt();
-const baseTxt=()=>rangeDays()===1?periodTxt():'the '+periodTxt();
+const periodTxt=()=>ALL()?'all conversations':LIVE()?(S.block==null?'today so far':'today, '+blockLabel(S.block)):({today:'today',yesterday:'yesterday','7':'last 7 days','30':'last 30 days'})[S.period];
+const inTxt=()=>ALL()?'across all conversations':rangeDays()===1?periodTxt():'in the '+periodTxt();
+const baseTxt=()=>ALL()?'all conversations':rangeDays()===1?periodTxt():'the '+periodTxt();
 const AFTER=['before the need was understood','after the need was understood','after the product was shown','after the price was quoted'];
 function leaks(L){return [0,1,2,3].map(k=>{const a=L.filter(c=>c.stage===k);return {k,n:a.length,v:sumv(a)}})}
 
@@ -170,6 +172,11 @@ function liveStrip(){if(!LIVE())return '';const B=dayBlocks(),all=CONVS.filter(c
  const chip=(b,label,a,st)=>`<button class="bchip" data-act="block" data-v="${b==null?'':b}" aria-pressed="${S.block===b}"><b>${label}</b><span class="num">${a.length} ${a.length===1?'chat':'chats'}${a.length?` · ${st.sold} sold · score ${st.score}`:''}</span></button>`;
  return `<div class="livebar"><div class="livehead"><span class="livedot" aria-hidden="true"></span><span>${bits.join(' · ')}</span></div>
   <div class="bstrip" role="group" aria-label="Time of day">${chip(null,'All day',all,stats(all))}${B.map(x=>chip(x.b,blockLabel(x.b),x.a,x.s)).join('')}</div></div>`}
+function timelessPanel(s){const by=o=>cur().filter(c=>c.outcome===o),fo=o=>`data-filter='${JSON.stringify({outcome:o})}'`;
+ return `<aside class="card hpanel" aria-label="Skills and results"><div class="cc-h"><h3>Average skill score</h3><span class="hint">${plural(s.n,'conversation')}</span></div>
+  ${ZC.barList(SKILLS.map(k=>({label:k.label,value:s.skill[k.id],text:String(s.skill[k.id]),tip:`${k.label}|Average ${s.skill[k.id]} out of 100`})),{max:100})}
+  <div class="cc-h" style="margin-top:8px"><h3>Results</h3><span class="hint">Tap to filter</span></div>
+  ${ZC.splitBar([{name:'Sold',n:by('sold').length,color:ZC.OUTCOME.sold,sub:inr(sumv(by('sold'))),attr:fo('sold')},{name:'Will return',n:by('followup').length,color:ZC.OUTCOME.followup,sub:inr(sumv(by('followup'))),attr:fo('followup')},{name:'Did not buy',n:by('lost').length,color:ZC.OUTCOME.lost,sub:inr(sumv(by('lost'))),attr:fo('lost')}])}</aside>`}
 function liveHomePanel(){const B=dayBlocks(),by=o=>cur().filter(c=>c.outcome===o),fo=o=>`data-filter='${JSON.stringify({outcome:o})}'`;
  const data=B.map(x=>{const v={sold:0,followup:0,lost:0};x.a.forEach(c=>v[c.outcome]++);return {label:h12(x.b)+((x.b)%24<12?'a':'p'),vals:v,tip:`${blockLabel(x.b)}|${plural(x.a.length,'conversation')}|${v.sold} sold · ${v.followup} will return · ${v.lost} did not buy`}});
  return `<aside class="card hpanel" aria-label="Day so far"><div class="cc-h"><h3>Conversations by 2-hour block</h3><span class="hint">${fdate(TODAY)}</span></div>
@@ -197,16 +204,16 @@ function renderHome(){
  const short={good:'Top',neutral:'On track',bad:'Coach'};
  return `<div class="homegrid"><section class="hero" data-tour="brief">
   <span class="mono">${ic('spark',14)} AI briefing · ${esc(ZD.store)} · ${periodTxt()}${rangeDays()===1?' · '+fdate(dayDate()):''} ${ZD.isSample?'<span class="sample">Sample data</span>':''}</span>
-  <h1>${greet()}</h1>
+  <h1>${TL?'Conversation review':greet()}</h1>
   <p class="lede">${lede(s,p,big)}</p>
-  </section>${LIVE()?liveHomePanel():homePanel(s)}</div>
+  </section>${TL?timelessPanel(s):LIVE()?liveHomePanel():homePanel(s)}</div>
   <div class="waveband" data-wave-anchor aria-hidden="true"><span class="wavehint">Live voice waves · hover or click</span></div>
  <section class="kpis" data-tour="kpis">
   ${kpi({label:'Sale conversion',tag:'Output',val:pct(s.conv),sub:`${s.sold} of ${s.n} customers`,delta:delta(s.conv,p.conv,{pts:true}),go:'#insights'})}
   ${kpi({label:'Sales closed',tag:'Output',val:inr(s.soldValue),sub:'Tagged as sold',delta:delta(s.soldValue,p.soldValue),filter:{outcome:'sold'}})}
   ${kpi({label:'Conversations recorded',tag:'Input',val:s.n,sub:`${(s.n/rangeDays()/REPS.length).toFixed(1)} per rep per day`,delta:delta(s.n,p.n),go:'#team'})}
  </section>
-  <div class="homegrid2"><section class="card" data-tour="actions"><div class="card-h"><h2>Today, do these three</h2><span class="hint">Ranked by money at stake</span></div>
+  <div class="homegrid2"><section class="card" data-tour="actions"><div class="card-h"><h2>${TL?'Start with these three':'Today, do these three'}</h2><span class="hint">Ranked by money at stake</span></div>
   <div class="acts">${acts.map((a,i)=>`<div class="act"><span class="n">${i+1}</span><div><h3>${a.title}</h3><p>${a.body}</p></div><div class="r"><span class="pill gold num">${inr(a.impact)}</span><button class="btn ${i===0?'primary':''} sm" data-go="${a.go}" ${a.tab?`data-tab="${a.tab}"`:''}>${a.btn}${ic('right',14)}</button></div></div>`).join('')}</div></section>
  <section class="card" data-tour="pulse"><div class="card-h"><h2>Team at a glance</h2><button class="link" data-go="#team">Full team${ic('right',14)}</button></div>
   <div class="pulse">${rows.map(r=>`<button class="pchip" data-go="#rep-${r.rep.id}">${ring(r.s.score,54)}<b>${r.rep.first}</b><span class="pill ${r.status[0]}">${short[r.status[0]]}</span></button>`).join('')}</div>
@@ -284,10 +291,10 @@ function renderTeam(){const L=cur(),P=prev(),rows=repRows(L),store=stats(L),p=st
  const top=rows[0],low=rows[rows.length-1],need=rows.filter(r=>r.status[0]==='bad');
  const lead=rows.length?`Store score is <b>${store.score}</b>${p.n?`, ${store.score>=p.score?'up':'down'} from ${p.score}`:''}. <b>${esc(top.rep.first)}</b> leads at ${top.s.score}.${need.length?` ${plural(need.length,'rep')} need${need.length===1?'s':''} coaching, furthest behind is <b>${esc(low.rep.first)}</b> on ${SK[low.weak].label.toLowerCase()} (${low.s.skill[low.weak]} vs ${store.skill[low.weak]}).`:''}`:'No recordings in this period.';
  const tiles=[
-  ZC.tile({label:'Conversation score',value:store.score,spark:ZC.spark(wk(W,x=>x.score)),sub:delta(store.score,p.score)+VS()}),
-  ZC.tile({label:'Sale conversion',value:pct(store.conv),spark:ZC.spark(wk(W,x=>x.conv*100)),sub:delta(store.conv,p.conv,{pts:true})+VS()}),
-  ZC.tile({label:'Conversations recorded',value:store.n,spark:ZC.spark(wk(W,x=>x.n)),sub:delta(store.n,p.n)+VS()}),
-  ZC.tile({label:'Sales closed',value:inr(store.soldValue),spark:ZC.spark(wk(W,x=>x.soldValue)),sub:delta(store.soldValue,p.soldValue)+VS()})].join('');
+  ZC.tile({label:'Conversation score',value:store.score,spark:SP(wk(W,x=>x.score)),sub:delta(store.score,p.score)+VS()}),
+  ZC.tile({label:'Sale conversion',value:pct(store.conv),spark:SP(wk(W,x=>x.conv*100)),sub:delta(store.conv,p.conv,{pts:true})+VS()}),
+  ZC.tile({label:'Conversations recorded',value:store.n,spark:SP(wk(W,x=>x.n)),sub:delta(store.n,p.n)+VS()}),
+  ZC.tile({label:'Sales closed',value:inr(store.soldValue),spark:SP(wk(W,x=>x.soldValue)),sub:delta(store.soldValue,p.soldValue)+VS()})].join('');
  const trend=ZC.lineChart({labels:W.map(x=>x.label),series:[{name:'Store score',values:wk(W,x=>x.score)}],aria:'Store conversation score by week for the last 8 weeks'});
  const sc=ZC.scatter({points:rows.filter(r=>r.s.n).map(r=>({x:r.s.score,y:Math.round(r.s.conv*100),size:r.s.n,label:r.rep.first,href:'#rep-'+r.rep.id,tip:`${r.rep.name}|Score ${r.s.score}|Conversion ${pct(r.s.conv)}|${plural(r.s.n,'conversation')}`})),xLabel:'Conversation score',yLabel:'Conversion %',ySuffix:'%',refX:store.score,refY:Math.round(store.conv*100),aria:'Each rep plotted by conversation score and conversion'});
  const grid=ZC.heatGrid({cols:SKILLS.map(k=>SHORT[k.id]),rows:rows.map(r=>({label:r.rep.first,attr:`data-go="#rep-${r.rep.id}"`,cells:SKILLS.map(k=>({text:r.s.skill[k.id],cls:cls(r.s.skill[k.id],store.skill[k.id]),tip:`${r.rep.name}|${k.label}: ${r.s.skill[k.id]}|Store ${store.skill[k.id]}`}))})).concat([{label:'Store',foot:true,cells:SKILLS.map(k=>({text:store.skill[k.id],cls:'n'}))}])});
@@ -296,13 +303,13 @@ function renderTeam(){const L=cur(),P=prev(),rows=repRows(L),store=stats(L),p=st
  `<div class="lead"><span class="orb" aria-hidden="true"></span><p style="margin:0">${lead}</p></div>
  <div class="ktiles">${tiles}</div>
  <div class="cgrid3">
-  ${ZC.ccard('Score trend','Store, 8 weeks',trend)}
+  ${TL?'':ZC.ccard('Score trend','Store, 8 weeks',trend)}
   ${ZC.ccard(hi?`${esc(hi.rep.first)} scores well but closes less`:'Score vs conversion','Dot size = conversations',sc)}
   ${ZC.ccard('Skills by rep','Green above store, red below',grid)}
  </div>
  <section class="card"><div class="card-h"><h2>Reps</h2><span class="hint">Ranked by conversation score</span></div>
- <div class="xr-h trow"><span>#</span><span>Rep</span><span class="r">Score</span><span class="r">Conv.</span><span class="r">Recorded</span><span>8-week score</span><span></span></div>
- ${rows.map((r,i)=>{const RW=weekly(CONVS.filter(c=>c.rep===r.rep.id));return `<details class="xrow"><summary class="trow"><span class="num rk">${i+1}</span><span class="nm"><b>${esc(r.rep.name)}</b><span class="st">${dotOf(r.status[0])}${r.status[1]}</span></span><span class="r num"><b>${r.s.score}</b></span><span class="r num">${pct(r.s.conv)}</span><span class="r num">${r.s.n}</span><span>${ZC.spark(wk(RW,x=>x.score),{w:96,h:24})}</span>${ic('chev',16)}</summary>
+ <div class="xr-h trow"><span>#</span><span>Rep</span><span class="r">Score</span><span class="r">Conv.</span><span class="r">Recorded</span><span>${TL?'':'8-week score'}</span><span></span></div>
+ ${rows.map((r,i)=>{const RW=weekly(CONVS.filter(c=>c.rep===r.rep.id));return `<details class="xrow"><summary class="trow"><span class="num rk">${i+1}</span><span class="nm"><b>${esc(r.rep.name)}</b><span class="st">${dotOf(r.status[0])}${r.status[1]}</span></span><span class="r num"><b>${r.s.score}</b></span><span class="r num">${pct(r.s.conv)}</span><span class="r num">${r.s.n}</span><span>${SP(wk(RW,x=>x.score),{w:96,h:24})}</span>${ic('chev',16)}</summary>
   <div class="xr-b"><div class="skills5">${SKILLS.map(k=>`<div class="skill"><div class="s2"><b style="font-weight:500">${SHORT[k.id]}</b><span class="num"><b style="color:var(--ink)">${r.s.skill[k.id]}</b> / ${store.skill[k.id]}</span></div><div class="bar"><i style="width:${r.s.skill[k.id]}%;background:${scoreCol(r.s.skill[k.id])}"></i><span class="tick" style="left:${store.skill[k.id]}%"></span></div></div>`).join('')}</div>
   <div class="xr-f"><span class="hint">Weakest vs store: <b style="color:var(--ink)">${SK[r.weak].label}</b> (${r.gap>0?'+':''}${r.gap}). ${inr(r.s.soldValue)} closed from ${plural(r.s.sold,'sale')}.</span><div class="btnrow"><button class="btn primary sm" data-go="#rep-${r.rep.id}/coaching">Coaching plan${ic('right',14)}</button><button class="btn sm" data-go="#rep-${r.rep.id}">Profile</button><button class="btn sm" data-go="#rep-${r.rep.id}/conversations">Conversations</button></div></div></div></details>`}).join('')}
  </section>`}
@@ -343,10 +350,10 @@ function repOverview(id,row,store,rows){
  const rep=row.rep,s=row.s,L=cur(),mine=row.L,p=stats(prev().filter(c=>c.rep===id));
  if(!s.n)return `<section class="card" style="text-align:center;padding:40px"><b>No conversations ${inTxt()}</b><p class="hint">Switch to 30 days, or check that ${esc(rep.first)} is recording conversations.</p></section>`;
  const RW=weekly(CONVS.filter(c=>c.rep===id)),SW=weekly(CONVS),rs=wk(RW,x=>x.score),first=rs.find(v=>v!=null),last=[...rs].reverse().find(v=>v!=null),ch=first!=null?last-first:0;
- const tiles=ZC.tile({label:'Conversation score',value:s.score,spark:ZC.spark(rs),sub:`Store ${store.score} · ${delta(s.score,p.score)}`})+
-  ZC.tile({label:'Sale conversion',value:pct(s.conv),spark:ZC.spark(wk(RW,x=>x.conv*100)),sub:`Store ${pct(store.conv)} · ${delta(s.conv,p.conv,{pts:true})}`})+
-  ZC.tile({label:'Conversations recorded',value:s.n,spark:ZC.spark(wk(RW,x=>x.n)),sub:`${(s.n/rangeDays()).toFixed(1)} a day · ${delta(s.n,p.n)}`})+
-  ZC.tile({label:'Sales closed',value:inr(s.soldValue),spark:ZC.spark(wk(RW,x=>x.soldValue)),sub:`${plural(s.sold,'sale')} · ${delta(s.soldValue,p.soldValue)}`});
+ const tiles=ZC.tile({label:'Conversation score',value:s.score,spark:SP(rs),sub:`Store ${store.score} · ${delta(s.score,p.score)}`})+
+  ZC.tile({label:'Sale conversion',value:pct(s.conv),spark:SP(wk(RW,x=>x.conv*100)),sub:`Store ${pct(store.conv)} · ${delta(s.conv,p.conv,{pts:true})}`})+
+  ZC.tile({label:'Conversations recorded',value:s.n,spark:SP(wk(RW,x=>x.n)),sub:`${(s.n/rangeDays()).toFixed(1)} a day · ${delta(s.n,p.n)}`})+
+  ZC.tile({label:'Sales closed',value:inr(s.soldValue),spark:SP(wk(RW,x=>x.soldValue)),sub:`${plural(s.sold,'sale')} · ${delta(s.soldValue,p.soldValue)}`});
  const trend=ZC.lineChart({labels:SW.map(x=>x.label),series:[{name:rep.first,values:rs},{name:'Store',values:wk(SW,x=>x.score),color:'#A39A8A'}],aria:`${rep.first}'s weekly conversation score against the store`});
  const gaps=SKILLS.map(k=>({k,mine:s.skill[k.id],st:store.skill[k.id],best:Math.max(...rows.map(r=>r.s.skill[k.id]))})),hiS=[...gaps].sort((a,b)=>(b.mine-b.st)-(a.mine-a.st));
  const skills=`<div class="skl-w">${gaps.map(g=>`<a class="skl" href="#rep-${id}/coaching" data-tip="${esc(`${g.k.label}|${rep.first} ${g.mine}|Store ${g.st} · Best rep ${g.best}`)}"><span class="s2"><b>${g.k.label}</b><span class="num"><b>${g.mine}</b> / ${g.st}</span></span><span class="bar"><i style="width:${g.mine}%;background:${scoreCol(g.mine)}"></i><span class="tick" style="left:${g.st}%"></span><span class="bestm" style="left:${g.best}%"></span></span></a>`).join('')}</div><div class="hint">Line = store average, dot = best rep. Tap a skill for coaching.</div>`;
@@ -367,7 +374,7 @@ function repOverview(id,row,store,rows){
  const act=ZC.columns({data:TB.data,h:120,w:560,every:TB.every,groups:[{key:'sold',name:'Sold',color:ZC.OUTCOME.sold},{key:'followup',name:'Will return',color:ZC.OUTCOME.followup},{key:'lost',name:'Did not buy',color:ZC.OUTCOME.lost}],aria:`${rep.first}'s conversations per day by result`});
  return `<div class="ktiles">${tiles}</div>
  <div class="cgrid3">
-  ${ZC.ccard(first==null?'Score trend':ch===0?'Score is flat over 8 weeks':`Score is ${ch>0?'up':'down'} ${Math.abs(ch)} pts in 8 weeks`,'vs store',trend)}
+  ${TL?'':ZC.ccard(first==null?'Score trend':ch===0?'Score is flat over 8 weeks':`Score is ${ch>0?'up':'down'} ${Math.abs(ch)} pts in 8 weeks`,'vs store',trend)}
   ${ZC.ccard(`Strongest: ${SHORT[hiS[0].k.id]}. Weakest: ${SHORT[hiS[hiS.length-1].k.id]}`,'Score / store',skills)}
   ${ZC.ccard(`Closes ${pct(s.conv)}, store closes ${pct(store.conv)}`,'Tap a result',outcomes)}
  </div>
@@ -378,7 +385,7 @@ function repOverview(id,row,store,rows){
  </div>
  <div class="agrid">
   ${ZC.ccard(bestP&&bestP.a>bestP.b?`Best with ${esc(lc(PER[bestP.k].label))} customers`:'Conversion by customer type','% bought · conversations',persona,'a5')}
-  ${ZC.ccard(rangeDays()===1?`${plural(s.n,'conversation')} ${periodTxt()}, by hour`:`${(s.n/rangeDays()).toFixed(1)} conversations a day`,periodTxt(),act,'a7')}
+  ${TL?'':ZC.ccard(rangeDays()===1?`${plural(s.n,'conversation')} ${periodTxt()}, by hour`:`${(s.n/rangeDays()).toFixed(1)} conversations a day`,periodTxt(),act,'a7')}
  </div>`}
 
 function repConvs(id,row){const f=S.rcf||{};
@@ -398,7 +405,7 @@ function convRow(c,own){const p=PRODUCTS[c.product];
 function cfLabel(k,v){return {rep:()=>'Rep: '+REP[v].first,outcome:()=>'Result: '+({sold:'Sold',followup:'Will return',lost:'Did not buy'}[v]),persona:()=>PER[v].label,product:()=>PRODUCTS[v].label,reason:()=>REASONS[v].label,stage:()=>'Left after: '+STAGES[v],comp:()=>'Mentioned '+COMP[v].label,kw:()=>'Said "'+v+'"',day:()=>'On '+fdate(new Date(TODAY.getTime()-v*DAY)),hour:()=>'At '+((+v%12)||12)+(+v<12?' am':' pm')}[k]()}
 function filtered(skipDay){const f=S.cf,q=(f.q||'').toLowerCase().trim();
  return cur().filter(c=>(skipDay||((f.day===undefined||c.d===+f.day)&&(f.hour===undefined||c.at.getHours()===+f.hour)))&&(!f.rep||c.rep===f.rep)&&(!f.outcome||c.outcome===f.outcome)&&(!f.persona||c.persona===f.persona)&&(!f.product||c.product===f.product)&&(!f.reason||c.reason===f.reason)&&(f.stage===undefined||f.stage===''||(c.stage===+f.stage&&c.outcome!=='sold'))&&(!f.comp||c.competitor===f.comp)&&(!f.kw||c.kw.includes(f.kw))&&
-  (!q||c.customer.toLowerCase().includes(q)||REP[c.rep].name.toLowerCase().includes(q)||PRODUCTS[c.product].label.toLowerCase().includes(q)||(c.phone||'').replace(/\s/g,'').includes(q.replace(/\s/g,''))))}
+  (!q||String(c.ref).toLowerCase().includes(q)||refNo(c)===q.replace(/^#/,'')||c.customer.toLowerCase().includes(q)||REP[c.rep].name.toLowerCase().includes(q)||PRODUCTS[c.product].label.toLowerCase().includes(q)||(c.phone||'').replace(/\s/g,'').includes(q.replace(/\s/g,''))))}
 const PAGE=50;
 function sortConvs(list){const k=S.sort;return k==='value'?[...list].sort((a,b)=>b.value-a.value):k==='score'?[...list].sort((a,b)=>a.score-b.score):k==='scorehi'?[...list].sort((a,b)=>b.score-a.score):list}
 function convAnalytics(list){
@@ -415,7 +422,7 @@ function convAnalytics(list){
  const sc=list.map(c=>c.score).sort((a,b)=>a-b),med=sc.length?sc[Math.floor(sc.length/2)]:0,low=list.filter(c=>c.score<55).length;
  const hist=ZC.columns({data:bins,h:150,w:260,every:1,groups:[{key:'n',name:'Conversations'}],aria:'Number of conversations by score band'});
  return `<div class="agrid">
-  ${ZC.ccard(n?`${pct(so.length/n)} bought, ${inr(sumv(lo))} walked out`:'Results','Tap a result to filter',split+`<div style="margin-top:14px">${time}</div>`,'a5')}
+  ${ZC.ccard(n?`${pct(so.length/n)} bought, ${inr(sumv(lo))} walked out`:'Results','Tap a result to filter',split+(TL?'':`<div style="margin-top:14px">${time}</div>`),'a5')}
   ${ZC.ccard(T==='reason'?'Why they did not buy':'Who came in and who bought',T==='reason'?'Customers · value not closed':'Conversations · % bought',`<div class="seg mini" role="group" aria-label="Break down by">${types.map(t=>`<button data-act="ctype" data-v="${t[0]}" aria-pressed="${T===t[0]}">${t[1]}</button>`).join('')}</div>${ZC.barList(items)}`,'a4')}
   ${ZC.ccard(n?`Median score ${med}`:'Scores',n?`${plural(low,'conversation')} under 55`:'',hist,'a3')}
  </div>`}
@@ -426,7 +433,7 @@ function renderConversations(){const list=sortConvs(filtered()),tot=cur().length
  return phead('Conversations',`${list.length} of ${tot} conversations ${inTxt()}. Charts and list follow the same filters.`)+
  `<details class="xband" data-xk="conv-analytics" ${ZC.isOpen('conv-analytics',true)?'open':''}><summary><span class="mono">Analytics</span><span class="x-s">${list.length?`${pct(list.filter(c=>c.outcome==='sold').length/list.length)} bought · ${inr(sumv(list))} discussed`:''}</span>${ic('chev',16)}</summary>${convAnalytics(list)}</details>
  ${S.cf.rep&&REP[S.cf.rep]?(()=>{const r=REP[S.cf.rep],rs=stats(cur().filter(c=>c.rep===r.id)),st=stats(cur());return `<div class="card cstrip">${ring(rs.score,40)}<div class="grow"><b>${esc(r.name)}</b><span class="hint num">Score ${rs.score} (store ${st.score}) · closes ${pct(rs.conv)} (store ${pct(st.conv)}) · ${plural(rs.n,'conversation')}</span></div><button class="btn sm" data-go="#rep-${r.id}">Open profile${ic('right',14)}</button><button class="btn sm" data-go="#rep-${r.id}/coaching">Coaching plan</button></div>`})():''}
- <section class="card clistc"><div class="filters stick"><input id="f-q" data-cf="q" type="search" placeholder="Customer, phone, rep or product" value="${esc(S.cf.q||'')}">${sel('rep',REPS.map(r=>[r.id,r.name]),'All reps')}${sel('outcome',[['sold','Sold'],['followup','Will return'],['lost','Did not buy']],'All results')}<select data-sort aria-label="Sort by">${[['date','Newest first'],['value','Highest value'],['score','Lowest score'],['scorehi','Highest score']].map(o=>`<option value="${o[0]}" ${S.sort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>
+ <section class="card clistc"><div class="filters stick"><input id="f-q" data-cf="q" type="search" placeholder="Customer, phone, rep, product or number" value="${esc(S.cf.q||'')}">${sel('rep',REPS.map(r=>[r.id,r.name]),'All reps')}${sel('outcome',[['sold','Sold'],['followup','Will return'],['lost','Did not buy']],'All results')}<select data-sort aria-label="Sort by">${[['date','Newest first'],['value','Highest value'],['score','Lowest score'],['scorehi','Highest score']].map(o=>`<option value="${o[0]}" ${S.sort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>
  ${active.length?`<div class="activechips" style="margin-top:12px">${active.map(k=>`<button class="achip" data-act="unfilter" data-k="${k}">${esc(cfLabel(k,S.cf[k]))}${ic('x',14)}</button>`).join('')}<button class="link" data-act="clearf">Clear all</button></div>`:''}
  <div class="clist" style="margin-top:8px">${list.length?shown.map(c=>convRow(c)).join(''):`<div style="padding:32px 8px;text-align:center"><b>No conversations match these filters</b><p class="hint">Try the 30-day range or remove a filter.</p><button class="btn sm" data-act="clearf">Clear filters</button></div>`}</div>
  ${list.length>PAGE?`<div class="pager"><span class="hint num">${from+1} to ${Math.min(from+PAGE,list.length)} of ${list.length}</span><div class="btnrow"><button class="btn sm" data-act="page" data-v="-1" ${S.page===0?'disabled':''}>${ic('left',14)}Previous</button><button class="btn sm" data-act="page" data-v="1" ${S.page>=pages-1?'disabled':''}>Next${ic('right',14)}</button></div></div>`:''}</section>`}
@@ -481,7 +488,7 @@ function openDrawer(id){S.drawer=+id;drawDrawer()}
 function closeDrawer(){S.drawer=null;document.getElementById('drawerRoot').innerHTML=''}
 function drawDrawer(){const c=CONV[S.drawer];if(!c)return;const rep=REP[c.rep],sm=summaryFor(c),ms=momentsFor(c);
  document.getElementById('drawerRoot').innerHTML=`<div class="drawer-scrim" data-act="close"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="Conversation with ${esc(c.customer)}"><span class="grab" aria-hidden="true"></span>
- <div class="dhead">${ring(c.score,46)}<div style="flex:1;min-width:0"><h2>${esc(c.customer)} ${outcomePill(c)}</h2><p>${repLink(rep.id,rep.name)} · ${when(c)} · ${c.dur} min${c.talkRep!=null?` · ${esc(rep.first)} spoke ${c.talkRep}%`:''}${c.phone?' · '+c.phone:''}</p></div><button class="iconbtn" data-act="close" aria-label="Close">${ic('x')}</button></div>
+ <div class="dhead">${ring(c.score,46)}<div style="flex:1;min-width:0"><h2>${esc(c.customer)} ${outcomePill(c)}</h2><p>Recorded by ${repLink(rep.id,rep.name)} · ${TL?'':'#'+refNo(c)+' · '}${when(c)} · ${c.dur} min${c.talkRep!=null?` · rep voice ${c.talkRep}% of words`:''}${c.phone?' · '+c.phone:''}</p></div><button class="iconbtn" data-act="close" aria-label="Close">${ic('x')}</button></div>
  <div class="dbody">
   <section class="card"><span class="eyebrow">In 30 seconds</span><dl class="sumgrid" style="margin:10px 0 0"><dt>Wanted</dt><dd>${esc(sm.wanted)}</dd><dt>What happened</dt><dd>${esc(sm.happened)}</dd><dt>${c.outcome==='sold'?'Why it worked':'Why not closed'}</dt><dd>${esc(sm.why)}</dd><dt>Next step</dt><dd><b>${esc(sm.next)}</b></dd></dl></section>
   ${aiCard(c)}
@@ -510,7 +517,7 @@ function renderFollowups(){const all=followups();const grp={overdue:[],today:[],
 function searchItems(q){q=q.toLowerCase().trim();if(!q)return [];const out=[];
  REPS.filter(r=>r.name.toLowerCase().includes(q)).slice(0,4).forEach(r=>out.push({g:'Reps',label:r.name,sub:'Coaching view',go:'#rep-'+r.id}));
  REPS.filter(r=>r.name.toLowerCase().includes(q)||'coaching'.includes(q)).slice(0,4).forEach(r=>out.push({g:'Coaching',label:r.name+' coaching plan',sub:'Plan',go:'#coach-'+r.id}));
- CONVS.filter(c=>c.customer.toLowerCase().includes(q)||(c.phone||'').replace(/\s/g,'').includes(q.replace(/\s/g,''))).slice(0,5).forEach(c=>out.push({g:'Customers',label:c.customer,sub:PRODUCTS[c.product].label+' · '+fdate(c.at),conv:c.id}));
+ CONVS.filter(c=>String(c.ref).toLowerCase().includes(q)||'#'+refNo(c)===q||c.customer.toLowerCase().includes(q)||(c.phone||'').replace(/\s/g,'').includes(q.replace(/\s/g,''))).slice(0,5).forEach(c=>out.push({g:'Customers',label:c.customer,sub:PRODUCTS[c.product].label+' · '+fdate(c.at),conv:c.id}));
  Object.entries(PRODUCTS).filter(([k,p])=>p.label.toLowerCase().includes(q)).slice(0,3).forEach(([k,p])=>out.push({g:'Products',label:p.label,sub:'Conversations',filter:{product:k}}));
  Object.entries(REASONS).filter(([k,r])=>r.label.toLowerCase().includes(q)).slice(0,3).forEach(([k,r])=>out.push({g:'Reasons',label:r.label,sub:'Conversations',filter:{reason:k}}));
  COMPS.filter(c=>c.label.toLowerCase().includes(q)).forEach(c=>out.push({g:'Competitors',label:c.label,sub:'Conversations',filter:{comp:c.id}}));

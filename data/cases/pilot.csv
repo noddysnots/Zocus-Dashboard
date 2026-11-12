@@ -1,380 +1,380 @@
-conversation_id,captured_at,rep_name,outcome,value_inr,product,score,score_need,score_budget,score_pitch,score_objection,score_close,reason,stage_reached,customer_name,customer_phone,duration_min,customer_type,in_stock,competitor,competitor_offer,keywords,customer_quote,customer_quote_en,summary_wanted,summary_happened,summary_why,summary_next,objection,objection_resolved,objection_quote,objection_quote_en,objection_reply,objection_reply_en,objection_at_sec,followup_due,followup_done,rep_tenure,store_name,owner_name,zocus_url,ai_coaching,ai_coaching_quote,ai_commitments,ai_next_action,ai_notes,ai_checks,transcript,vertical,talk_rep_pct,segments_n
+conversation_id,captured_at,rep_name,outcome,value_inr,product,score,score_need,score_budget,score_pitch,score_objection,score_close,reason,stage_reached,customer_name,customer_phone,duration_min,customer_type,in_stock,competitor,competitor_offer,keywords,customer_quote,customer_quote_en,summary_wanted,summary_happened,summary_why,summary_next,objection,objection_resolved,objection_quote,objection_quote_en,objection_reply,objection_reply_en,objection_at_sec,followup_due,followup_done,rep_tenure,store_name,owner_name,zocus_url,ai_coaching,ai_coaching_quote,ai_commitments,ai_next_action,ai_notes,ai_checks,transcript,vertical,talk_rep_pct,segments_n,quality,ai_model
 ZC-236,2026-10-29 14:15,Abhishek,lost,370000,Second-hand automatic (not manual gear) car,56,0,100,100,,50,"Customer asked about verification of ownership, challans and",product_shown,Test-car,98123123,3,,,,,"Customer asked about verification of ownership, challans and cases|Customer questioned what 'good condition' means versus other vehicles","Understood. And like how will I know that basically the ownership and that there is no challan on this or there is no, ah, case against this? You verify all of these when you buy?",,Second-hand automatic (not manual gear) car,"Customer need: The customer wanted a second-hand automatic car within a 4 lakh budget. What happened: The salesperson showed a single-owner 2016 Celerio VXI automatic with about 61,000 km driven, quoted 3,70,000, explained variants, said it is sold as-is, described fines and insurance being held at ",,,"Customer asked about verification of ownership, challans and cases",yes,"Understood. And like how will I know that basically the ownership and that there is no challan on this or there is no, ah, case against this? You verify all of these when you buy?",,"We verify and we clear it, that all of what is the, ah, see, when they are, you are selling the vehicle,",,68,,,,Pilot rehearsal (29 Oct tests),,,,,,,No competitor mentioned.,"NOT_MET: Asked the occasion or purpose (D1). Rep never asked about the purpose or use of the car; only asked for budget. | NOT_MET: Confirmed the category or type (D2). Rep jumped to recommending a Celerio automatic without asking or confirming category or material preference; the buyer volunteered automatic. | MET: Asked the budget (D3). Rep asked how much budget and confirmed 4 lakh. | NOT_MET: Confirmed specifications (D4). Rep did not ask or confirm relevant specification requirements from the buyer; buyer asked for them. | MET: Addressed the customer's priority (P2). Buyer wanted a budget car around 4 lakh; rep offered a 3.70 lakh Celerio. | MET: Explained the value (P3). Rep explained single owner, 2016 model, kilometres driven, remaining usable life and better condition than other vehicles. | MET: Stayed respectful (SOP1). Rep was respectful, addressed the buyer as sir and communicated in English. | NOT_MET: Agreed a next step and contact (N1). Buyer left saying he would return in the evening without purchasing; rep gave timings but did not agree a concrete next step or confirm contact details.","[0:15] Customer: Sir, yahan pe do you sell cars also, second-hand ones?
-[0:18] Abhishek: Yeah, yeah, second-hand.
+[0:18] Rep: Yeah, yeah, second-hand.
 [0:20] Customer: I wanted to inquire about, whom should I ask?
-[0:23] Abhishek: Ask me, sir.
+[0:23] Rep: Ask me, sir.
 [0:24] Customer: So, what options are there? So, I wanted a budget car.
-[0:27] Abhishek: Ah, how much budget, sir?
+[0:27] Rep: Ah, how much budget, sir?
 [0:29] Customer: 4 lakh?
-[0:30] Abhishek: 4 lakh, na? Celerio automatic, le lijiye.
+[0:30] Rep: 4 lakh, na? Celerio automatic, le lijiye.
 [0:33] Customer: Ha, I need automatic, not gear. This is automatic?
-[0:36] Abhishek: Automatic. Single owner, 16 model, VXI automatic, 340.
+[0:36] Rep: Automatic. Single owner, 16 model, VXI automatic, 340.
 [0:42] Customer: Accha, what do you mean by VXI, LXI?
-[0:45] Abhishek: Ah, with AC, power windows. ZXI, ZXI, ZXI+ is two, the two is, ah, the two variants is top-end variant. VXI is mid-version.
+[0:45] Rep: Ah, with AC, power windows. ZXI, ZXI, ZXI+ is two, the two is, ah, the two variants is top-end variant. VXI is mid-version.
 [0:53] Customer: Okay. Okay.
-[0:55] Abhishek: And LXI is, ah, base variant.
+[0:55] Rep: And LXI is, ah, base variant.
 [0:58] Customer: Understood. And scratches and all, basically you will repair and then
-[1:03] Abhishek: No, no, as it is condition.
+[1:03] Rep: No, no, as it is condition.
 [1:05] Customer: Accha, as it is condition.
-[1:06] Abhishek: As it is condition, we can sell it.
+[1:06] Rep: As it is condition, we can sell it.
 [1:08] Customer: Understood. And like how will I know that basically the ownership and that there is no challan on this or there is no, ah, case against this? You verify all of these when you buy?
-[1:19] Abhishek: We verify and we clear it, that all of what is the, ah, see, when they are, you are selling the vehicle,
+[1:19] Rep: We verify and we clear it, that all of what is the, ah, see, when they are, you are selling the vehicle,
 [1:26] Customer: Hmm.
-[1:26] Abhishek: On that time we hold the amount, insurance amount, insurance not is there, insurance amount and, ah, any fines is there means, fine's amount, per breach of 500 to 500 rupees, that all are we hold it and what, ah, has a balance amount, what is there that, that will be refund to Ah, sell customer.
+[1:26] Rep: On that time we hold the amount, insurance amount, insurance not is there, insurance amount and, ah, any fines is there means, fine's amount, per breach of 500 to 500 rupees, that all are we hold it and what, ah, has a balance amount, what is there that, that will be refund to Ah, sell customer.
 [1:45] Customer: Okay, understood. And how many kilometers it would have
-[1:48] Abhishek: 60, 61,000 driven. 61,000. 60 plus driven.
+[1:48] Rep: 60, 61,000 driven. 61,000. 60 plus driven.
 [1:52] Customer: And what does that mean, sir? Basically, how much can I drive more, how many years or how many
-[1:56] Abhishek: You can drive in 1,40,000.
+[1:56] Rep: You can drive in 1,40,000.
 [1:57] Customer: Okay, single owner.
-[1:59] Abhishek: Single owner vehicle. You, you will take means, ah, you are the second owner.
+[1:59] Rep: Single owner vehicle. You, you will take means, ah, you are the second owner.
 [2:03] Customer: I'm the second owner.
-[2:05] Abhishek: Ha.
+[2:05] Rep: Ha.
 [2:05] Customer: And, ah, about financing, sir, is there any
-[2:08] Abhishek: Ah, finance is available.
+[2:08] Rep: Ah, finance is available.
 [2:09] Customer: What, what is the
-[2:09] Abhishek: We have Kotak, ah, ICICI, ah, Bajaj, M&M Mahindra,
+[2:09] Rep: We have Kotak, ah, ICICI, ah, Bajaj, M&M Mahindra,
 [2:16] Customer: Hmm.
-[2:16] Abhishek: and IDFC, SBI.
+[2:16] Rep: and IDFC, SBI.
 [2:19] Customer: Okay.
-[2:20] Abhishek: We have a lot of banks.
+[2:20] Rep: We have a lot of banks.
 [2:21] Customer: And what is the typical interest rate on these cars?
-[2:24] Abhishek: Used cars is we have, we have 14. 14% interest on the used car.
+[2:24] Rep: Used cars is we have, we have 14. 14% interest on the used car.
 [2:28] Customer: And what is the exact price of this?
-[2:30] Abhishek: 3,70.
+[2:30] Rep: 3,70.
 [2:31] Customer: 3,70,000. 3,70,000.
-[2:33] Abhishek: Hmm.
+[2:33] Rep: Hmm.
 [2:34] Customer: And any other options in this range of 4 lakh? Only this one is there?
-[2:37] Abhishek: A good condition vehicle, better vehicle, this vehicle only is there.
+[2:37] Rep: A good condition vehicle, better vehicle, this vehicle only is there.
 [2:40] Customer: Accha. What do you mean by good condition? What, others are not in good condition?
-[2:44] Abhishek: Ah, not is good condition, better, better than other vehicles, this is a good condition.
+[2:44] Rep: Ah, not is good condition, better, better than other vehicles, this is a good condition.
 [2:48] Customer: Accha, accha.
-[2:49] Abhishek: This, this vehicle is, ah, really good.
+[2:49] Rep: This, this vehicle is, ah, really good.
 [2:51] Customer: Okay. And if I, ah, I'll bring my wife also, sir, she wants to see, so I can do a test drive and
-[2:56] Abhishek: Yeah. You can do test drive.
+[2:56] Rep: Yeah. You can do test drive.
 [2:59] Customer: When is, when is this open, sir? All days it's open or
-[3:02] Abhishek: It will be open, sir. Sundays also will open.
+[3:02] Rep: It will be open, sir. Sundays also will open.
 [3:04] Customer: Okay, today, today what time till
-[3:06] Abhishek: Ah, 6:15. Morning 9:15 to evening 6:15 will be open.
+[3:06] Rep: Ah, 6:15. Morning 9:15 to evening 6:15 will be open.
 [3:11] Customer: Okay, sir. I'll come in the evening then.
-[3:13] Abhishek: Okay.
-[3:14] Customer: Thank you.",car,52,59
-ZC-237,2026-10-29 17:37,Abhishek,lost,100000,"Necklace or earring, low making charges",62,33,0,86,,50,family,product_shown,Josalukkas Test,98123123123,4,"Buying for his wife, who will select the design",,,,,,,"Necklace or earring, low making charges · Gift for his wife","Customer need: The customer wanted a gift for his wife, either earrings or a necklace, in the 1 lakh range with lower making charges. What happened: Staff said the pieces are about 6 grams of 22 carat gold, quoted gold at 13,195 and 24 carat at about 14,000, and gave a 2.9% making charge. Staff calc",Customer wants his wife to select the design before buying.,,,,,,,,,,,,Pilot rehearsal (29 Oct tests),,,,,,,"Staff asked only about grams, not needs. | Customer stated the budget and staff worked within it.","NOT_MET: Asked the occasion or purpose (D1). The buyer volunteered a gift for his wife; the rep never asked about or confirmed the occasion or purpose. | NOT_MET: Confirmed the category or type (D2). The buyer stated necklace or earring; the rep did not confirm category or metal preference (gold carat was only an answer to the buyer's question). | NOT_MET: Asked the budget (D3). The buyer volunteered a 1 lakh range; the rep neither asked nor confirmed the budget. | MET: Confirmed specifications (D4). The rep asked how many grams, a relevant weight specification, and confirmed all pieces are about 6 g. | MET: Gave a correct product fact (P1). The rep answered the making charge question directly (2.9% on the selected piece), consistent with the catalogue's making charge fact. | MET: Addressed the customer's priority (P2). The buyer asked to see options in the 1 lakh range and the rep quoted pieces below 1 lakh (82,000) and confirmed items fit the budget. | NOT_MET: Explained the value (P3). The rep gave only price components; no quality assurance or product value explanation (hallmark, design, craftsmanship) was offered. | MET: Stayed respectful (SOP1). The rep communicated respectfully throughout, addressing the buyer as sir and answering clearly in English. | NOT_MET: Agreed a next step and contact (N1). The buyer left without purchasing, saying he would return with his wife; the rep only said okay sure, with no concrete next step and no contact confirmed.","[0:10] Customer: Bag, should I keep it?
-[0:12] Speaker 2: No, no, you can take it.
+[3:13] Rep: Okay.
+[3:14] Customer: Thank you.",car,52,59,,claude-sonnet-5-5
+ZC-237,2026-10-29 17:37,Abhishek,lost,100000,"Necklace or earring, low making charges",62,33,0,86,,50,family,product_shown,Josalukkas Test,98123123123,4,Gift milestone,,,,,,,"Necklace or earring, low making charges · Gift for his wife","Customer need: The customer wanted a gift for his wife, either earrings or a necklace, in the 1 lakh range with lower making charges. What happened: Staff said the pieces are about 6 grams of 22 carat gold, quoted gold at 13,195 and 24 carat at about 14,000, and gave a 2.9% making charge. Staff calc",Customer wants his wife to select the design before buying.,,,,,,,,,,,,Pilot rehearsal (29 Oct tests),,,,,,,"Staff asked only about grams, not needs. | Customer stated the budget and staff worked within it.","NOT_MET: Asked the occasion or purpose (D1). The buyer volunteered a gift for his wife; the rep never asked about or confirmed the occasion or purpose. | NOT_MET: Confirmed the category or type (D2). The buyer stated necklace or earring; the rep did not confirm category or metal preference (gold carat was only an answer to the buyer's question). | NOT_MET: Asked the budget (D3). The buyer volunteered a 1 lakh range; the rep neither asked nor confirmed the budget. | MET: Confirmed specifications (D4). The rep asked how many grams, a relevant weight specification, and confirmed all pieces are about 6 g. | MET: Gave a correct product fact (P1). The rep answered the making charge question directly (2.9% on the selected piece), consistent with the catalogue's making charge fact. | MET: Addressed the customer's priority (P2). The buyer asked to see options in the 1 lakh range and the rep quoted pieces below 1 lakh (82,000) and confirmed items fit the budget. | NOT_MET: Explained the value (P3). The rep gave only price components; no quality assurance or product value explanation (hallmark, design, craftsmanship) was offered. | MET: Stayed respectful (SOP1). The rep communicated respectfully throughout, addressing the buyer as sir and answering clearly in English. | NOT_MET: Agreed a next step and contact (N1). The buyer left without purchasing, saying he would return with his wife; the rep only said okay sure, with no concrete next step and no contact confirmed.","[0:10] Customer: Bag, should I keep it?
+[0:12] Other staff: No, no, you can take it.
 [0:13] Customer: Ha. No, no, I wanted to buy a gift, a earring.
-[0:17] Speaker 2: For?
+[0:17] Other staff: For?
 [0:18] Customer: For my wife.
-[0:18] Speaker 2: Wife. Necklace?
+[0:18] Other staff: Wife. Necklace?
 [0:20] Customer: Earrings or necklace, anything. Wait.
-[0:20] Speaker 2: Necklaces What all plan are you looking?
+[0:20] Other staff: Necklaces What all plan are you looking?
 [0:25] Customer: For necklace.
-[0:27] Speaker 2: Like that? Earrings is first one.
+[0:27] Other staff: Like that? Earrings is first one.
 [0:32] Customer: Huh?
-[0:32] Speaker 2: First one.
+[0:32] Other staff: First one.
 [0:33] Customer: And?
-[0:33] Speaker 2: Necklace is here.
+[0:33] Other staff: Necklace is here.
 [0:34] Customer: Which one will have like less making charges?
-[0:36] Speaker 2: No, flat you are getting this.
+[0:36] Other staff: No, flat you are getting this.
 [0:38] Customer: Oh.
-[0:39] Speaker 2: Flat 2.99.
+[0:39] Other staff: Flat 2.99.
 [0:40] Customer: And what will be the starting range for?
-[0:43] Speaker 2: You can see. You can ask him, he will tell you.
+[0:43] Other staff: You can see. You can ask him, he will tell you.
 [0:49] Customer: Sir, wanted to see something in 1 lakh range. Uh, for my wife. Either a uh, necklace or a earring.
-[1:05] Abhishek: How many grams?
+[1:05] Rep: How many grams?
 [1:07] Customer: Uh, something comes up to 1 lakh uh, price? Can you show me in this range?
-[1:20] Abhishek: 6 gram. All are around 6 gram.
+[1:20] Rep: 6 gram. All are around 6 gram.
 [1:26] Customer: Okay. And uh, like this is like what gold? 18 carat?
-[1:34] Abhishek: 22 carat.
+[1:34] Rep: 22 carat.
 [1:35] Customer: 22 carat. What's the current price of the gold right now?
-[1:38] Abhishek: 13,195.
+[1:38] Rep: 13,195.
 [1:40] Customer: For 20, and 24 is?
-[1:42] Abhishek: Uh, 14,000.
+[1:42] Rep: Uh, 14,000.
 [1:45] Customer: 14,000?
-[1:46] Abhishek: Yeah.
+[1:46] Rep: Yeah.
 [1:47] Customer: Acha, it's fallen. It's fallen right? Uh, it is 14,500 or something.
-[1:53] Abhishek: Yeah, yeah.
+[1:53] Rep: Yeah, yeah.
 [1:55] Customer: Uh, Which one is 6 gram?
-[2:01] Abhishek: All are around 6 gram.
+[2:01] Rep: All are around 6 gram.
 [2:03] Customer: Okay.
-[2:04] Abhishek: It's nearly 6 gram.
+[2:04] Rep: It's nearly 6 gram.
 [2:06] Customer: Ha. Okay. And in this one, what will be the price of gold uh, making charges basically? How much is the making charge? How much is the uh, production charge?
-[2:17] Abhishek: 2.9% is only making charge.
+[2:17] Rep: 2.9% is only making charge.
 [2:19] Customer: Okay.
-[2:20] Abhishek: Selected piece.
+[2:20] Rep: Selected piece.
 [2:21] Customer: What's the price of this whole?
-[2:22] Abhishek: Nearly 1 lakh. Below, below 1 lakh.
+[2:22] Rep: Nearly 1 lakh. Below, below 1 lakh.
 [2:24] Customer: Okay. Uh,
-[2:35] Abhishek: Which one, sir?
+[2:35] Rep: Which one, sir?
 [2:36] Customer: Which one is, this one is?
-[2:38] Abhishek: This is 5.87. 5.87 into 13,195 into 2.99 percentage, 3 percentage tax.
+[2:38] Rep: This is 5.87. 5.87 into 13,195 into 2.99 percentage, 3 percentage tax.
 [2:45] Customer: Hmm.
-[2:53] Abhishek: 82, sir. 82,000.
+[2:53] Rep: 82, sir. 82,000.
 [2:55] Customer: 82,000.
-[2:58] Abhishek: 6 gram.
+[2:58] Rep: 6 gram.
 [3:00] Customer: Okay. And This is in uh, necklace. In earring or ring, anything will come in this budget or?
-[3:08] Abhishek: Yeah.
+[3:08] Rep: Yeah.
 [3:09] Customer: Okay, what time is the showroom open?
-[3:11] Abhishek: Only 2 years.
+[3:11] Rep: Only 2 years.
 [3:13] Customer: 2 years?
-[3:14] Abhishek: 2 years.
+[3:14] Rep: 2 years.
 [3:15] Customer: Nahi, nahi, nahi. Till what time in the evening it is?
-[3:17] Abhishek: Evening, ah? 9 o'clock.
+[3:17] Rep: Evening, ah? 9 o'clock.
 [3:18] Customer: Ha. Okay. I'll bring my wife around, so I'll just uh, She can select the design.
-[3:24] Abhishek: Okay.
+[3:24] Rep: Okay.
 [3:24] Customer: I just wanted to know if the range is available or not.
-[3:26] Abhishek: Okay, sure.
-[3:27] Customer: Okay, thank you.",car,23,65
-ZC-238,2026-10-29 17:44,Abhishek,lost,,"Looking at two wheelers: Jupiter, Ntorq, compared with Activa",36,0,0,100,33,50,competitor,product_shown,TVS 2 Wheeler Test,98123123124,4,,,Activa,,Prior accelerator sticking problem on another scooter|Display reliability in rain|Price gap between variants is small,"Usme mera ek do baar accident ho chuka hai, accelerator phas jata hai. To wo ek badi problem aa rahi thi usme.",,"Looking at two wheelers: Jupiter, Ntorq, compared with Activa","Customer need: The customer came to look at a two wheeler, asked about the Jupiter and the Ntorq, and wanted a comparison with the Activa; no budget or purchase timing was stated. What happened: The salesperson explained the Ntorq is 125cc, quoted 1,11,000, described free accessories for the Diwali ",,,Prior accelerator sticking problem on another scooter,no,"Usme mera ek do baar accident ho chuka hai, accelerator phas jata hai. To wo ek badi problem aa rahi thi usme.",,"Haan, accelerator",,93,,,,Pilot rehearsal (29 Oct tests),,,,,,,"No salesperson question about needs or usage was seen. | Budget was not discussed. | Price, accessories, warranty and display features were explained.","NOT_MET: Asked the occasion or purpose (D1). Rep only greeted; never asked about use or purchase purpose. | NOT_MET: Confirmed the category or type (D2). Rep did not capture or confirm category/preference beyond answering questions. | NOT_MET: Asked the budget (D3). Rep never asked about or confirmed the buyer's budget. | NOT_MET: Confirmed specifications (D4). Rep did not confirm any relevant specification requirements from the buyer. | MET: Addressed the customer's priority (P2). Buyer showed interest in the display/connectivity features and the rep explained SmartXonnect and display durability. | MET: Explained the value (P3). Rep explained feature, warranty and connectivity value of the product. | MET: Acknowledged the objection (O1). Rep acknowledged the accelerator problem ('Haan, accelerator'). | NOT_MET: Explored the objection (O2). Rep did not ask about or explain the accelerator issue; only said 'Iska sir dekhiye'. | NOT_MET: Answered the objection (O3). No actionable resolution to the accelerator concern was offered; rep moved to helmets. | MET: Stayed respectful (SOP1). Rep communicated politely in Hinglish with 'sir' throughout. | NOT_MET: Agreed a next step and contact (N1). Buyer left without purchasing; rep only gave closing time and set no next step or contact confirmation.","[0:25] Abhishek: Yes sir?
+[3:26] Rep: Okay, sure.
+[3:27] Customer: Okay, thank you.",car,23,65,,claude-sonnet-5-5
+ZC-238,2026-10-29 17:44,Abhishek,lost,,"Looking at two wheelers: Jupiter, Ntorq, compared with Activa",36,0,0,100,33,50,competitor,product_shown,TVS 2 Wheeler Test,98123123124,4,,,Activa,,Prior accelerator sticking problem on another scooter|Display reliability in rain|Price gap between variants is small,"Usme mera ek do baar accident ho chuka hai, accelerator phas jata hai. To wo ek badi problem aa rahi thi usme.",,"Looking at two wheelers: Jupiter, Ntorq, compared with Activa","Customer need: The customer came to look at a two wheeler, asked about the Jupiter and the Ntorq, and wanted a comparison with the Activa; no budget or purchase timing was stated. What happened: The salesperson explained the Ntorq is 125cc, quoted 1,11,000, described free accessories for the Diwali ",,,Prior accelerator sticking problem on another scooter,no,"Usme mera ek do baar accident ho chuka hai, accelerator phas jata hai. To wo ek badi problem aa rahi thi usme.",,"Haan, accelerator",,93,,,,Pilot rehearsal (29 Oct tests),,,,,,,"No salesperson question about needs or usage was seen. | Budget was not discussed. | Price, accessories, warranty and display features were explained.","NOT_MET: Asked the occasion or purpose (D1). Rep only greeted; never asked about use or purchase purpose. | NOT_MET: Confirmed the category or type (D2). Rep did not capture or confirm category/preference beyond answering questions. | NOT_MET: Asked the budget (D3). Rep never asked about or confirmed the buyer's budget. | NOT_MET: Confirmed specifications (D4). Rep did not confirm any relevant specification requirements from the buyer. | MET: Addressed the customer's priority (P2). Buyer showed interest in the display/connectivity features and the rep explained SmartXonnect and display durability. | MET: Explained the value (P3). Rep explained feature, warranty and connectivity value of the product. | MET: Acknowledged the objection (O1). Rep acknowledged the accelerator problem ('Haan, accelerator'). | NOT_MET: Explored the objection (O2). Rep did not ask about or explain the accelerator issue; only said 'Iska sir dekhiye'. | NOT_MET: Answered the objection (O3). No actionable resolution to the accelerator concern was offered; rep moved to helmets. | MET: Stayed respectful (SOP1). Rep communicated politely in Hinglish with 'sir' throughout. | NOT_MET: Agreed a next step and contact (N1). Buyer left without purchasing; rep only gave closing time and set no next step or contact confirmation.","[0:25] Rep: Yes sir?
 [0:26] Customer: Two wheeler dekhne aaya tha. To Jupiter hi aaya hai? Aur ye wala kaun sa hai?
-[0:57] Abhishek: Ye Ntorq hai.
+[0:57] Rep: Ye Ntorq hai.
 [0:59] Customer: Kya difference, kya farq hai? Nahi nahi, isme aur isme kya difference hai?
-[1:03] Abhishek: Isme bas design ka difference hai sir.
+[1:03] Rep: Isme bas design ka difference hai sir.
 [1:07] Customer: Aur iska Activa se kaise, matlab power same rehti hai ya kaisi rehti hai?
-[1:13] Abhishek: Ye sir 125cc hai. Isme sir features zyada aata hai. Activa me aapko boot space dekh lijiye iska boot space, iska seat dekh lijiye.
+[1:13] Rep: Ye sir 125cc hai. Isme sir features zyada aata hai. Activa me aapko boot space dekh lijiye iska boot space, iska seat dekh lijiye.
 [1:21] Customer: Haan.
-[1:22] Abhishek: Aur... iska mileage sir aapko 10 year ke baad bhi same rahega. Uska 10, 5 year ke baad alag ho jata hai. 40 bolta hai wo 30 ho jata hai.
+[1:22] Rep: Aur... iska mileage sir aapko 10 year ke baad bhi same rahega. Uska 10, 5 year ke baad alag ho jata hai. 40 bolta hai wo 30 ho jata hai.
 [1:33] Customer: Usme mera ek do baar accident ho chuka hai, accelerator phas jata hai. To wo ek badi problem aa rahi thi usme.
-[1:37] Abhishek: Haan, accelerator Iska sir dekhiye.
+[1:37] Rep: Haan, accelerator Iska sir dekhiye.
 [1:42] Customer: Hmm.
-[1:43] Abhishek: Do helmet aaram se aa jayega sir. Ji sir.
+[1:43] Rep: Do helmet aaram se aa jayega sir. Ji sir.
 [1:47] Customer: Achha.
-[1:47] Abhishek: Kumar Call kar idhar se.
+[1:47] Rep: Kumar Call kar idhar se.
 [1:54] Customer: Isme kitna hai iska price?
-[1:58] Abhishek: Iska price 1,11,000 hai.
+[1:58] Rep: Iska price 1,11,000 hai.
 [1:59] Customer: 1,11,000
-[2:00] Abhishek: Ji sir.
+[2:00] Rep: Ji sir.
 [2:01] Customer: Achha. Aur abhi koi scheme chal rahi hai Diwali pe koi offer ya kuch?
-[2:05] Abhishek: Haan sir, accessories free hai.
+[2:05] Rep: Haan sir, accessories free hai.
 [2:06] Customer: Kaun si accessories?
-[2:07] Abhishek: Front guard, back guard, seat cover, grip cover, foot rest, helmet, ye sab aapko full free mil raha hai sir. 6000 iska price hai, wo aapko free mil jayega.
+[2:07] Rep: Front guard, back guard, seat cover, grip cover, foot rest, helmet, ye sab aapko full free mil raha hai sir. 6000 iska price hai, wo aapko free mil jayega.
 [2:17] Customer: Achha. Warranty kya rehta hai isme?
-[2:19] Abhishek: Warranty sir 5 year.
+[2:19] Rep: Warranty sir 5 year.
 [2:23] Customer: Aur colors?
-[2:25] Abhishek: Color sir sirf isme three color aata hai sir. White, black aur... White, grey.
+[2:25] Rep: Color sir sirf isme three color aata hai sir. White, black aur... White, grey.
 [2:32] Customer: Wo grey hai?
-[2:33] Abhishek: Nahi, wo...
+[2:33] Rep: Nahi, wo...
 [2:41] Customer: Kaun sa, white wala?
-[2:42] Abhishek: Haan, white wala 110cc ka hai.
+[2:42] Rep: Haan, white wala 110cc ka hai.
 [2:44] Customer: Kya bas cc ka difference hai ya kuch aur?
-[2:45] Abhishek: Haan sir, cc ka difference hai.
+[2:45] Rep: Haan sir, cc ka difference hai.
 [2:47] Customer: Wo kitne ka padta hai?
-[2:48] Abhishek: Iska 1,14,400.
+[2:48] Rep: Iska 1,14,400.
 [2:50] Customer: Aur ye 1,15,000 bol rahe ho. To price to almost same hi hai.
-[2:53] Abhishek: Aur ye sir normal display me hai, wo digital display SmartXonnect ke sath me hai.
+[2:53] Rep: Aur ye sir normal display me hai, wo digital display SmartXonnect ke sath me hai.
 [2:56] Customer: Achha. Kya hota hai SmartXonnect? Ye... achha, oh.
-[3:00] Abhishek: Haan sir, mobile se bas bluetooth connect karke aap turn by turn navigation, message, call kuch bhi aata hai, screen pe show karega sir.
+[3:00] Rep: Haan sir, mobile se bas bluetooth connect karke aap turn by turn navigation, message, call kuch bhi aata hai, screen pe show karega sir.
 [3:06] Customer: Achha. To phir baarish-vaarish me kharab to nahi ho jata display iska?
-[3:09] Abhishek: Nahi sir. Abhi tak to waisa nahi aaya hai.
+[3:09] Rep: Nahi sir. Abhi tak to waisa nahi aaya hai.
 [3:18] Customer: Test ride to hoti hai na?
-[3:20] Abhishek: Haan sir, mil jayega.
+[3:20] Rep: Haan sir, mil jayega.
 [3:21] Customer: Thik hai, mai apni wife ko bhi leke aata hu, phir mai aapko batata hu. Kab tak khula hai showroom?
-[3:25] Abhishek: 7:30 sir.
+[3:25] Rep: 7:30 sir.
 [3:32] Customer: Thik hai, thank you.
-[3:39] Abhishek: Rohan.",car,54,47
-ZC-239,2026-10-29 17:51,Abhishek,followup,,Interested in Activa vs Dio; wife to finalise colour,40,0,0,75,,50,family,product_shown,Honda 2 Wheeler,98125125125,3,Owns an old Activa and wants an exchange,,TVS,,Customer undecided on cash vs EMI and Activa vs TVS; needs wife's input,"I'll have to think about it, ma'am, right now I'm not sure.",,Interested in Activa vs Dio; wife to finalise colour,"Customer need: The customer, who already owns an Activa, asked about Honda Activa versus Dio, with Activa pricing, warranty, finance and exchange of the old scooter; budget was not stated. What happened: The salesperson quoted on-road prices of about 1,19,000 (Dio) and 1,21,000 (Activa), a three-yea",Customer wants wife's input on colour and model and is unsure about payment mode,,Customer undecided on cash vs EMI and Activa vs TVS; needs wife's input,no,"I'll have to think about it, ma'am, right now I'm not sure.",,Planning this week?,,157,,,,Pilot rehearsal (29 Oct tests),,,,,Customer to bring wife and RC card to the showroom for vehicle check,,Asked cash or EMI; no budget amount obtained. | TVS was mentioned by the customer; no response observed.,"NOT_MET: Asked the occasion or purpose (D1). Rep asked about purchase timing and whether it is just an inquiry, but never established the use or purpose of the vehicle. | NOT_MET: Confirmed the category or type (D2). Rep asked which model was being considered but did not capture or confirm a jewellery category or metal preference. | NOT_MET: Asked the budget (D3). Rep asked only whether the buyer pays full cash or EMI, which is not a budget or price band; the buyer remained unsure and no budget was discussed. | NOT_MET: Confirmed specifications (D4). No relevant purity, weight, size or wear specification was captured or confirmed by the rep. | MET: Addressed the customer's priority (P2). Buyer asked about warranty and offers; rep stated the engine warranty, insurance, accessories and discount details addressing that priority. | NOT_MET: Explained the value (P3). Presentation was reached, but rep gave only a minimal 'only body difference' answer and a bare warranty mention without explaining product quality or value. | MET: Stayed respectful (SOP1). Rep communicated politely, addressing the buyer as sir, asking his name and using the buyer's mixed Hindi-English language. | NOT_MET: Agreed a next step and contact (N1). Buyer was leaving to consult his wife without purchasing. Rep took the name and asked for a phone number, but no concrete next step such as a return visit or callback was agreed, a","[0:18] Abhishek: Sir? Kaunsa liye hai, ye Dio hai?
+[3:39] Rep: Rohan.",car,54,47,,claude-sonnet-5-5
+ZC-239,2026-10-29 17:51,Abhishek,followup,,Interested in Activa vs Dio; wife to finalise colour,40,0,0,75,,50,family,product_shown,Honda 2 Wheeler,98125125125,3,Owns an old Activa and wants an exchange,,TVS,,Customer undecided on cash vs EMI and Activa vs TVS; needs wife's input,"I'll have to think about it, ma'am, right now I'm not sure.",,Interested in Activa vs Dio; wife to finalise colour,"Customer need: The customer, who already owns an Activa, asked about Honda Activa versus Dio, with Activa pricing, warranty, finance and exchange of the old scooter; budget was not stated. What happened: The salesperson quoted on-road prices of about 1,19,000 (Dio) and 1,21,000 (Activa), a three-yea",Customer wants wife's input on colour and model and is unsure about payment mode,,Customer undecided on cash vs EMI and Activa vs TVS; needs wife's input,no,"I'll have to think about it, ma'am, right now I'm not sure.",,Planning this week?,,157,,,,Pilot rehearsal (29 Oct tests),,,,,Customer to bring wife and RC card to the showroom for vehicle check,,Asked cash or EMI; no budget amount obtained. | TVS was mentioned by the customer; no response observed.,"NOT_MET: Asked the occasion or purpose (D1). Rep asked about purchase timing and whether it is just an inquiry, but never established the use or purpose of the vehicle. | NOT_MET: Confirmed the category or type (D2). Rep asked which model was being considered but did not capture or confirm a jewellery category or metal preference. | NOT_MET: Asked the budget (D3). Rep asked only whether the buyer pays full cash or EMI, which is not a budget or price band; the buyer remained unsure and no budget was discussed. | NOT_MET: Confirmed specifications (D4). No relevant purity, weight, size or wear specification was captured or confirmed by the rep. | MET: Addressed the customer's priority (P2). Buyer asked about warranty and offers; rep stated the engine warranty, insurance, accessories and discount details addressing that priority. | NOT_MET: Explained the value (P3). Presentation was reached, but rep gave only a minimal 'only body difference' answer and a bare warranty mention without explaining product quality or value. | MET: Stayed respectful (SOP1). Rep communicated politely, addressing the buyer as sir, asking his name and using the buyer's mixed Hindi-English language. | NOT_MET: Agreed a next step and contact (N1). Buyer was leaving to consult his wife without purchasing. Rep took the name and asked for a phone number, but no concrete next step such as a return visit or callback was agreed, a","[0:18] Rep: Sir? Kaunsa liye hai, ye Dio hai?
 [0:22] Customer: Aur kaunsa aata hai, Activa mein?
-[0:24] Abhishek: Activa, Dio.
+[0:24] Rep: Activa, Dio.
 [0:26] Customer: Dio which one hai? This one? What's the difference? No, I have a Activa right now, so what's the difference between the two?
-[0:34] Abhishek: Only body difference, sir.
+[0:34] Rep: Only body difference, sir.
 [0:35] Customer: Body. Both is 110cc? What's the price, ma'am, for Activa?
-[0:45] Abhishek: On-road price 1,19,000.
+[0:45] Rep: On-road price 1,19,000.
 [0:47] Customer: For both?
-[0:48] Abhishek: Activa. Dio. Activa 1,21,000.
+[0:48] Rep: Activa. Dio. Activa 1,21,000.
 [0:52] Customer: 1,21,000. And what is the warranty or anything that you offer?
-[0:58] Abhishek: Engine warranty three years, sir.
+[0:58] Rep: Engine warranty three years, sir.
 [1:01] Customer: Okay.
-[1:01] Abhishek: Insurance 5 + 5 years, 5 year first party, 5 year third party, and accessories charges you want to accessories, 4,500. Uh, 3,000 discount and 2,000 extra.
+[1:01] Rep: Insurance 5 + 5 years, 5 year first party, 5 year third party, and accessories charges you want to accessories, 4,500. Uh, 3,000 discount and 2,000 extra.
 [1:13] Customer: Okay.
-[1:14] Abhishek: Which company working?
+[1:14] Rep: Which company working?
 [1:15] Customer: Uh, Flipkart.
-[1:18] Abhishek: Yeh Indian corporate company list hai. Tie-up companies 2,000 discount.
+[1:18] Rep: Yeh Indian corporate company list hai. Tie-up companies 2,000 discount.
 [1:23] Customer: 2,000 discount.
-[1:25] Abhishek: Indian corporate company.
+[1:25] Rep: Indian corporate company.
 [1:27] Customer: Flipkart India And, uh, is pe financing options wagera kuch hai kya?
-[1:35] Abhishek: Haan, hai.
+[1:35] Rep: Haan, hai.
 [1:36] Customer: Here only or?
-[1:37] Abhishek: I am only finance.
+[1:37] Rep: I am only finance.
 [1:38] Customer: Oh, you only do. And any exchange offers you have? I have a old Activa.
-[1:42] Abhishek: Haan, old vehicle 2,000.
+[1:42] Rep: Haan, old vehicle 2,000.
 [1:44] Customer: Activa only.
-[1:45] Abhishek: Activa, any one vehicle.
+[1:45] Rep: Activa, any one vehicle.
 [1:46] Customer: Accha, any vehicle.
-[1:47] Abhishek: Karnataka registration?
+[1:47] Rep: Karnataka registration?
 [1:48] Customer: Haan, Karnataka, KA 04. What would be the
-[1:51] Abhishek: You checking the vehicle, sir, first.
+[1:51] Rep: You checking the vehicle, sir, first.
 [1:53] Customer: What can we get for this?
-[1:54] Abhishek: Depend upon a vehicle condition.
+[1:54] Rep: Depend upon a vehicle condition.
 [1:57] Customer: Okay.
-[1:58] Abhishek: Which model, sir?
+[1:58] Rep: Which model, sir?
 [2:00] Customer: Uh, I am not sure.
-[2:01] Abhishek: RC card is not there?
+[2:01] Rep: RC card is not there?
 [2:03] Customer: Haan.
-[2:03] Abhishek: You have first owner or second owner?
+[2:03] Rep: You have first owner or second owner?
 [2:05] Customer: Which one, ma'am?
-[2:06] Abhishek: You first owner or second owner? New vehicle aapka new vehicle hai na?
+[2:06] Rep: You first owner or second owner? New vehicle aapka new vehicle hai na?
 [2:09] Customer: Haan, new vehicle liya tha.
-[2:11] Abhishek: RC card?
+[2:11] Rep: RC card?
 [2:12] Customer: RC card hai.
-[2:13] Abhishek: Haan, woh RC card le aao, check karta hai.
+[2:13] Rep: Haan, woh RC card le aao, check karta hai.
 [2:15] Customer: Okay.
-[2:16] Abhishek: Kitna price aata hai bolte hai.
+[2:16] Rep: Kitna price aata hai bolte hai.
 [2:18] Customer: Okay. Thik hai, ek baar I'll, kitne baje tak showroom open rehta hai?
-[2:23] Abhishek: Abhi it's closed. 6:30, 7 o'clock close ho jata.
+[2:23] Rep: Abhi it's closed. 6:30, 7 o'clock close ho jata.
 [2:27] Customer: I'll get my wife along, woh ek baar dekh ke color final kar legi.
-[2:32] Abhishek: Your good name, sir?
+[2:32] Rep: Your good name, sir?
 [2:34] Customer: Abhishek.
-[2:35] Abhishek: You have full cash or EMI, sir?
+[2:35] Rep: You have full cash or EMI, sir?
 [2:37] Customer: I'll have to think about it, ma'am, right now I'm not sure. Uh, depending upon aap what offer you give, uh
-[2:43] Abhishek: Planning this week?
+[2:43] Rep: Planning this week?
 [2:44] Customer: Haan, ma'am?
-[2:45] Abhishek: Planning this week?
+[2:45] Rep: Planning this week?
 [2:46] Customer: Planning means?
-[2:47] Abhishek: Purchasing planning hai, nahi hai, just inquiry hai?
+[2:47] Rep: Purchasing planning hai, nahi hai, just inquiry hai?
 [2:51] Customer: Nahi, I'll plan, but ab woh Activa lena hai ya TVS lena hai woh I'll discuss, ek baar wife ko dikha ke, and then
-[2:56] Abhishek: Okay. Phone number. Right.
-[3:17] Customer: Okay, thank you.",car,47,62
-ZC-240,2026-10-29 17:58,Abhishek,lost,,Earring or pendant in lab-grown diamond,46,0,0,75,67,50,family,price_quoted,Jiva Jeweller,98126126126,4,Customer will bring their wife to help decide,,,,Budget lower than some options|Question whether lab-grown diamond is fake or has resale value,यह चीज है मतलब वह मेरा budget उतना नहीं। Okay sir यह वाला ले सकते हैं।,,Earring or pendant in lab-grown diamond · Daily wear,"Customer need: The customer asked about a target range of twenty-two and a daily-wear piece such as an earring or pendant; the stated budget is limited. What happened: The salesperson explained lab-grown versus mined diamond, quoted starting prices of about fifteen to twenty-six thousand, mentioned ",Customer said the budget was limited and wants to bring their wife,,Budget lower than some options,yes,यह चीज है मतलब वह मेरा budget उतना नहीं। Okay sir यह वाला ले सकते हैं।,,Okay sir ये वाला ले सकते हैं ये आपका 15 में है। Okay. और ये आपका 7 into 18 है sir। Okay. ये वाला आपका 23 है। तो ये भी आपका 26 to उतना में आएगा sir।,,171,,,,Pilot rehearsal (29 Oct tests),,,,,,,,"NOT_MET: Asked the occasion or purpose (D1). The rep never asked about the occasion or purchase purpose. The customer volunteered 'daily wear' but the rep did not elicit or confirm it. | NOT_MET: Confirmed the category or type (D2). The category (earring/pendant) was raised by the customer; the rep did not capture or confirm category and metal preference. | NOT_MET: Asked the budget (D3). The customer, not the rep, raised the target range; the rep did not ask or confirm the budget. The rep's opening line is not a budget question. | NOT_MET: Confirmed specifications (D4). The rep mentioned carat options when quoting prices but never asked about or confirmed purity, weight or size requirements. | NOT_MET: Addressed the customer's priority (P2). The customer mentioned daily wear; the rep never acknowledged or addressed that priority. | MET: Addressed the customer's priority (P2). The customer stated a target range and budget limits; the rep presented lab-grown as budget friendly and quoted options at specific price points. | MET: Explained the value (P3). The rep explained that lab-grown and mined diamonds share the same physical and chemical properties and hardness, differing only in origin, and that lab-grown is budget friendly. | MET: Acknowledged the objection (O1). After the customer said the budget was not enough for that item, the rep acknowledged it with 'Okay sir, you can take this one'. | NOT_MET: Explored the objection (O2). The rep did not ask about the underlying budget or need, nor explain the constraint, and moved straight to quoting prices. | MET: Answered the objection (O3). The rep offered an actionable alternative: a pendant at 15 thousand, with the other options priced. | MET: Stayed respectful (SOP1). The rep spoke respectfully, addressing the customer as 'sir' and mixing Hindi and English to match the customer. | NOT_MET: Agreed a next step and contact (N1). The customer said he would bring his wife and then ended the visit without purchasing. The rep did not agree a concrete next step (date or time) or confirm contact details.","[0:26] Abhishek: We have to dream and then make it happen.
+[2:56] Rep: Okay. Phone number. Right.
+[3:17] Customer: Okay, thank you.",car,47,62,,claude-sonnet-5-5
+ZC-240,2026-10-29 17:58,Abhishek,lost,,Earring or pendant in lab-grown diamond,46,0,0,75,67,50,family,price_quoted,Jiva Jeweller,98126126126,4,Customer will bring their wife to help decide,,,,Budget lower than some options|Question whether lab-grown diamond is fake or has resale value,यह चीज है मतलब वह मेरा budget उतना नहीं। Okay sir यह वाला ले सकते हैं।,,Earring or pendant in lab-grown diamond · Daily wear,"Customer need: The customer asked about a target range of twenty-two and a daily-wear piece such as an earring or pendant; the stated budget is limited. What happened: The salesperson explained lab-grown versus mined diamond, quoted starting prices of about fifteen to twenty-six thousand, mentioned ",Customer said the budget was limited and wants to bring their wife,,Budget lower than some options,yes,यह चीज है मतलब वह मेरा budget उतना नहीं। Okay sir यह वाला ले सकते हैं।,,Okay sir ये वाला ले सकते हैं ये आपका 15 में है। Okay. और ये आपका 7 into 18 है sir। Okay. ये वाला आपका 23 है। तो ये भी आपका 26 to उतना में आएगा sir।,,171,,,,Pilot rehearsal (29 Oct tests),,,,,,,,"NOT_MET: Asked the occasion or purpose (D1). The rep never asked about the occasion or purchase purpose. The customer volunteered 'daily wear' but the rep did not elicit or confirm it. | NOT_MET: Confirmed the category or type (D2). The category (earring/pendant) was raised by the customer; the rep did not capture or confirm category and metal preference. | NOT_MET: Asked the budget (D3). The customer, not the rep, raised the target range; the rep did not ask or confirm the budget. The rep's opening line is not a budget question. | NOT_MET: Confirmed specifications (D4). The rep mentioned carat options when quoting prices but never asked about or confirmed purity, weight or size requirements. | NOT_MET: Addressed the customer's priority (P2). The customer mentioned daily wear; the rep never acknowledged or addressed that priority. | MET: Addressed the customer's priority (P2). The customer stated a target range and budget limits; the rep presented lab-grown as budget friendly and quoted options at specific price points. | MET: Explained the value (P3). The rep explained that lab-grown and mined diamonds share the same physical and chemical properties and hardness, differing only in origin, and that lab-grown is budget friendly. | MET: Acknowledged the objection (O1). After the customer said the budget was not enough for that item, the rep acknowledged it with 'Okay sir, you can take this one'. | NOT_MET: Explored the objection (O2). The rep did not ask about the underlying budget or need, nor explain the constraint, and moved straight to quoting prices. | MET: Answered the objection (O3). The rep offered an actionable alternative: a pendant at 15 thousand, with the other options priced. | MET: Stayed respectful (SOP1). The rep spoke respectfully, addressing the customer as 'sir' and mixing Hindi and English to match the customer. | NOT_MET: Agreed a next step and contact (N1). The customer said he would bring his wife and then ended the visit without purchasing. The rep did not agree a concrete next step (date or time) or confirm contact details.","[0:26] Rep: We have to dream and then make it happen.
 [0:29] Customer: Okay. So like what will be the target range?
-[0:33] Speaker 3: Twenty thousand.
+[0:33] Unidentified: Twenty thousand.
 [0:34] Customer: Twenty two.
-[0:35] Speaker 3: ten thousand to fifteen thousand if you want to some like this type hearing. So for them also career in like 25000.
+[0:35] Unidentified: ten thousand to fifteen thousand if you want to some like this type hearing. So for them also career in like 25000.
 [0:46] Customer: And what is this actually? Is it like diamond, gold?
-[0:49] Speaker 3: Gold with Lab-grown diamonds.
+[0:49] Unidentified: Gold with Lab-grown diamonds.
 [0:52] Customer: At Gold Overy Terrace.
-[0:53] Speaker 3: 18 carat, 14 carat and we have also 9 carat. So to compare with 32 carat and 18 carat, 14 and 9 carat is the most stronger. more than stronger 18 carat.
+[0:53] Unidentified: 18 carat, 14 carat and we have also 9 carat. So to compare with 32 carat and 18 carat, 14 and 9 carat is the most stronger. more than stronger 18 carat.
 [1:07] Customer: Okay smoke flavor for daily work.
-[1:09] Speaker 3: And you can do the DCL value.
+[1:09] Unidentified: And you can do the DCL value.
 [1:13] Customer: And like this diamond you have to push lab grown diamond was it lab grown or what does it mean maybe is it like fake or is it like like grown or like does it have a resale value or not?
-[1:17] Speaker 3: That's good. Yeah, you will get this value 90%.
-[1:26] Abhishek: Man diamond and lab diamond so both are like same only properties like physical properties chemical properties okay plus hardness will be same only plus just different is this is made in lab another one is 9 to that's it.
+[1:17] Unidentified: That's good. Yeah, you will get this value 90%.
+[1:26] Rep: Man diamond and lab diamond so both are like same only properties like physical properties chemical properties okay plus hardness will be same only plus just different is this is made in lab another one is 9 to that's it.
 [1:39] Customer: Okay but purity wise your all are same.
-[1:41] Abhishek: All are same only. Just all these are like lab grown is made by in lab. So another one is like you will get through mindset that's it. Everything will be same on this. And this is like budget friendly. And see retail matlab I can retail here only. Yeah, pan India retail sir. You have to go Jigaon under that for diamond sir.
-[1:58] Speaker 3: Yeah.
+[1:41] Rep: All are same only. Just all these are like lab grown is made by in lab. So another one is like you will get through mindset that's it. Everything will be same on this. And this is like budget friendly. And see retail matlab I can retail here only. Yeah, pan India retail sir. You have to go Jigaon under that for diamond sir.
+[1:58] Unidentified: Yeah.
 [2:07] Customer: And in that, this is your uh in ear ring, something in maybe pendant or something.
-[2:13] Abhishek: All right. So, abhi hum log ka zero making chal raha hai iska.
+[2:13] Rep: All right. So, abhi hum log ka zero making chal raha hai iska.
 [2:18] Customer: Okay.
-[2:21] Abhishek: Option. Test will also remain pending.
+[2:21] Rep: Option. Test will also remain pending.
 [2:26] Customer: And what is its starting salary?
-[2:28] Abhishek: Starting sir example, its price is seventeen to eighteen thousand. This one is twenty-three, this one is twenty-six, okay. So, it will come at this rate. This one is a bit of eighteen carat, this may be like fourteen up to. The rest, like twenty-three, twenty-six, this one will come at fifteen and all. This one is fifteen thousand.
+[2:28] Rep: Starting sir example, its price is seventeen to eighteen thousand. This one is twenty-three, this one is twenty-six, okay. So, it will come at this rate. This one is a bit of eighteen carat, this may be like fourteen up to. The rest, like twenty-three, twenty-six, this one will come at fifteen and all. This one is fifteen thousand.
 [2:33] Customer: Okay.
-[2:44] Abhishek: तो if chain भी जाएगा मतलब chain भी जाएगा 14 carat का chain करेगा। [change] if chain है तो आप pendant ले सकते हो नहीं है तो फिर आपको chain के साथ ही... [change] chain है मतलब वो...
+[2:44] Rep: तो if chain भी जाएगा मतलब chain भी जाएगा 14 carat का chain करेगा। [change] if chain है तो आप pendant ले सकते हो नहीं है तो फिर आपको chain के साथ ही... [change] chain है मतलब वो...
 [2:50] Customer: यह चीज है मतलब वह मेरा budget उतना नहीं। Okay sir यह वाला ले सकते हैं।
-[2:52] Abhishek: Okay sir ये वाला ले सकते हैं ये आपका 15 में है। Okay. और ये आपका 7 into 18 है sir। Okay. ये वाला आपका 23 है। तो ये भी आपका 26 to उतना में आएगा sir।
+[2:52] Rep: Okay sir ये वाला ले सकते हैं ये आपका 15 में है। Okay. और ये आपका 7 into 18 है sir। Okay. ये वाला आपका 23 है। तो ये भी आपका 26 to उतना में आएगा sir।
 [2:55] Customer: Okay. Yes.
-[3:04] Abhishek: Ten o'clock.
+[3:04] Rep: Ten o'clock.
 [3:04] Customer: Telugu. I will. I will bring the wife because she will play the role. I know what the budget is. So I will.
-[3:10] Abhishek: Okay, so. और आपको कुछ wallet से recharge करेंगे तो आपको कुछ discount भी आएगा हम बोल देंगे। Jiva wallet।
+[3:10] Rep: Okay, so. और आपको कुछ wallet से recharge करेंगे तो आपको कुछ discount भी आएगा हम बोल देंगे। Jiva wallet।
 [3:15] Customer: हम बोल देंगे। जीवा wallet। अच्छा जीवा app।
-[3:18] Abhishek: We will speak in this too.
+[3:18] Rep: We will speak in this too.
 [3:19] Customer: How much discount?
-[3:21] Abhishek: सब ज्यादा नहीं है क्योंकि gold का market में होता है ना आपको almost like 5% का मिलेगा बस।
+[3:21] Rep: सब ज्यादा नहीं है क्योंकि gold का market में होता है ना आपको almost like 5% का मिलेगा बस।
 [3:22] Customer: Camera. And making charges zero.
-[3:26] Abhishek: Zero making, abhi zero hai.
-[3:28] Customer: Okay. Thank you.",car,66,38
-ZC-241,2026-10-29 18:04,Abhishek,sold,,Lightweight and cheaper vehicle; colour not important,70,50,0,100,100,100,,,Bajaj 2W,9898127127,5,Father finds a heavy scooter hard to handle; customer rides a bike,,,,Customer must consult father and is unsure the father will accept the vehicle; asked about exchanging Activa,"I'll have to talk to my father. Sir, mera price bata dijiye kyunki will he drive Activa woh check karna hai.",,Lightweight and cheaper vehicle; colour not important · Vehicle for customer's father; customer would ride a bike himself,"Customer need: A vehicle for the customer's father, who finds a heavy scooter hard to handle; the customer wants a lightweight, cheap and best-value option and asked about EV, Activa and Diwali offers. What happened: The salesperson showed the Chetak EV but did not recommend it for the father, then ",,,Customer must consult father and is unsure the father will accept the vehicle; asked about exchanging Activa,no,"I'll have to talk to my father. Sir, mera price bata dijiye kyunki will he drive Activa woh check karna hai.",,"Within 1 lakh hai, sir.",,187,,,,Pilot rehearsal (29 Oct tests),,,,,Salesperson said he would provide a quotation and tell the offers,,Salesperson stated a within-1-lakh price but did not ask for the customer's budget.,,"[0:26] Abhishek: Haan model hai. Haan, okay.
+[3:26] Rep: Zero making, abhi zero hai.
+[3:28] Customer: Okay. Thank you.",car,66,38,,claude-sonnet-5-5
+ZC-241,2026-10-29 18:04,Abhishek,sold,,Lightweight and cheaper vehicle; colour not important,70,50,0,100,100,100,,,Bajaj 2W,9898127127,5,Father finds a heavy scooter hard to handle; customer rides a bike,,,,Customer must consult father and is unsure the father will accept the vehicle; asked about exchanging Activa,"I'll have to talk to my father. Sir, mera price bata dijiye kyunki will he drive Activa woh check karna hai.",,Lightweight and cheaper vehicle; colour not important · Vehicle for customer's father; customer would ride a bike himself,"Customer need: A vehicle for the customer's father, who finds a heavy scooter hard to handle; the customer wants a lightweight, cheap and best-value option and asked about EV, Activa and Diwali offers. What happened: The salesperson showed the Chetak EV but did not recommend it for the father, then ",,,Customer must consult father and is unsure the father will accept the vehicle; asked about exchanging Activa,no,"I'll have to talk to my father. Sir, mera price bata dijiye kyunki will he drive Activa woh check karna hai.",,"Within 1 lakh hai, sir.",,187,,,,Pilot rehearsal (29 Oct tests),,,,,Salesperson said he would provide a quotation and tell the offers,,Salesperson stated a within-1-lakh price but did not ask for the customer's budget.,,"[0:26] Rep: Haan model hai. Haan, okay.
 [0:31] Customer: Isme scooter type ka bhi kuch aata hai Bajaj mein?
-[0:33] Abhishek: EV hai.
+[0:33] Rep: EV hai.
 [0:34] Customer: Haan EV mein dikhayein, father ke liye chahiye.
-[0:35] Abhishek: Udhar hai dekhiye. Haan.
+[0:35] Rep: Udhar hai dekhiye. Haan.
 [0:37] Customer: Yeh wala hai? Sirf Chetak?
-[0:42] Abhishek: Haan, Chetak. Doosra nahi hai.
+[0:42] Rep: Haan, Chetak. Doosra nahi hai.
 [0:44] Customer: Achha. Baki bikes hi hai?
-[0:45] Abhishek: Yes, yes.
+[0:45] Rep: Yes, yes.
 [0:46] Customer: And isme kya, jaise Activa se is it lighter ya heavy?
-[0:49] Abhishek: No, no, no, no. That is petrol. This is EV, electric vehicle.
+[0:49] Rep: No, no, no, no. That is petrol. This is EV, electric vehicle.
 [0:51] Customer: But lighter hoga na yeh toh?
-[0:52] Abhishek: Haan, aise hi lagta hai.
+[0:52] Rep: Haan, aise hi lagta hai.
 [0:53] Customer: Toh father ke liye I need, jaise mere father ke liye.
-[0:57] Abhishek: Iska pickup zyada hai.
+[0:57] Rep: Iska pickup zyada hai.
 [0:59] Customer: Oh! EV mein pickup hota hai itna?
-[1:01] Abhishek: Bohot hai. Usko kya lagta hai yaar. Aisa karne se, aisa karne mein bohot difference hai. Usko isko aisa karke dekhiye, udega yeh. Father ke liye I don't recommend this.
+[1:01] Rep: Bohot hai. Usko kya lagta hai yaar. Aisa karne se, aisa karne mein bohot difference hai. Usko isko aisa karke dekhiye, udega yeh. Father ke liye I don't recommend this.
 [1:13] Customer: What would you recommend yaani ki? Wahi Activa hi better hai?
-[1:16] Abhishek: Wahi best hai.
+[1:16] Rep: Wahi best hai.
 [1:16] Customer: Woh unhe heavy lagta hai toh isliye maine kaha.
-[1:19] Abhishek: Best. Bhaiya, wahi hai best.
+[1:19] Rep: Best. Bhaiya, wahi hai best.
 [1:22] Customer: Achha.
-[1:23] Abhishek: Theek hai? Bike chalate hain father?
+[1:23] Rep: Theek hai? Bike chalate hain father?
 [1:25] Customer: Nahi, bike main chalata hoon, unke liye Activa.
-[1:27] Abhishek: Activa unko de do, aap bike le lo.
+[1:27] Rep: Activa unko de do, aap bike le lo.
 [1:30] Customer: Thoda lightweight chahiye mujhe, heavy wala nahi chahiye.
-[1:33] Abhishek: Mehenga wala nahi chahiye, cheap and best chahiye.
+[1:33] Rep: Mehenga wala nahi chahiye, cheap and best chahiye.
 [1:34] Customer: Cheaper, lightweight chahiye mujhe usse zyada.
-[1:36] Abhishek: Yeh lijiye.
+[1:36] Rep: Yeh lijiye.
 [1:37] Customer: Heavy se bhi zyada lightweight is big deal.
-[1:38] Abhishek: This is within 1 lakh.
+[1:38] Rep: This is within 1 lakh.
 [1:40] Customer: Achha. Yeh konsi...
-[1:41] Abhishek: Mileage is 60 to 70. This is a Platina.
+[1:41] Rep: Mileage is 60 to 70. This is a Platina.
 [1:43] Customer: Hmm.
-[1:44] Abhishek: This is CT.
+[1:44] Rep: This is CT.
 [1:45] Customer: Okay.
-[1:45] Abhishek: CT 110, Platina 110. Within 1 lakh rupees. Mileage 60 to 70, lightweight.
+[1:45] Rep: CT 110, Platina 110. Within 1 lakh rupees. Mileage 60 to 70, lightweight.
 [1:51] Customer: Hmm.
-[1:53] Abhishek: Mileage. Abhi, aap...
+[1:53] Rep: Mileage. Abhi, aap...
 [1:54] Customer: Diwali offer is there or something?
-[1:56] Abhishek: Main bata deta hoon jo bhi offer hai.
+[1:56] Rep: Main bata deta hoon jo bhi offer hai.
 [1:57] Customer: Sure.
-[1:57] Abhishek: Ek hi din mein delivery hoga.
+[1:57] Rep: Ek hi din mein delivery hoga.
 [1:58] Customer: Hmm.
-[1:59] Abhishek: Isme main, isme, you people you must have seen no? Swiggy, Zomato, Rapido wala, Uber wala, bike taxi sab yahi karte hain.
+[1:59] Rep: Isme main, isme, you people you must have seen no? Swiggy, Zomato, Rapido wala, Uber wala, bike taxi sab yahi karte hain.
 [2:05] Customer: Okay.
-[2:06] Abhishek: Jo best hai, lightweight hai, wahi karte hain hum log budget mein.
+[2:06] Rep: Jo best hai, lightweight hai, wahi karte hain hum log budget mein.
 [2:08] Customer: Durability, mileage.
-[2:09] Abhishek: Haan, aur mileage mein. So, these two are the vehicle, you can just see.
+[2:09] Rep: Haan, aur mileage mein. So, these two are the vehicle, you can just see.
 [2:12] Customer: Alright, alright.
-[2:13] Abhishek: Iska main quotation deta hoon. Aap bilkul le lijiye, mehenga bhi nahi hai. Within 1 lakh mein. Aap papa ko dijiye, aap yeh chalaiye.
+[2:13] Rep: Iska main quotation deta hoon. Aap bilkul le lijiye, mehenga bhi nahi hai. Within 1 lakh mein. Aap papa ko dijiye, aap yeh chalaiye.
 [2:19] Customer: And isme se woh warranty ya kya rehta hai, engine warranty?
-[2:21] Abhishek: Same, company jo warranty dega wahi hai. It's all company, engine warranty, teen saal company de toh teen saal hai, paanch de toh paanch.
+[2:21] Rep: Same, company jo warranty dega wahi hai. It's all company, engine warranty, teen saal company de toh teen saal hai, paanch de toh paanch.
 [2:27] Customer: Okay.
-[2:28] Abhishek: Uske alawa hum log kya denge woh batayenge.
+[2:28] Rep: Uske alawa hum log kya denge woh batayenge.
 [2:30] Customer: Okay.
-[2:31] Abhishek: Toh in dono mein kya chahiye aap bataiye?
+[2:31] Rep: Toh in dono mein kya chahiye aap bataiye?
 [2:33] Customer: Matlab kya difference kya hai dono mein, Platina...
-[2:35] Abhishek: Dono similar hi hai.
+[2:35] Rep: Dono similar hi hai.
 [2:36] Customer: Bas design different hai?
-[2:37] Abhishek: Bas brand alag hai. Platina, CT. Aap model dekh lijiye bas. Whichever model you like, you can go for it.
+[2:37] Rep: Bas brand alag hai. Platina, CT. Aap model dekh lijiye bas. Whichever model you like, you can go for it.
 [2:43] Customer: Which one is like the cheaper of the two, sir?
-[2:46] Abhishek: Hazaar rupaye difference hai. Dono perform same hai.
+[2:46] Rep: Hazaar rupaye difference hai. Dono perform same hai.
 [2:46] Customer: Same hi hai?
-[2:49] Abhishek: 110 cc, 110 cc.
+[2:49] Rep: 110 cc, 110 cc.
 [2:51] Customer: That way looking better, CTX.
-[2:53] Abhishek: Haan, but you can take this one. In this another combination you will get.
+[2:53] Rep: Haan, but you can take this one. In this another combination you will get.
 [2:56] Customer: Achha. What do you mean by combination sir, color?
-[2:58] Abhishek: Red, blue.
+[2:58] Rep: Red, blue.
 [2:59] Customer: Haan, haan, red, blue.
-[3:00] Abhishek: Color not important?
+[3:00] Rep: Color not important?
 [3:01] Customer: Nahi, color not important.
-[3:02] Abhishek: Then I will give you whatever available color, you can take it. One day, tomorrow only you want delivery, today only I can give.
+[3:02] Rep: Then I will give you whatever available color, you can take it. One day, tomorrow only you want delivery, today only I can give.
 [3:07] Customer: I'll have to talk to my father. Sir, mera price bata dijiye kyunki will he drive Activa woh check karna hai.
-[3:11] Abhishek: Within 1 lakh hai, sir.
+[3:11] Rep: Within 1 lakh hai, sir.
 [3:12] Customer: Within 1 lakh?
-[3:13] Abhishek: Yes, sir. Main 2,000 discount bhi de deta hoon main aapko. I'm giving you seat cover, tank cover, indicator, buzzer, helmet, hand gripper, paanch service free denge.
+[3:13] Rep: Yes, sir. Main 2,000 discount bhi de deta hoon main aapko. I'm giving you seat cover, tank cover, indicator, buzzer, helmet, hand gripper, paanch service free denge.
 [3:18] Customer: Hmm. Understood, sir.
-[3:22] Abhishek: Pickup and drop ek saal ke liye.
+[3:22] Rep: Pickup and drop ek saal ke liye.
 [3:24] Customer: Okay.
-[3:25] Abhishek: Service mein bhi hum gift cash voucher de rahe hain free of cost.
+[3:25] Rep: Service mein bhi hum gift cash voucher de rahe hain free of cost.
 [3:27] Customer: Achha, cash voucher of how much?
-[3:29] Abhishek: See, paanch service hum de rahe hain na,
+[3:29] Rep: See, paanch service hum de rahe hain na,
 [3:31] Customer: Hmm.
-[3:31] Abhishek: paancho service mein labor cost zero rahega.
+[3:31] Rep: paancho service mein labor cost zero rahega.
 [3:33] Customer: Okay.
-[3:34] Abhishek: Aur jo material hum dalenge na, filter, usme phir aapko discount milega. Paancho service mein bhi aapko...
+[3:34] Rep: Aur jo material hum dalenge na, filter, usme phir aapko discount milega. Paancho service mein bhi aapko...
 [3:39] Customer: Service bhi yahi hai?
-[3:40] Abhishek: Idhar hi hai. Aap ek saal pickup and drop hai. Nahi chahiye toh pick karenge, service karenge, ghar pe chhod denge.
+[3:40] Rep: Idhar hi hai. Aap ek saal pickup and drop hai. Nahi chahiye toh pick karenge, service karenge, ghar pe chhod denge.
 [3:47] Customer: And maan lijiye agar jaise if he doesn't agree, exchange ho jata hai kya Activa? Can I exchange?
-[3:51] Abhishek: Yes, you can change. We'll do. Karnataka registration hai na?
+[3:51] Rep: Yes, you can change. We'll do. Karnataka registration hai na?
 [3:53] Customer: Haan, Karnataka registration.
-[3:54] Abhishek: Exchange ho jayega. Uska validate karenge, RC book dijiye.
+[3:54] Rep: Exchange ho jayega. Uska validate karenge, RC book dijiye.
 [3:57] Customer: Okay.
-[3:58] Abhishek: RC card dijiye
+[3:58] Rep: RC card dijiye
 [3:59] Customer: Hmm.
-[4:00] Abhishek: and usko check karenge usme police cases kuch hai, kya hai, RTO, insurance. We'll do the, woh lenge toh.
+[4:00] Rep: and usko check karenge usme police cases kuch hai, kya hai, RTO, insurance. We'll do the, woh lenge toh.
 [4:02] Customer: Sure, sure. You will only take it? Usi mein deduct ho jayega jo bhi hoga?
-[4:07] Abhishek: Isme deduct ho jayega. Samjho woh down payment hai samjho. Baki ka paisa do aap, leke jaiye.
+[4:07] Rep: Isme deduct ho jayega. Samjho woh down payment hai samjho. Baki ka paisa do aap, leke jaiye.
 [4:12] Customer: Understood.
-[4:13] Abhishek: Exchange offer bhi hai. Number likhiye, number likhiye mera. WhatsApp kar dijiye exchange chahiye, jo bhi hai.
+[4:13] Rep: Exchange offer bhi hai. Number likhiye, number likhiye mera. WhatsApp kar dijiye exchange chahiye, jo bhi hai.
 [4:19] Customer: Hmm.
-[4:19] Abhishek: Aapke liye bike nahi, dono yahi chalayenge.
+[4:19] Rep: Aapke liye bike nahi, dono yahi chalayenge.
 [4:21] Customer: Haan sir?
-[4:22] Abhishek: Dono yahi chalayenge.
+[4:22] Rep: Dono yahi chalayenge.
 [4:23] Customer: Nahi-nahi, phir main agar woh bole ki EV lena hai ya thoda lighter wala lena hai, toh yeh main exchange karke apna bike le loon. Main aise kuch soch raha tha. Haan bataiye, sir.
-[4:33] Abhishek: 80 733 91 047.
-[4:39] Customer: Main aapko miss call deta hoon.",car,63,108
+[4:33] Rep: 80 733 91 047.
+[4:39] Customer: Main aapko miss call deta hoon.",car,63,108,,claude-sonnet-5-5
