@@ -12,6 +12,7 @@ Upload validates the whole file first. If any row is bad, nothing is loaded and 
 | `rep_name` | text | `Priya Sharma` | Team, coaching, filters |
 | `outcome` | `sold` / `followup` / `lost` | `followup` | conversion, funnel, follow-ups |
 | `value_inr` | whole rupees, blank = 0 | `85000` | sales closed, money at stake |
+| `value_source` | optional: `call` (price said in the conversation), `budget` (customer budget), `indicative` (typical price of the model), `team` (entered by hand), `recorded` (recorded in the app). Blank with a blank value = not known | `indicative` | the source shown next to each value; rupee totals say how many are indicative or unknown |
 | `product` | text | `Lightweight 22K bangles` | What they want, restock action |
 | `score` | 0-100 | `67` | score rings, ranking |
 
@@ -20,7 +21,7 @@ Upload validates the whole file first. If any row is bad, nothing is loaded and 
 | Column | Format | Used for |
 |---|---|---|
 | `score_need`, `score_budget`, `score_pitch`, `score_objection`, `score_close` | 0-100 | Team skill table, coaching focus. If missing, `score` is used for all five and coaching shows no skill gaps. |
-| `reason` | `browse` `stock` `design` `making` `budget` `competitor` `family`, or free text. Blank on sold rows. | "Why they did not buy". Free text appears as its own reason. Blank on a not-sold row becomes "No clear reason". |
+| `reason` | `browse` `stock` `design` `making` `budget` `competitor` `family` `exchange`, or free text. Blank on sold rows. | "Why they did not buy". Free text appears as its own reason. Blank on a not-sold row becomes "No clear reason". |
 | `stage_reached` | `talked` `need_understood` `product_shown` `price_quoted`. Blank on sold rows. | Funnel. Defaults from the reason if blank. |
 | `conversation_id` | text, unique | reference only |
 
@@ -71,7 +72,7 @@ The repo already has `GET /api/v1/organizations/:orgId/interactions/export?forma
 | Column | Backend source |
 |---|---|
 | `outcome` | `sale_recorded`; otherwise `sessions.outcome.stage` (`lost`, or `follow_up`/`considering`/`committed`/`interested`) |
-| `value_inr` | `sessions.outcome.amountMinor / 100`, else AI `revenueRecovery.value` |
+| `value_inr`, `value_source` | team notes, else `sessions.outcome.amountMinor / 100`, else AI `revenueRecovery.value` (basis `quoted_price`), else for car stores a price read from the transcript, the customer budget, or the model band in `data/price-list.json` |
 | `product` | normalised category `product_type` (relation `requested`) |
 | `score_*` | `score_dimensions`: `pitch_knowledge`, `objection_handling`, `sop_closing`. See gap 1. |
 | `reason` | `outcome.lossReason` or `revenueRecovery.rootCause` |
@@ -86,3 +87,8 @@ The repo already has `GET /api/v1/organizations/:orgId/interactions/export?forma
 2. **Loss reason** is free text; the dashboard wants it grouped into the 7 reasons above (or accepts free text).
 3. **Not captured by analysis yet:** `customer_type`, `in_stock`, `competitor_offer`, `keywords`, and English translations of quotes. The matching Insights tabs stay thin until the analysis adds them.
 4. Export only conversations that are analysed and included.
+
+
+## Car showrooms
+
+When `vertical` is `car` the dashboard uses showroom wording (Booked, test drive, on-road price) and the reason codes read: `browse` just enquiring, `stock` long waiting period, `design` not convinced after the test drive, `making` on-road price too high, `budget` over budget or EMI, `competitor` another brand, `family` family approval, `exchange` exchange value too low. `stage_reached` `product_shown` means "test drive done". `product` is the model; `Model not decided` when none was named.

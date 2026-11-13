@@ -1,47 +1,81 @@
-# Pilot day flow (Saturday 14 Nov 2026)
+# Pilot day flow (Saturday 14 Nov 2026, Mahindra showroom)
 
-The dashboard has three kinds of store, chosen from the dropdown in the header (the Data menu on phones):
+Decided with the team on 13 Nov. This replaces the earlier plan (one login per rep, 2-hour blocks).
 
-| Group | What it is | Shows time and trends? |
-|---|---|---|
-| **Pilot (live)** | The dealership's real recordings for the pilot day | Yes: the day in 2-hour blocks, each block against the one before it |
-| **Real test calls** | The team's own test recordings (Tanishq, TVS, Mahindra) | No. They were recorded by one account on random days, so only per-conversation analysis is shown |
-| **Demo (fictional)** | Invented data showing a prospective customer what the dashboard looks like once reps have logins | Yes. "Apex Motors: pilot day" is the one to show for the Saturday experience |
+- **One day, one snapshot.** No hourly view, no trends, no comparisons. The dashboard is refreshed 2 to 3 times (about 12 pm, 4 pm, 8 pm) and shows when it was updated and how many conversations it held at each earlier update.
+- **One phone records everything.** A Zocus team member records every conversation back to back, in the existing Zocus company. The database therefore cannot tell which showroom rep handled a customer.
+- **The team's notes fill the gaps.** Rep name, customer name, segment, model, a value, and which calls to drop come from the Zocus WhatsApp group and go into `data/pilot-notes.json`.
+- **Car wording.** Booked / Will return / Did not book, test drive, on-road price, showroom. "After the booking" (add-ons) says "To be updated".
+- **The dealer gets a locked link**: `https://<site>/?dealer`.
 
-## Before the day (Friday)
+## The stores in the dropdown
 
-1. **Backend:** the dealership is created as its own company, with one login per rep (name = what should appear on screen). Each rep records on their **own** login: `rep` on the dashboard means "the account that recorded", not the voice in the audio.
-2. **Config:** in `data/cases.json`, entry `pilot`, set `org` to the company name exactly as `node tools/export-from-db.mjs --list` shows it, `date` to `2026-11-14`, `name` to the dealership name, `vertical` (`car`, `two-wheeler`, `jewellery`), and delete the `note`. (Ask Claude: "set up the pilot for <company>".)
-3. **Deploy:** commit and push the dashboard code so Vercel has the Live view. Open the Vercel link on a phone and a laptop.
-4. **Rehearse** with "Apex Motors: pilot day (fictional demo)".
+| Group | What it is |
+|---|---|
+| **Pilot** | "Mahindra showroom (pilot)": every recording in the Zocus company on the pilot date, minus the calls the team dropped |
+| **Real test calls** | The team's own test recordings (Tanishq, TVS, Mahindra): per-conversation analysis only. These files are not on the public site |
+| **Demo (fictional)** | "Apex Motors: pilot day" shows what a full pilot day looks like; the sample store shows several weeks of a jewellery store |
 
-## On the day
+## Before the day
 
-1. **Introduce the product** on the demo store: Live strip, blocks, reps, a long conversation with its transcript, AI tips, skill checks.
-2. **Switch the dropdown to the pilot store** once real recordings exist.
-3. **Refresh about every 3 hours, or whenever you ask** ("refresh the pilot"): Claude runs `node tools/refresh-pilot.mjs`, which exports the company's conversations for the pilot date (read-only), validates the file with the dashboard's own parser, prints recorded / shown / new / still analysing / failed, per-rep counts, and commits locally. It never pushes. **You push to GitHub, Vercel redeploys in about a minute, reload the page.**
-4. The top line says when the data was pulled, how many conversations, how many are still being analysed, and when the last recording was. Long recordings take time to transcribe and score: they show as "Being analysed" and join the numbers on the next refresh.
-5. Fallbacks: Data menu, Upload CSV, `data/cases/pilot.csv`; or present from `http://localhost:4173`.
+1. Set the dealership's name: `name` of the `pilot` entry in `data/cases.json` (ask Claude: "the pilot dealership is called …").
+2. Push the code so Vercel has it. The pilot store then says "No conversations yet today".
+3. If the dealer has a price list, replace the bands in `data/price-list.json`. Until then the bands are the placeholders from the team's sample.
+
+## During the day
+
+**Each conversation**
+
+- Record on the phone. If you can, type the customer's name in the app's customer box. Typing `Rep / Customer` (for example `Rohan / Mr Shah`) tags both automatically.
+- Post one line on WhatsApp: start time, rep, customer, anything that was not said aloud (model, price), and whether to keep or drop the call.
+- If the rep says the on-road price during the conversation, it is picked up automatically. Saying the model name once also helps ("so, the Scorpio N…").
+
+**Each refresh (about 12 pm, 4 pm, 8 pm)**
+
+1. Paste the WhatsApp notes to Claude and say "refresh the pilot".
+2. Claude matches each note to a recording by its start time, updates `data/pilot-notes.json`, and runs `node tools/refresh-pilot.mjs`. That exports the day (read-only), applies the notes, checks the file with the dashboard's own parser and commits locally. It never pushes.
+3. Claude replies with the list of conversations (number, time, length, rep, customer, model, value and where the value came from), the calls that look weak, and what is still being analysed.
+4. You push to GitHub. Vercel redeploys in about a minute. Reload the page.
+
+**Dropping calls.** Nothing is dropped automatically. On each refresh the list flags calls that look weak (under 3 minutes, marked partial, cut off mid-conversation, no customer voice, not a sales conversation). Say which numbers to drop and why; the dashboard shows "2 left out (recording cut short)".
+
+**Backup audio on the second phone.** Not part of the dashboard. The backend accepts uploaded recordings, so ask the backend person whether a backup file can be uploaded into Zocus; if it can, it appears at the next refresh like any other call.
 
 ## After
 
-Final refresh, then export the day's CSV for the owner. Pick **All day** for the totals.
+Final refresh, push, send the dealer `https://<site>/?dealer`. The link opens their store only: no store switcher, no demo stores, no upload. It hides the rest, it does not secure it: the link is open to anyone who has it, and the pilot file holds real customer names, phone numbers and conversation text (accepted 12 Nov).
 
-## What the audience sees
+## How each number is worked out
 
-- **Overview:** results so far, conversations per 2-hour block, reps (chats, talk time, score, results), time with customers, latest conversations with the AI's one-line summary.
-- **Block chips:** tap one and every page filters to it; arrows compare with the previous block only. The first block has nothing to compare with, so it shows no arrows.
-- **A conversation:** AI summary, coaching tips, skill checks, the transcript as speaker turns (Rep / Customer / Other staff) with search, and "What was said". Audio is **Coming soon**.
+**Rep.** Team notes, else `Rep / Customer` typed in the app, else "Rep not tagged". Comparing reps with each other needs at least two tagged reps with three conversations each; until then each rep is compared with the showroom average.
 
-## Things to say out loud
+**Customer.** Team notes, else the name typed in the app, else "Customer 1, 2, …" in the order of the day.
 
-- Scores are real rubric scores only when the scorer judged the conversation complete enough; otherwise they are an estimate from the AI's review, and the export report says which.
-- Outcomes come from staff tags when present, otherwise from the AI's reading. Unclear ones count as "will return".
-- Sale value is the recorded amount, else the customer's stated budget.
-- Speaker labels (Rep / Customer) are the AI's guess.
+**Model.** Team notes, else the model named most often in the conversation (matched against `data/price-list.json`), else "Model not decided".
 
-## Known risks
+**Value.** First match wins, and the dashboard shows the source next to every value:
 
-- **Real customer names, phones and full transcripts are in the committed pilot file, and the Vercel link is open** (decision 12 Nov). The site sends `noindex`, which only keeps it out of search engines. To withhold personal details run the export with `--public`.
-- Reps sharing a login will make the rep views meaningless.
-- If the dealership's company or rep logins are not in the database by Saturday morning, show the demo store and say so.
+1. a number the team sent ("entered by team")
+2. an amount recorded in the app ("recorded in the app")
+3. a price said in the conversation: the AI's quoted price if it found one, else the last rupee figure on a line about on-road, ex-showroom, price or quotation. Lines about EMI, down payment, discount, exchange or insurance are ignored, and only ₹3 lakh to ₹60 lakh counts ("said in the call")
+4. the customer's stated budget ("customer budget")
+5. the midpoint of the model's band in `data/price-list.json` ("indicative by model", shown with a ~)
+6. no model decided: no value. The conversation still counts everywhere except in rupee totals ("value not known")
+
+**Segment.** Team notes, else mapped from what the AI captured about the buyer: First car in the family, Family upgrade to a 7-seater, Switching to electric, Lifestyle and off-road, Replacing current car, Used car buyer, Business use, Daily city use, Family car, else "Not clear".
+
+**Result.** Staff tag if there is one, else the AI's reading of the conversation. Unclear ones count as "Will return".
+
+**Step reached.** Estimated: need understood (a purpose was captured), test drive done (the conversation shows one was taken), price quoted (a price was discussed).
+
+**Scores.** Real rubric scores when the scorer judged the conversation complete enough, otherwise an estimate from the AI's review. The export report says which.
+
+**Coaching examples.** A rep's answer is shown as "What works" only if the objection was resolved and that conversation scored 70 or more on the skill. Otherwise the dashboard shows a line marked "Suggested line · Zocus playbook", which is never credited to a rep.
+
+## Known limits
+
+- The Zocus company is set up as a jewellery store in the backend (the backend knows only jewellery and real estate). The AI cannot check car facts against a car catalogue, so the "Walkaround and test drive" score rests on fewer checks, and the AI's remarks about the jewellery catalogue are filtered out. Fix if wanted: the backend swaps that company's product list and field names to Mahindra; it only affects calls recorded after the change.
+- A price read from the transcript can be wrong when several figures are said. Every refresh lists the prices it read so they can be corrected on WhatsApp.
+- Number words in Hindi ("atharah lakh") are not read as prices; digits and English number words are.
+- The price bands are placeholders until the dealer shares a price list.
+- Not built: the add-ons section ("After the booking"), a PDF report, a multi-week Mahindra sample store.

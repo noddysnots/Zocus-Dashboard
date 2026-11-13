@@ -10,7 +10,7 @@ const SKILL_COLS={need:'score_need',budget:'score_budget',pitch:'score_pitch',ob
 const ALIAS={interaction_id:'conversation_id',employee:'rep_name',rep:'rep_name',store:'store_name',amount:'value_inr',value:'value_inr',sale_value:'value_inr',
   date:'captured_at',datetime:'captured_at',product_name:'product',customer:'customer_name',phone:'customer_phone',duration:'duration_min'};
 const REASON_DEF={browse:['Just browsing, need not found',0],stock:['Lightweight piece not in stock',1],design:['Did not like the designs',2],making:['Making charges too high',3],
-  budget:['Over budget',3],competitor:['Comparing with another store',3],family:['Needs family approval',3],other:['No clear reason',3]};
+  budget:['Over budget',3],competitor:['Comparing with another store',3],family:['Needs family approval',3],exchange:['Exchange value too low',3],other:['No clear reason',3]};
 const REASON_LABEL=Object.fromEntries(Object.entries(REASON_DEF).map(([k,v])=>[v[0].toLowerCase(),k]));
 const STAGE_CODE={talked:0,need_understood:1,product_shown:2,price_quoted:3};
 const COMP_HI={'Shree Gold Palace':'Shree Gold Palace mein making sirf 8% hai.','Nakshatra Online':'Nakshatra Online pe 1 lakh pe gold coin free mil raha hai.','Ratna Jewellers':'Ratna Jewellers mein exchange rate zyada de rahe hain.'};
@@ -132,7 +132,7 @@ function build(text,name){
       aiPromises:get(r,'ai_commitments').split('|').map(t=>t.trim()).filter(Boolean),aiNext:get(r,'ai_next_action'),
       aiNotes:get(r,'ai_notes').split('|').map(t=>t.trim()).filter(Boolean),
       aiChecks:get(r,'ai_checks').split(' | ').map(t=>{const m=t.trim().match(/^(MET|NOT_MET):\s*(.*?)\s*\((\w+)\)\.?\s*(.*)$/);return m?{ok:m[1]==='MET',label:m[2],id:m[3],why:m[4]}:null}).filter(Boolean),
-      transcript:get(r,'transcript'),talkRep:get(r,'talk_rep_pct')===''?null:num(get(r,'talk_rep_pct')),
+      valueSrc:get(r,'value_source').toLowerCase(),transcript:get(r,'transcript'),talkRep:get(r,'talk_rep_pct')===''?null:num(get(r,'talk_rep_pct')),
       turns:(()=>{const t=get(r,'transcript');if(!/^\[\d+:\d\d\] /.test(t))return null;return t.split('\n').map(l=>{const m=l.match(/^\[(\d+):(\d\d)\] ([^:]{0,40}): ([\s\S]*)$/);return m?{t:+m[1]*60+ +m[2],who:m[3],text:m[4]}:null}).filter(Boolean)})()}});
   if(noReason)warnings.push(noReason+' not-sold conversation'+(noReason>1?'s have':' has')+' no reason. They are grouped as "No clear reason".');
   REPS.sort((a,b)=>CONVS.filter(c=>c.rep===b.id).length-CONVS.filter(c=>c.rep===a.id).length||a.name.localeCompare(b.name));
@@ -142,7 +142,7 @@ function build(text,name){
   const ns=rr.filter(r=>!/^(sold|yes|won)$/i.test(get(r,'outcome'))),nsFilled=c=>ns.length?ns.filter(r=>get(r,c)!=='').length/ns.length>=.3:false;
   const has={stock:filled('in_stock'),competitor:filled('competitor'),offer:filled('competitor_offer'),reason:nsFilled('reason'),stage:nsFilled('stage_reached'),
     followups:filled('followup_due'),replies:filled('objection_reply'),types:filled('customer_type'),
-    ai:CONVS.some(c=>c.aiCoach.length||c.aiPromises.length||c.aiNext||c.aiNotes.length),checks:CONVS.some(c=>c.aiChecks.length),transcript:CONVS.some(c=>c.transcript)};
+    ai:CONVS.some(c=>c.aiCoach.length||c.aiPromises.length||c.aiNext||c.aiNotes.length),checks:CONVS.some(c=>c.aiChecks.length),valueSrc:'value_source' in idx,transcript:CONVS.some(c=>c.transcript)};
   return {ok:true,name,warnings,
     ds:{has,vertical:(get(first,'vertical')||'').toLowerCase(),today,store:get(first,'store_name')||'Your store',owner:get(first,'owner_name')||'',REPS,PRODUCTS,PERSONAS,COMPS,CONVS,customReasons,hasObjection,rawText:text,file:name}}}
 
@@ -161,19 +161,20 @@ function modal(title,body){const root=document.getElementById('modalRoot');
   const b=root.querySelector('button');if(b)b.focus()}
 function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function menuHtml(){const ds=window.ZD;
+  if(ds.locked)return '<div class="dm-info"><b>'+esc(ds.store)+'</b><span>'+(ds.CONVS?ds.CONVS.length:0)+' conversations</span></div>'+(ds.rawText?'<button data-zact="export">Export current data (CSV)</button>':'')+(ds.empty?'':'<button data-zact="tour">Show me around</button>');
   const info=ds.isSample?'Showing sample data (fictional store)':esc(ds.file)+' · '+ds.CONVS.length+' conversations';
   const so=storeOptions(),storeList=ds.stores&&ds.stores.length?[...GROUPS,['upload','Your upload']].map(([g,l])=>{const a=so.filter(x=>x.group===g);return a.length?'<div class="dm-sec">'+esc(l)+'</div>'+a.map(o=>'<button data-zact="store" data-id="'+esc(o.id)+'"'+(o.id===ds.storeId?' aria-current="true"':'')+'><span class="dm-dot"></span>'+esc(o.label)+'</button>').join(''):''}).join('')+'<div class="dm-sec">Data</div>':'';
   return '<div class="dm-info"><b>'+(ds.isSample?'Data':esc(ds.store))+'</b><span>'+info+'</span></div>'+storeList+
    '<button data-zact="upload"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>Upload CSV</button>'+
-   '<button data-zact="export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></svg>Export current data (CSV)</button>'+
+   (ds.empty?'':'<button data-zact="export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></svg>Export current data (CSV)</button>')+
    '<button data-zact="template"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Download CSV template</button>'+
    (ds.isSample?'':'<button data-zact="reset"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg>Reset to sample data</button>')+
-   '<button data-zact="tour"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 3.9"/></svg>Show me around</button>'+
+   (ds.empty?'':'<button data-zact="tour"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 3.9"/></svg>Show me around</button>')+
    '<p class="dm-note">Uploaded files stay in this browser only.</p>'}
 function toggleMenu(force){const m=document.getElementById('dataMenu'),b=document.querySelector('[data-zact="menu"]');if(!m)return;
   const open=force===undefined?m.hidden:force;if(open)m.innerHTML=menuHtml();m.hidden=!open;if(b)b.setAttribute('aria-expanded',String(open))}
 async function handleFile(file){
-  if(!file)return;toggleMenu(false);
+  if(!file||(window.ZD&&window.ZD.locked))return;toggleMenu(false);
   if(file.size>25*1024*1024){modal('File too large','<p>The file is over 25 MB. Export a shorter period and try again.</p>');return}
   const text=await file.text(),res=build(text,file.name);
   if(!res.ok){modal('This file was not loaded','<p>Nothing was changed. Fix these and upload again:</p><ul class="zerr">'+res.errors.map(e=>'<li><b>Line '+e.row+'</b> '+esc(e.msg)+'</li>').join('')+'</ul>'+(res.errors.length>=25?'<p class="hint">Showing the first 25 problems.</p>':''));return}
@@ -209,29 +210,50 @@ function setChoice(v){try{localStorage.setItem(CHOICE_KEY,v)}catch(e){}}
 /* Stores = groups of real test conversations described in data/cases.json. A store is listed only if its CSV (data/cases/<id>.csv) is present. */
 async function loadStores(){
   try{const r=await fetch(CASES_URL,{cache:'no-store'});if(!r.ok)return [];const j=await r.json(),out=[];
-    await Promise.all((j.stores||[]).map(async st=>{try{const file=st.file||'data/cases/'+st.id+'.csv',c=await fetch(file,{cache:'no-store'});if(!c.ok)return;const text=await c.text();if(/^\s*<(!doctype|html)/i.test(text))return;let meta=null;try{const m=await fetch(file.replace(/\.csv$/,'.meta.json'),{cache:'no-store'});if(m.ok)meta=await m.json()}catch(e){}out.push({id:st.id,name:st.name,vertical:st.vertical||'',featured:(st.featured||[]).map(n=>'ZC-'+n),text,meta,isDefault:!!st.default,timeless:!!st.timeless,group:st.group||(st.timeless?'test':'pilot')})}catch(e){}}));
+    await Promise.all((j.stores||[]).map(async st=>{try{const file=st.file||'data/cases/'+st.id+'.csv',c=await fetch(file,{cache:'no-store'});if(!c.ok)return;const text=await c.text();if(/^\s*<(!doctype|html)/i.test(text))return;let meta=null;try{const m=await fetch(file.replace(/\.csv$/,'.meta.json'),{cache:'no-store'});if(m.ok)meta=await m.json()}catch(e){}out.push({id:st.id,name:st.name,vertical:st.vertical||'',featured:(st.featured||[]).map(n=>'ZC-'+n),text,meta,isDefault:!!st.default,timeless:!!st.timeless,snapshot:!!st.snapshot,empty:parseCSV(text).length<2,group:st.group||(st.timeless?'test':'pilot')})}catch(e){}}));
     const order=(j.stores||[]).map(x=>x.id);return out.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id))}catch(e){return []}}
 function setStore(id){setChoice(id);try{sessionStorage.setItem('zocus-skip-splash','1')}catch(e){}location.reload()}
+/* A dealer link (…/?dealer) opens the pilot store only: no store switcher, no demo stores, no upload. It hides, it does not secure. */
+const LOCKED=(()=>{try{return new URLSearchParams(location.search).has('dealer')}catch(e){return false}})();
+const dayName=s=>{const d=parseDate(s);return d?['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()]+' '+d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]:''};
+const clock=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})\s*$/);if(!m)return '';const h=+m[1];return (h%12||12)+':'+m[2]+(h<12?' am':' pm')};
+/* A one-day store with nothing ready yet: say so, instead of falling back to the sample store. app.js is not started. */
+function emptyDay(st,stores,rec){
+  const m=st.meta||{},wait=(m.analysing||[]).length,bits=[];
+  if(m.recorded)bits.push(m.recorded+' recorded so far'+(wait?', '+wait+' still being analysed':''));
+  if(m.exportedLocal)bits.push('last updated '+clock(m.exportedLocal));
+  window.ZD={empty:true,locked:LOCKED,isSample:false,storeId:st.id,store:st.name,file:st.id+'.csv',meta:m,CONVS:[],rawText:'',
+    stores:stores.map(x=>({id:x.id,name:x.name,vertical:x.vertical,group:x.group})),hasUpload:!!(rec&&rec.text),uploadName:rec&&rec.name||''};
+  document.documentElement.classList.add('emptyday');document.title=st.name+' · Zocus AI';
+  document.getElementById('page').innerHTML='<div class="phead"><h1>'+esc(st.name)+'</h1><p>'+esc(dayName(m.date)||'Pilot day')+'</p></div>'+
+    '<section class="card" style="text-align:center;padding:52px 20px"><b style="font-size:18px">No conversations yet today</b>'+
+    '<p class="hint" style="margin:8px auto 0;max-width:520px">Conversations appear here after they are recorded, analysed and the page is updated. Updates are planned around 12 pm, 4 pm and 8 pm.'+(bits.length?' '+esc(bits.join(' · ').replace(/^./,c=>c.toUpperCase()))+'.':'')+'</p></section>';
+  fillStoreSelect();return window.ZD}
 async function load(){
   let res=null;
-  const rec=await kvGet('csv'),stores=await loadStores(),pick=choice();
+  if(LOCKED)document.documentElement.classList.add('locked');
+  const rec=LOCKED?null:await kvGet('csv'),stores=await loadStores(),pick=LOCKED?'':choice();
   const st=stores.find(x=>x.id===pick)||(!pick?stores.find(x=>x.isDefault):null);
-  if(st){const b=build(st.text,st.id+'.csv');if(b.ok){res=b;res.ds.isSample=false;res.ds.storeId=st.id;res.ds.featured=st.featured;res.ds.meta=st.meta;res.ds.timeless=st.timeless;res.ds.group=st.group;if(!res.ds.vertical)res.ds.vertical=st.vertical}}
+  if(LOCKED&&!st){fatal('The pilot data is not available yet. Please try again in a little while.');throw new Error('dealer link: no pilot store')}
+  if(st&&st.empty&&st.snapshot)return emptyDay(st,stores,rec);
+  if(st){const b=build(st.text,st.id+'.csv');if(b.ok){res=b;res.ds.isSample=false;res.ds.storeId=st.id;res.ds.featured=st.featured;res.ds.meta=st.meta;res.ds.timeless=st.timeless;res.ds.snapshot=st.snapshot;res.ds.group=st.group;if(!res.ds.vertical)res.ds.vertical=st.vertical;if(st.snapshot)res.ds.store=st.name}}
+  if(LOCKED&&!res){fatal('The pilot data could not be read. Please try again in a little while.');throw new Error('dealer link: pilot store invalid')}
   if(!res&&rec&&rec.text&&pick!=='sample'){const b=build(rec.text,rec.name);if(b.ok){res=b;res.ds.isSample=false;res.ds.storeId='upload'}}
   if(!res){
     let text;try{const r=await fetch(SAMPLE_URL);if(!r.ok)throw new Error(r.status);text=await r.text()}
     catch(e){fatal('The sample data could not be read. Open this page through a web server (for example <code>npx serve</code>), not by double-clicking the file.');throw e}
     res=build(text,'sample.csv');if(!res.ok)throw new Error('sample.csv invalid: '+res.errors[0].msg);res.ds.isSample=true;res.ds.storeId='sample'}
+  res.ds.locked=LOCKED;
   res.ds.stores=stores.map(x=>({id:x.id,name:x.name,vertical:x.vertical,group:x.group}));res.ds.hasUpload=!!(rec&&rec.text);res.ds.uploadName=rec&&rec.name||'';
-  const days=new Set(res.ds.CONVS.map(c=>c.d));res.ds.spanDays=days.size?Math.max(...days)+1:0;res.ds.liveDay=!res.ds.isSample&&!res.ds.timeless&&res.ds.spanDays<=2;
+  const days=new Set(res.ds.CONVS.map(c=>c.d));res.ds.spanDays=days.size?Math.max(...days)+1:0;
   window.ZD=res.ds;fillStoreSelect();
   try{const m=JSON.parse(sessionStorage.getItem('zocus-loaded-msg')||'null');if(m){sessionStorage.removeItem('zocus-loaded-msg');
     setTimeout(()=>toast('Loaded '+m.n+' conversations from '+m.name+(m.w&&m.w.length?'. '+m.w[0]:'')),700)}}catch(e){}
   return res.ds}
-const GROUPS=[['pilot','Pilot (live)'],['test','Real test calls (no trends)'],['demo','Demo (fictional data)']];
+const GROUPS=[['pilot','Pilot'],['test','Real test calls (no trends)'],['demo','Demo (fictional data)']];
 function storeOptions(){const d=window.ZD,o=d.stores.map(s=>({id:s.id,label:s.name,group:s.group}));if(d.hasUpload)o.push({id:'upload',label:'Uploaded: '+d.uploadName,group:'upload'});o.push({id:'sample',label:'Sample store (fictional)',group:'demo'});return o}
 function groupedOptions(sel){const o=storeOptions(),gs=[...GROUPS,['upload','Your upload']];return gs.map(([g,l])=>{const a=o.filter(x=>x.group===g);return a.length?{label:l,items:a}:null}).filter(Boolean).map(x=>'<optgroup label="'+esc(x.label)+'">'+x.items.map(i=>'<option value="'+esc(i.id)+'"'+(i.id===sel?' selected':'')+'>'+esc(i.label)+'</option>').join('')+'</optgroup>').join('')}
-function fillStoreSelect(){const sel=document.getElementById('storeSel'),d=window.ZD;if(!sel||!d||!d.stores.length)return;
+function fillStoreSelect(){const sel=document.getElementById('storeSel'),d=window.ZD;if(!sel||!d||!d.stores.length||d.locked)return;
   sel.innerHTML=groupedOptions(d.storeId);sel.hidden=false}
 document.addEventListener('change',e=>{if(e.target.id==='storeSel')setStore(e.target.value)});
 window.ZocusData={load,build,parseCSV,setStore};

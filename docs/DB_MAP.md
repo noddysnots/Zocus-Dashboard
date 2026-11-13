@@ -43,7 +43,7 @@ The exporter prints "FICTIONAL DATA" in its report when a company's rows come fr
 | `coaching_assignments`, `practice_attempts`, `coaching_interests` | backend coaching: a manager assigns a scenario, the rep answers a short scored practice. Fixture data only | not used; the dashboard computes coaching from scores |
 | `deletion_tombstones` | a recording deleted on request (19 in org 1) | never exported |
 | `ai_provider_calls`, `ai_model_configurations`, `ai_configuration_validations`, `ai_validation_calls`, `ai_runtime_state` | AI usage, models and routing | none |
-| `configuration_versions` | a company's rubric configuration | none |
+| `configuration_versions` | a company's AI settings: `products` (catalogue), `extractionFields`, `sop`, `scorecard`, `competitors`, `objectionResponses`. `organizations.current_config_version_id` points at the live one | none directly, but it decides what the AI extracts and checks |
 | `audit_events`, `legacy_entity_ids`, `zocus_migrations`, `pgboss.*`, `support_grants`, `inclusion_events` | audit, plumbing, job queue | none |
 
 ## `sessions` columns that matter
@@ -62,3 +62,7 @@ The exporter prints "FICTIONAL DATA" in its report when a company's rows come fr
 5. Sale value is the recorded amount, else the customer's stated budget.
 6. A recording is not in the CSV until it has an analysis; the exporter's meta file lists the rest as "still being analysed", "too short to score" or "upload failed".
 7. Org 1 has no store name; `data/cases.json` supplies names for test stores, and the pilot entry names the dealership.
+
+- **The Zocus company (org 1) is configured as jewellery.** The `vertical` enum has only `jewellery` and `real_estate`. Its settings list one product ("Traditional gold necklace") and fields labelled "Occasion" and "Design preference", so on a car conversation the AI writes notes such as "vehicle facts cannot be checked against the supplied catalogue, which only lists jewellery". The exporter filters those notes for car stores. The AI does not extract a car model, a rep name or a customer name.
+- **The AI does give a quoted price when one is said**: `analysis_runs.result.revenueRecovery.value` with `basis: quoted_price`, `amountMinor` and the evidence quote. The exporter uses it before reading the transcript itself.
+- **`sessions.customer_name` and `customer_phone` are typed in the app at recording time.** They are the only names in the database. On a pilot day the recorder can type `Rep / Customer` there.

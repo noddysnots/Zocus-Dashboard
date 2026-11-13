@@ -1,0 +1,5 @@
+{
+  "note": "Team notes for the pilot day, from the Zocus WhatsApp group. One entry per conversation, keyed by the conversation number (the # shown in the dashboard and in the refresh list). Any field can be left out. rep = showroom rep who handled it; customer = customer name; segment = customer type; model = car discussed; value = rupees, only when the team wants to set it by hand; drop = true to leave the call out of the dashboard; why = reason for dropping, shown as a count on the dashboard.",
+  "example": { "261": { "rep": "Rohan", "customer": "Mr Shah", "segment": "Family upgrade to a 7-seater", "model": "Scorpio N", "value": 2150000 }, "263": { "drop": true, "why": "Recording cut short" } },
+  "calls": {}
+}

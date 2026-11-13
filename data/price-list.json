@@ -1,0 +1,78 @@
+{
+  "note": "Indicative on-road price bands per model, used only when no price is said in a conversation. These are the placeholder bands from the team's sample dashboard, NOT this dealer's price list: replace them when the dealer shares theirs. The midpoint of a band is used as the indicative value. Aliases are how the model may appear in a transcript; longer names are matched first (Thar Roxx before Thar).",
+  "brand": "Mahindra",
+  "min": 300000,
+  "max": 6000000,
+  "models": [
+    {
+      "id": "roxx",
+      "label": "Thar Roxx",
+      "aliases": ["thar roxx", "thar rocks", "thar rox", "roxx"],
+      "range": [1450000, 2750000]
+    },
+    {
+      "id": "thar",
+      "label": "Thar",
+      "aliases": ["thar"],
+      "range": [1200000, 2200000]
+    },
+    {
+      "id": "xuv3xo",
+      "label": "XUV 3XO",
+      "aliases": ["xuv 3xo", "xuv 3 xo", "3xo", "xuv 300", "xuv three hundred"],
+      "range": [860000, 1750000]
+    },
+    {
+      "id": "xuv7xo",
+      "label": "XUV 7XO",
+      "aliases": ["xuv 7xo", "xuv 7 xo", "7xo", "xuv 700", "xuv seven hundred"],
+      "range": [1650000, 3000000]
+    },
+    {
+      "id": "scorpion",
+      "label": "Scorpio N",
+      "aliases": ["scorpio n", "scorpio en"],
+      "range": [1600000, 2950000]
+    },
+    {
+      "id": "sclassic",
+      "label": "Scorpio Classic",
+      "aliases": ["scorpio classic", "scorpio"],
+      "range": [1580000, 2050000]
+    },
+    {
+      "id": "bneo",
+      "label": "Bolero Neo",
+      "aliases": ["bolero neo", "bolero"],
+      "range": [1050000, 1280000]
+    },
+    {
+      "id": "be6",
+      "label": "BE 6",
+      "aliases": ["BE 6", "BE 6e", "BE Six"],
+      "range": [2150000, 2950000],
+      "caseSensitive": true
+    },
+    {
+      "id": "xev9e",
+      "label": "XEV 9e",
+      "aliases": ["xev 9e", "xev 9 e"],
+      "range": [2300000, 3250000]
+    },
+    {
+      "id": "xev9s",
+      "label": "XEV 9S",
+      "aliases": ["xev 9s", "xev 9 s"],
+      "range": [2250000, 3300000]
+    }
+  ],
+  "competitors": ["Tata", "Hyundai", "Maruti", "Kia", "Toyota", "MG", "Honda", "Skoda", "Volkswagen", "Renault", "Nissan", "Citroen", "Jeep"],
+  "competitorModels": {
+    "Tata": ["nexon", "harrier", "safari", "punch", "curvv"],
+    "Hyundai": ["creta", "venue", "alcazar", "verna"],
+    "Maruti": ["brezza", "grand vitara", "fronx", "ertiga", "jimny"],
+    "Kia": ["seltos", "sonet", "carens"],
+    "Toyota": ["fortuner", "innova", "hyryder"],
+    "MG": ["hector", "astor", "windsor"]
+  }
+}

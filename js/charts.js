@@ -100,7 +100,7 @@ function scatter(o){const W=360,H=o.h||200,l=34,r=14,t=22,b=30,P=o.points;if(P.l
   let g='';[yr[0],(yr[0]+yr[1])/2,yr[1]].forEach(v=>{g+=`<line x1="${l}" x2="${W-r}" y1="${f1(Y(v))}" y2="${f1(Y(v))}" stroke="${GRID}"/><text x="${l-6}" y="${f1(Y(v)+3.5)}" text-anchor="end" class="ax">${Math.round(v)}${o.ySuffix||''}</text>`});
   [xr[0],(xr[0]+xr[1])/2,xr[1]].forEach(v=>{g+=`<text x="${f1(X(v))}" y="${H-b+13}" text-anchor="middle" class="ax">${Math.round(v)}</text>`});
   g+=`<text x="${(l+W-r)/2}" y="${H-3}" text-anchor="middle" class="ax">${esc(o.xLabel)}</text><text x="2" y="9" class="ax">${esc(o.yLabel)}</text>`;
-  if(o.refX!=null)g+=`<line x1="${f1(X(o.refX))}" x2="${f1(X(o.refX))}" y1="${t}" y2="${H-b}" stroke="${MUTE}" stroke-width="1"/><text x="${f1(X(o.refX)+4)}" y="${t+9}" class="ax">store avg</text>`;
+  if(o.refX!=null)g+=`<line x1="${f1(X(o.refX))}" x2="${f1(X(o.refX))}" y1="${t}" y2="${H-b}" stroke="${MUTE}" stroke-width="1"/><text x="${f1(X(o.refX)+4)}" y="${t+9}" class="ax">${o.refLabel||'store avg'}</text>`;
   if(o.refY!=null)g+=`<line x1="${l}" x2="${W-r}" y1="${f1(Y(o.refY))}" y2="${f1(Y(o.refY))}" stroke="${MUTE}" stroke-width="1"/>`;
   [...P].sort((a,b)=>(b.size||1)-(a.size||1)).forEach(p=>{const cx=X(p.x),cy=Y(p.y),rad=4+4.5*Math.sqrt((p.size||1)/ms),left=cx>W-r-70;
     g+=`<a href="${esc(p.href||'#')}" data-tip="${esc(p.tip)}" aria-label="${esc(p.tip.replace(/\|/g,', '))}"><circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(rad+5)}" fill="transparent"/><circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(rad)}" fill="${INK}" fill-opacity=".86" stroke="${SURF}" stroke-width="2"/><text x="${f1(cx+(left?-rad-4:rad+4))}" y="${f1(cy+3.5)}" text-anchor="${left?'end':'start'}" class="dl">${esc(p.label)}</text></a>`});

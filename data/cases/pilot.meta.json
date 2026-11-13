@@ -1,17 +1,21 @@
 {
- "store": "Pilot rehearsal (29 Oct tests)",
- "exportedAt": "2026-11-12T13:54:50.448Z",
- "exportedLocal": "2026-11-12 19:24",
- "date": "2026-10-29",
- "recorded": 6,
- "shown": 6,
+ "store": "Mahindra showroom (pilot)",
+ "exportedAt": "2026-11-13T05:19:51.308Z",
+ "exportedLocal": "2026-11-13 10:49",
+ "date": "2026-11-14",
+ "recorded": 0,
+ "shown": 0,
  "analysing": [],
  "failed": [],
  "unscored": [],
- "reps": [
+ "leftOut": [],
+ "suggestDrop": [],
+ "valueSources": {},
+ "history": [
   {
-   "name": "Abhishek",
-   "recorded": 6
+   "at": "2026-11-13 10:47",
+   "shown": 0
   }
- ]
+ ],
+ "reps": []
 }
