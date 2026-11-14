@@ -589,7 +589,7 @@ const MK={na:['neutral','Not counted'],done:['good','Done'],partly:['warn','Part
 const cname=c=>/^Customer( \d+)?$/.test(c.customer)?'Customer at '+ftime(c.at):c.customer;
 const rname=r=>r.name==='Rep not tagged'?'Rep not noted':r.name;
 const tRange=c=>{if(!c.endAt)return ftime(c.at);const a=ftime(c.at),b=ftime(c.endAt);return (a.slice(-2)===b.slice(-2)?a.slice(0,-3):a)+' to '+b};
-const clk=(c,s)=>ftime(new Date(c.at.getTime()+s*1000));
+const clk=(c,s)=>ftime(new Date(c.at.getTime()+((c.startSec||0)+s)*1000));
 const SIDE=/^(Background|Other voice)$/;
 const rg=(c,sz)=>c.scored===false?`<span class="noscore" style="width:${sz}px;height:${sz}px" title="Score not available yet">–</span>`:ring(c.score,sz);
 const PDONE=new Set((()=>{try{return JSON.parse(localStorage.getItem('zocus-pdone-'+(ZD.storeId||''))||'[]')}catch(e){return []}})());
@@ -597,7 +597,7 @@ const savePdone=()=>{try{localStorage.setItem('zocus-pdone-'+ZD.storeId,JSON.str
 function openPromises(L){const out=[];L.forEach(c=>c.promises.forEach((p,i)=>{const key=c.id+':'+i;out.push({c,p,i,key,done:PDONE.has(key)})}));return out.sort((a,b)=>a.c.at-b.c.at)}
 function dueBy(c,p){const s=p.due||'';let m,mn=null;if((m=s.match(/(\d+|an|one) hours?/i)))mn=(/^\d+$/.test(m[1])?+m[1]:1)*60;else if((m=s.match(/(\d+) min/i)))mn=+m[1];return mn==null||!c.endAt?null:new Date(c.endAt.getTime()+mn*6e4)}
 const promiseRow=(x,full)=>{const c=x.c,p=x.p,by=dueBy(c,p);
- return `<div class="prom ${x.done?'done':''}"><div class="pm"><b>${esc(p.t)}</b><span class="hint">${esc(cname(c))} · ${esc(rname(REP[c.rep]))} · call ended ${ftime(c.endAt||c.at)}${p.due?` · <b>${esc(p.due)}</b>${by?' (by '+ftime(by)+')':''}`:''}</span>
+ return `<div class="prom ${x.done?'done':''}"><div class="pm"><b>${esc(p.t)}</b><span class="hint">${esc(cname(c))} · ${esc(rname(REP[c.rep]))} · call ended ${ftime(c.endAt||c.at)}${p.due?` · <b>${esc(p.due)}</b>${by?' (around '+ftime(by)+')':''}`:''}</span>
   ${full&&p.q?`<div class="quote key"><div class="hi">"${esc(p.q)}"</div><div class="by">What was said</div>${jumpBtn(c,p.q)}</div>`:''}${full&&p.d?`<div class="draft">${esc(p.d)}</div>`:''}</div>
   <div class="btnrow">${p.d?`<button class="btn sm" data-act="copy" data-text="${esc(p.d)}">${ic('copy',14)}Copy message</button>`:''}<button class="btn sm" data-conv="${c.id}">Open</button><button class="btn sm ${x.done?'':'primary'}" data-act="pdone" data-key="${x.key}">${x.done?'Undo':'Mark done'}</button></div></div>`};
 function dayTimeline(L){if(!L.length)return '';
@@ -638,7 +638,7 @@ function renderHomeRich(){const L=cur(),D=DELV(),LD=allCur(),P=openPromises(LD),
  <div class="statline daystrip"><div><b class="num">${L.length}</b><span>sales conversations</span></div>${D.length?`<div><b class="num">${D.length}</b><span>after the sale</span></div>`:''}<div><b class="num">${q}</b><span>left with a quotation</span></div><div><b class="num">${hi}</b><span>high intent</span></div><div><b class="num">${open}</b><span>promises to keep</span></div></div>
  ${dayTimeline(LD)}
  ${D.length?`<section class="card attn"><div class="card-h"><h2>After the sale: needs attention</h2><span class="hint">Customers who already booked</span></div><div class="ccds">${D.map(deliveryCard).join('')}</div></section>`:''}
- <section class="card" data-tour="actions"><div class="card-h"><h2>Promises to keep</h2><span class="hint">${open} open</span></div>${P.length?P.map(x=>promiseRow(x,false)).join(''):'<p class="hint" style="margin:0">Nothing promised so far.</p>'}</section>
+ <section class="card" data-tour="actions"><div class="card-h"><h2>Promises to keep</h2><span class="hint">${open} open · ticks are saved on this device only</span></div>${P.length?P.map(x=>promiseRow(x,false)).join(''):'<p class="hint" style="margin:0">Nothing promised so far.</p>'}</section>
  <section class="card" data-tour="pulse"><div class="card-h"><h2>Conversations</h2><button class="link" data-go="#conversations">All ${LD.length}${ic('right',14)}</button></div><div class="ccds">${list.map(convCard).join('')}</div>${pendingHtml()}</section>
  ${L.length>=8?floorCards(L):modelsLine(L)}`}
 const CHK_GROUP=[['need','Understanding the need',['need']],['budget','Asking the budget',['budget']],['pitch','Showing the right model',['options','experience','value_proof']],['objection','Handling price doubts',['price_offers','concerns']],['close','Closing and next step',['decision_timing','ask','next_step']]];

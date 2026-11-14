@@ -122,7 +122,7 @@ function build(text,name){
     const dur=num(get(r,'duration_min'));
     const due=parseDate(get(r,'followup_due'));
     return {id:i+1,ref:get(r,'conversation_id')||('row-'+(i+2)),rep:repMap[x.rep],at:x.at,d:Math.round((todayMid-new Date(x.at.getFullYear(),x.at.getMonth(),x.at.getDate()).getTime())/DAY),
-      persona:perMap[cl],product:prodMap[pl],inStock:!no(get(r,'in_stock')),skills:x.sk,score:x.score,scored:x.scored,kind:get(r,'kind').toLowerCase()==='delivery'?'delivery':'sale',jstage:get(r,'stage').toLowerCase(),stageSrc:get(r,'stage_src'),payment:get(r,'payment_status'),resultLabel:get(r,'result_label'),competitor:comp,outcome:x.oc,reason,stage,value:x.value,
+      persona:perMap[cl],product:prodMap[pl],inStock:!no(get(r,'in_stock')),skills:x.sk,score:x.score,scored:x.scored,kind:get(r,'kind').toLowerCase()==='delivery'?'delivery':'sale',startSec:+get(r,'start_sec')||0,jstage:get(r,'stage').toLowerCase(),stageSrc:get(r,'stage_src'),payment:get(r,'payment_status'),resultLabel:get(r,'result_label'),competitor:comp,outcome:x.oc,reason,stage,value:x.value,
       dur:isNaN(dur)||dur<=0?15:Math.round(dur),customer:get(r,'customer_name')||'Customer',phone:get(r,'customer_phone')||null,
       kw:get(r,'keywords').split('|').map(s=>s.trim()).filter(Boolean),done:false,
       cq:get(r,'customer_quote'),cqEn:get(r,'customer_quote_en'),

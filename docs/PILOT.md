@@ -5,7 +5,7 @@ Decided with the team on 13 Nov. This replaces the earlier plan (one login per r
 - **One day, one snapshot.** No hourly view, no trends, no comparisons. The dashboard is refreshed 2 to 3 times (about 12 pm, 4 pm, 8 pm) and shows when it was updated and how many conversations it held at each earlier update.
 - **One phone records everything.** A Zocus team member records every conversation back to back, in the existing Zocus company. The database therefore cannot tell which showroom rep handled a customer.
 - **The team's notes fill the gaps.** Rep name, customer name, segment, model, a value, and which calls to drop come from the Zocus WhatsApp group and go into `data/pilot-notes.json`.
-- **Car wording.** Booked / Will return / Did not book, test drive, on-road price, showroom. "After the booking" (add-ons) says "To be updated".
+- **Car wording.** Booked / Will return / Did not book, test drive, on-road price, showroom. "After the booking" lists accessories and add-ons with prices, payment and open issues once a customer has come back after booking, and says "To be updated" until then.
 - **The dealer gets a locked link**: `https://<site>/?dealer`.
 
 ## What the floor told us (14 Nov, Abhishek)
@@ -16,11 +16,11 @@ Decided with the team on 13 Nov. This replaces the earlier plan (one login per r
 - Giving a quotation is the big step; a test drive does not move the needle much.
 - 8 reps for regular customers, 2 for EV; the EV rep shows the EV first.
 
-So the Overview leads with customers, high-intent customers and **quotations given**; the funnel is Talked, Need understood, Options shown, **Quotation given**, Booked; and there are cards for the model mix (best sellers vs other models vs EV), models compared, what customers care about, fuel, colour, availability and test drives. The first action is always "send the quotation to customers who left without one". Reps with fewer than 3 conversations are not ranked or rated. Add fuel, colour and "quotation given?" to the WhatsApp line when they are not said aloud.
+(This was the first design. The Overview is now conversation by conversation: see "How the pilot day is shown" below.) The quotation is still the key step; the funnel is Talked, Need understood, Options shown, **Quotation given**, Booked; and there are cards for the model mix (best sellers vs other models vs EV), models compared, what customers care about, fuel, colour, availability and test drives. The first action is always "send the quotation to customers who left without one". Reps with fewer than 3 conversations are not ranked or rated. Add fuel, colour and "quotation given?" to the WhatsApp line when they are not said aloud.
 
 ## Who sees what
 
-The site opens on the pilot store only (no switcher, demos or upload). The full app with demos and test stores is at `/?all`.
+Three addresses. The plain site opens on the Mahindra pilot store with a dropdown that also offers the fictional sample day (no upload, no other stores). **`/?dealer`** is the one to share: the pilot store only, no dropdown. `/?all` is for the Zocus team: every store, the demos and the test calls, and upload.
 
 ## The stores in the dropdown (/?all)
 
@@ -28,7 +28,7 @@ The site opens on the pilot store only (no switcher, demos or upload). The full 
 |---|---|
 | **Pilot** | "Mahindra showroom (pilot)": every recording in the Zocus company on the pilot date, minus the calls the team dropped |
 | **Real test calls** | The team's own test recordings (Tanishq, TVS, Mahindra): per-conversation analysis only. These files are not on the public site |
-| **Demo (fictional)** | "Apex Motors: pilot day" shows what a full pilot day looks like; the sample store shows several weeks of a jewellery store |
+| **Demo (fictional)** | "Mahindra showroom: sample day (fictional data)" shows what a full pilot day looks like; the sample store shows several weeks of a jewellery store |
 
 ## Before the day
 
@@ -101,7 +101,7 @@ The screen is built **conversation by conversation**, for the dealer's owner and
 - **Overview, "Today at the showroom":** one sentence of facts, the day timeline (each conversation from start to end; gaps are visible), **Promises to keep** (what the rep promised each customer, when, and a ready message with Copy and Mark done), one card per conversation, and a small day strip. Bigger charts return at 8 or more conversations.
 - **Conversation panel:** the five-part AI summary (Customer need, What happened, Outcome, Why, Next step), what the customer wants, **prices quoted** (written by Claude at each refresh from the AI summary and the recording), customer concerns, promises with messages, **How the rep did** (10 checks, Done / Partly / Missed, each with the reason and the line), the transcript (side talk and phone calls collapsed, English under key lines) and notes from the floor.
 - **Times:** start to end of each conversation everywhere, clock time on every transcript line, and "analysed at" in the panel footer.
-- **Scores:** from the backend's automotive scoring (points-score-v3): 9 of the 10 checks give the score (done 100, partly 50, missed 0); the test-drive check is shown but not scored because the dealer says it matters little. A conversation with no real score shows "Score not available yet", never an invented number.
+- **Scores:** from the backend's automotive scoring (points-score-v3): the checks that apply give the score (done 100, partly 50, missed 0): 9 of the 10 for early enquiries, 7 of the 10 for customers who have already chosen a model; the test-drive check is shown but not scored because the dealer says it matters little. A conversation with no real score shows "Score not available yet", never an invented number.
 - **Reps** are nicknames from the floor (rep 1 Speed Racer, rep 2 Black and White Stripe). A rep is ranked only from 3 conversations.
 - **The dealer link** (the site address plus `/?dealer`) hides the store menu, the demo, the "left out" counts and the first-visit tour.
 
@@ -121,3 +121,9 @@ Abhishek, 11:48 am: today's traffic is mostly model finalisation, accessory sele
 - **finalising**: the customer has chosen a model and is settling variant, price, finance, stock; "understand the need" and "ask the budget" are shown as "Not counted" and are left out of the score.
 - **after_booking**: accessories, payment, delivery or a dispute; not scored, left out of the sales numbers, shown under "After the sale" and in the "After the booking" tab (accessories and add-ons with prices, payment status, open issues). `payment` in the notes shows the payment status.
 The team's one-line note about the day goes in the notes file as `"daynote"` and is shown on the Overview.
+
+### Things to know
+- **"Mark done" on promises is saved in the browser it was clicked in.** It does not sync, so the dealer's screen will not show what the team marked.
+- **Outcome tags:** a result comes from a tag set in the app when there is one, otherwise from the AI. #261 shows "Did not book" because someone tagged it "no" in the app, while the AI reads the customer as still considering. Change it in the notes (`"csv": {"outcome": "followup"}`) if the tag was wrong.
+- **Seconds:** clock times on transcript lines are the recording start plus the offset, shown to the minute.
+- **The pilot file in the public repository contains the full transcripts**, including any names spoken in the room and in side talk (accepted on 12 Nov).
