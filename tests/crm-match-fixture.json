@@ -1,0 +1,8 @@
+{
+  "_note": "Non-personal fixtures for tools/match-crm.mjs --test. Each is one CRM enquiry reduced to time, consultant, model, colour and fuel. 'expect' is the recording number that must come out as the high-confidence match, or 'none' when a person has to decide.",
+  "enquiries": [
+    { "name": "11:45 walk-in, Hardik, XEV 9e (the rep app screenshot, without any customer detail)", "time": "11:45", "consultant": "Hardik", "model": "XEV 9e", "colour": "Stealth Black", "fuel": "Electric", "expect": 266 },
+    { "name": "same car and rep but the time is before every recording of the day", "time": "08:00", "consultant": "Hardik", "model": "XEV 9e", "colour": "", "fuel": "Electric", "expect": "none" },
+    { "name": "Jatin, Scorpio N, 10:30", "time": "10:30", "consultant": "Jatin", "model": "Scorpio N", "colour": "", "fuel": "Diesel", "expect": 261 }
+  ]
+}

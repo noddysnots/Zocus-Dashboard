@@ -59,7 +59,8 @@
       "stage": "finalising",
       "kind": "",
       "scored": "yes",
-      "priorities": "Price and offers"
+      "priorities": "Price and offers",
+      "outcome": "followup"
     },
     "262": {
       "rep_name": "Black and White Stripe",
@@ -75,7 +76,9 @@
       "kind": "",
       "scored": "yes",
       "priorities": "Price and offers|Loan and finance",
-      "visit": "repeat"
+      "visit": "repeat",
+      "outcome": "followup",
+      "_why_outcome": "Will return until the dealer confirms a booking: the recording ends before one, the AI says no booking is confirmed, the only 'sale: yes' is a Zocus-app tag set by the recording account at 2:28 pm."
     },
     "264": {
       "rep_name": "Jatin",
@@ -87,7 +90,8 @@
       "stage": "after_booking",
       "kind": "delivery",
       "scored": "no",
-      "result_label": "Delivery dispute"
+      "result_label": "Delivery dispute",
+      "outcome": "followup"
     },
     "266": {
       "_why": "EV enquiry. The 10 lakh said at 10:00 is a battery replacement cost, not a car price; the petrol, diesel and CNG talk is the rep listing other versions; rough price ranges are not a quotation; a name said in the audio is not published as the customer.",
@@ -104,7 +108,8 @@
       "kind": "",
       "scored": "yes",
       "priorities": "Range and charging|Service|Features|Price and offers",
-      "customer_name": "Customer 5"
+      "customer_name": "Customer 5",
+      "outcome": "followup"
     },
     "272": {
       "_why": "Repeat visit to settle price and delivery of a red 3XO. Quotations were sent on WhatsApp, so no car price is said aloud; the value is the model's indicative band. 'Petrol diesel' at 0:04 is a stray opening word, not the customer's choice.",
@@ -119,7 +124,8 @@
       "kind": "",
       "scored": "yes",
       "customer_name": "Customer 6",
-      "visit": "repeat"
+      "visit": "repeat",
+      "outcome": "followup"
     },
     "275": {
       "_why": "EV vs CNG enquiry for a 3XO. The EV was not at the showroom. Test drive: floor says it happened (note), the AI summary says none. Three models compared, so the value is the 3XO EV's typical price (indicative, marked ~), not a quote; the rep said about 15.5 lakh for the AX5.",
@@ -134,7 +140,8 @@
       "kind": "",
       "scored": "yes",
       "customer_name": "Customer 8",
-      "rep_name": "Jatin"
+      "rep_name": "Jatin",
+      "outcome": "followup"
     },
     "276": {
       "_why": "Short walk-around of an older and the new model; no need, budget or follow-up. The model is never named, so there is no value. The wireless charger is not an EV-charging priority. Staff talk at the end is not part of the conversation.",
@@ -148,7 +155,9 @@
       "stage": "exploring",
       "kind": "",
       "scored": "yes",
-      "customer_name": "Customer 9"
+      "customer_name": "Customer 9",
+      "rep_name": "Lead rep",
+      "outcome": "followup"
     },
     "278": {
       "_why": "Family at the Scorpio N top model; the car did not start; seat space concern; Innova and Fortuner mentioned. The 28.9 lakh is said in Gujarati number words with no basis, so the value is set in the notes as 'said in the call'. A test drive was talked about, not done.",
@@ -164,7 +173,8 @@
       "scored": "yes",
       "priorities": "Space|Comfort|Price and offers",
       "customer_name": "Customer 10",
-      "rep_name": "Jatin"
+      "rep_name": "Jatin",
+      "outcome": "followup"
     },
     "274": {
       "_why": "Top 9e in Ruby Velvet, price negotiation (2 lakh scheme, 30.50 target), colour not in stock, customer may go to Ahmedabad. The rep says his own name (Joshi) at 24:08. On-road 31.89 lakh was the figure given as final. The AI's 30 lakh value came from the customer's own words, so the value is set in the notes.",
@@ -181,7 +191,9 @@
       "kind": "",
       "scored": "yes",
       "priorities": "Price and offers|Availability|Range and charging",
-      "customer_name": "Customer 7"
+      "customer_name": "Customer 7",
+      "outcome": "followup",
+      "critical_contains": "Ahmedabad"
     }
   }
 }

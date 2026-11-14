@@ -77,3 +77,10 @@ Everything below differs from the pre-pilot dashboard. Each is limited to one-da
 To change the contract on purpose: edit this file and `tests/contract.json` in the same commit and say why.
 
 Price tables in the conversation panel show the exact rupee figure (for example ₹1,07,500), not a rounded lakh, so each figure can be checked against the transcript.
+
+## Added 14 Nov, 8 pm
+
+- **Overview, same slot:** the one-line "Rupee figures" hint under the number cards is now a folded card, "How these numbers are worked out": Bookings won, Quoted not booked (every figure with the line and time it came from, or the model's typical price marked ~), and Booking conversion with the counts. Closed by default; nothing else on the Overview moved. The day report prints it open.
+- **Critical follow-up:** when the floor says a conversation needs one, it is a red "Critical" pill, the first row in "Do these next" and the first group ("Critical") on the Follow-ups page.
+- **A result is shown as Booked only when the recording or the dealer says so.** The "sale: yes/no" tag in the Zocus app is set by the recording account (Abhishek), hours after the recording; it is shown as a source, not as a booking. #262 and #266 therefore read Will return (like #261) until the dealer confirms. Every conversation's panel and the breakdown card say where its figure and its result come from.
+

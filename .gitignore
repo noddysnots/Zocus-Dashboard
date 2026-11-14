@@ -13,3 +13,4 @@ data/cases/*.calls.json
 !data/cases/pilot-crm.csv
 !data/cases/pilot.meta.json
 !data/demo/
+data/crm-import/

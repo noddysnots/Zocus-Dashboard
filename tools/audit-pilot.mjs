@@ -151,10 +151,13 @@ for (const r of rows) {
   const bf = golden.must_not_contain_in_flags.filter(w => new RegExp(w, 'i').test(r.flags || ''));
   bf.length ? fail(id, 'flags contain the backend jewellery-catalogue remark: ' + r.flags) : ok(id, 'flags are about this conversation');
 
+  /* where the figure and the result come from must always be written down, and a critical follow-up must be the first one */
+  if (r.kind !== 'delivery') { r.outcome_src ? ok(id, 'the result source is written down') : fail(id, 'no result source'); if (r.value_inr !== '') r.value_why ? ok(id, 'the figure source is written down: ' + r.value_why.slice(0, 70)) : fail(id, 'value has no written source'); }
+  if (golden.calls[String(n)]?.critical_contains) { const f0 = pr[0]; f0 && f0.crit && String(r.critical).includes(golden.calls[String(n)].critical_contains) ? ok(id, 'the critical follow-up is the first follow-up') : fail(id, 'the critical follow-up is missing or not first'); }
   /* golden */
   const g = golden.calls[String(n)];
   if (!g) warn(id, 'no golden answer yet: read the recording by hand and add it to tests/pilot-golden.json');
-  else { const diff = Object.entries(g).filter(([k]) => !k.startsWith('_')).filter(([k, v]) => r[k] !== v).map(([k, v]) => `${k}: expected "${v}", got "${r[k]}"`); diff.length ? fail(id, 'differs from the checked answers: ' + diff.join('; ')) : ok(id, 'matches the checked answers'); }
+  else { const diff = Object.entries(g).filter(([k]) => !k.startsWith('_') && k !== 'critical_contains').filter(([k, v]) => r[k] !== v).map(([k, v]) => `${k}: expected "${v}", got "${r[k]}"`); diff.length ? fail(id, 'differs from the checked answers: ' + diff.join('; ')) : ok(id, 'matches the checked answers'); }
 }
 for (const k of Object.keys(golden.calls)) if (!rows.some(r => r.conversation_id === 'ZC-' + k)) warn('golden', `#${k} has a golden answer but is not in the file`);
 

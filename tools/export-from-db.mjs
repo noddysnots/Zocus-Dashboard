@@ -77,7 +77,7 @@ function saidInCall(turns, re) {
   let f = null;
   for (const t of turns) for (const s of String(t.text || '').split(/(?<=[.?!।])\s+/)) {
     if (!re.test(s) || (re === PRICE_RE && NOT_PRICE.test(s)) || (re === BUDGET_RE && (NOT_BUDGET.test(s) || (t.who && !/^Customer/.test(t.who))))) continue;
-    const v = rupeeFigures(s); if (v.length) f = { v: v.at(-1), who: t.who, text: s.trim().slice(0, 160) };
+    const v = rupeeFigures(s); if (v.length) f = { v: v.at(-1), who: t.who, at: t.at, text: s.trim().slice(0, 160) };
   }
   return f;
 }
@@ -169,6 +169,7 @@ const rows = await q(`
     (select min(t.due_at) from tasks t where t.session_id=s.id and t.state::text<>'cancelled') task_due,
     (select bool_and(t.state::text='done') from tasks t where t.session_id=s.id and t.state::text<>'cancelled') task_done,
     (select min(f.wake_up_at) from followup_opportunities f where f.session_id=s.id) fu_wake,
+    (select jsonb_build_object('v', e.value, 'at', e.created_at, 'by', u2.name) from sale_tag_events e left join users u2 on u2.id=e.actor_id where e.session_id=s.id order by e.id desc limit 1) tagev,
     coalesce((select f.proposal->>'title' from followup_opportunities f where f.session_id=s.id order by f.id limit 1),(select t.title from tasks t where t.session_id=s.id and t.state::text<>'cancelled' order by t.id limit 1)) fu_title
   from sessions s
   left join users u on u.id=s.rep_id left join locations l on l.id=s.location_id
@@ -192,7 +193,7 @@ const CHK = { D1: 'need', D2: 'need', D4: 'need', D3: 'budget', P1: 'pitch', P2:
 const SOP = { discovery: 'need', product_knowledge: 'pitch', objection_handling: 'objection', competitor_handling: 'objection' };
 const reasonCode = t => { const s = (t || '').toLowerCase(); if (!s) return ''; if (/family|approval|discuss|husband|wife|mother|parents/.test(s)) return 'family'; if (/competitor|another|other jeweller|elsewhere/.test(s)) return 'competitor'; if (/budget|price|cost|making|charge|discount|expensive/.test(s)) return 'budget'; if (/design|style|pattern/.test(s)) return 'design'; if (/stock|unavailable|size/.test(s)) return 'stock'; if (/browsing|just looking/.test(s)) return 'browse'; return clip(t, 60); };
 
-const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'customer_quote_en', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_quote_en', 'objection_reply', 'objection_reply_en', 'objection_at_sec', 'followup_due', 'followup_done', 'rep_tenure', 'store_name', 'owner_name', 'zocus_url', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'value_source', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision', 'ended_at', 'analysed_at', 'scored', 'sum_need', 'sum_happened', 'sum_outcome', 'sum_why', 'sum_next', 'promises_json', 'concerns_json', 'flags', 'remarks', 'prices_json', 'f_budget', 'f_preference', 'f_timing', 'f_competitor', 'tr_en', 'kind', 'result_label', 'stage', 'stage_src', 'payment_status', 'start_sec', 'test_drive_note', 'parts_json', 'visit', 'visit_history', 'arrived', 'need_form', 'stock_json', 'objections_json', 'crm_json'];
+const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'customer_quote_en', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_quote_en', 'objection_reply', 'objection_reply_en', 'objection_at_sec', 'followup_due', 'followup_done', 'rep_tenure', 'store_name', 'owner_name', 'zocus_url', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'value_source', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision', 'ended_at', 'analysed_at', 'scored', 'sum_need', 'sum_happened', 'sum_outcome', 'sum_why', 'sum_next', 'promises_json', 'concerns_json', 'flags', 'remarks', 'prices_json', 'f_budget', 'f_preference', 'f_timing', 'f_competitor', 'tr_en', 'kind', 'result_label', 'stage', 'stage_src', 'payment_status', 'start_sec', 'test_drive_note', 'parts_json', 'value_why', 'outcome_src', 'critical', 'visit', 'visit_history', 'arrived', 'need_form', 'stock_json', 'objections_json', 'crm_json'];
 const DERIVED = {}; const mark = (col, how) => { (DERIVED[col] ||= { how, n: 0 }).n++; };
 const exported = new Set(), unscored = []; let fixtureN = 0, heldN = 0, partialN = 0;
 const skip = { range: 0, noOutcome: 0, noScore: 0, dropped: 0 }, src = { checks: 0, 'analysis review': 0 }, srcN = {}, calls = [];
@@ -364,8 +365,9 @@ for (const r of rows) {
   fus.forEach((f, i) => { if (!usedF.has(i)) promises.push({ t: f.title, d: scrubDraft(f.draft || ''), q: clip(f.evidence?.[0]?.quote, 160), k: f.timing?.kind || '', ph: f.timing?.phrase || '' }); });
   if (!promises.length) (res.commitments || []).forEach(c => promises.push({ t: String(c.text || '').replace(/^Salesperson (said|will say) (he would |that |the )?/i, '').replace(/^./, ch => ch.toUpperCase()), d: '', q: clipE(c.evidence?.[0]?.quote, 220), k: '', ph: '', due: '', fromC: 1 }));
   if (Array.isArray(note.followups)) { promises.length = 0; note.followups.forEach(f => promises.push({ t: f.t, d: f.d || '', q: f.q || '', k: '', ph: '', due: f.due || '', at: f.at || '', s: f.s ? 1 : 0, hand: 1 })); mark('promises_json', 'follow-ups written by hand from the recording (team notes)'); }
+  if (note.critical) promises.unshift({ t: note.critical.t, d: '', q: '', k: '', ph: '', due: note.critical.due || '', crit: 1, why: note.critical.why || '' });
   const dueOf = txt => { const s = String(txt || ''); let mm; if (/by (the )?(evening|tonight)|by evening/i.test(s)) return 'by evening'; if ((mm = s.match(/within (about |around )?(an|one|1|two|2|\d+) (hour|hours|minutes?|mins?|days?)/i))) return 'within ' + (mm[1] ? 'about ' : '') + ({ an: 'an', one: 'an', 1: 'an' }[mm[2].toLowerCase()] || mm[2]) + ' ' + mm[3].replace(/^hours?$/i, mm[2].toLowerCase().match(/^(an|one|1)$/) ? 'hour' : 'hours'); return ''; };
-  promises.forEach(p => { if (p.hand) return; p.due = p.fromC ? dueOf(p.t) : dueOf(p.t + ' ' + (res.commitments || []).map(c => c.text).join(' ')); if (!p.due && /stock/i.test(p.k)) p.due = 'when stock is confirmed'; });
+  promises.forEach(p => { if (p.hand || p.crit) return; p.due = p.fromC ? dueOf(p.t) : dueOf(p.t + ' ' + (res.commitments || []).map(c => c.text).join(' ')); if (!p.due && /stock/i.test(p.k)) p.due = 'when stock is confirmed'; });
   const concerns = (sc?.concerns || []).map(c => ({ t: c.concern, s: c.status })).map(c => { const ob = (res.objections || []).map(x => ({ x, s: jac(c.t, x.theme) })).sort((a, b) => b.s - a.s)[0]; return { ...c, a: ob && ob.s > 0.3 ? clip(ob.x.resolution || '', 240) : '' }; });
   (res.objections || []).forEach(x => { if (!concerns.some(c => jac(c.t, x.theme) > 0.3)) concerns.push({ t: x.theme, s: x.resolution ? 'partly' : 'open', a: clip(x.resolution || '', 240) }); });
   const flagsAI = (res.warnings || []).filter(w => !/jewell?ery|catalog(?:ue)?|tanishq/i.test(w)).map(w => /interrupt|someone else|other person/i.test(w) ? 'Phone calls or other conversations interrupted the recording' : /multi-person|several people|multiple people|excluded spans/i.test(w) ? 'Several people were speaking' : clip(w, 120));
@@ -393,6 +395,15 @@ for (const r of rows) {
       ['Lost reason', [['Lost reason', lost ? (REMARK[rcode] || '') : '', lost ? 'backend' : ''], ['Detailed reason', lost ? clip(lossFinal, 160) : '', lost ? 'backend' : ''], ['Sales consultant remark', '', ''], ['Sales manager remark', '', '']]]]
       .map(([g, f]) => ({ g, f })) };
   }
+  /* where the rupee figure and the result come from, in words (shown in the Overview's "How these numbers are worked out") */
+  const inrTxt = v => '₹' + Number(v).toLocaleString('en-IN');
+  const valueWhy = (v, src) => { if (v === '' || v == null) return ''; if (isDelivery) return ''; const pm = (note.prices || []).find(x => +x.p === +v);
+    if (src === 'call') return pm ? `${pm.m}: ${inrTxt(v)}, said at ${pm.at}` : priceLine && +priceLine.v === +v ? `${inrTxt(v)} on the line ${priceLine.at != null ? 'at ' + ts(priceLine.at) + ' ' : ''}"${clip(priceLine.text, 110)}"` : `${inrTxt(v)}, said in the conversation`;
+    if (src === 'indicative') return `No price said: the middle of the typical ex-showroom range for the ${product} (${mainModel?.range ? inrTxt(mainModel.range[0]) + ' to ' + inrTxt(mainModel.range[1]) : 'price list'}); not a quote`;
+    if (src === 'budget') return `The customer's own budget: ${clip(budgetText, 100)}`; if (src === 'team') return 'Entered by the team'; if (src === 'recorded') return 'Recorded in the Zocus app'; return ''; };
+  const tg = r.tagev, h12 = hm => { const [h, m] = String(hm).split(':').map(Number); return (h % 12 || 12) + ':' + String(m).padStart(2, '0') + (h < 12 ? ' am' : ' pm'); }, tgAt = tg && tg.at ? h12(fmt(tg.at).slice(11)) : '';
+  const aiStage = String(res.outcome?.stage || '').replace(/_/g, ' '), shownRes = (note.csv && note.csv.outcome) || outcome;
+  const outcomeSrc = isDelivery ? 'After the sale: not counted as a sales result' : [`AI reading of the recording: ${aiStage || 'no outcome'}`, tg ? `Zocus app tag "sale: ${tg.v}" set by ${tg.by || 'a user'} at ${tgAt}${tg.v === 'yes' ? ' (the recording ended before that)' : ''}` : 'no tag in the Zocus app', `shown as: ${({ sold: 'Booked', followup: 'Will return', lost: 'Did not book' })[shownRes] || shownRes}${note.csv && note.csv.outcome && note.csv.outcome !== outcome ? ' (set in the notes, to confirm with the dealer)' : ''}`].join('; ');
   const rec = {
     conversation_id: 'ZC-' + r.id, captured_at: fmt(r.captured_at), rep_name: repName, outcome, value_inr: value, value_source: vsrc, product,
     kind: isDelivery ? 'delivery' : '', scored: scored && !isDelivery ? 'yes' : 'no', score: isDelivery ? '' : overall, score_need: isDelivery ? '' : sk.need ?? '', score_budget: isDelivery ? '' : sk.budget ?? '', score_pitch: isDelivery ? '' : sk.pitch ?? '', score_objection: isDelivery ? '' : sk.objection ?? '', score_close: isDelivery ? '' : sk.close ?? '',
@@ -419,6 +430,7 @@ for (const r of rows) {
     quality: r.quality && r.quality !== 'complete' ? r.quality : '', ai_model: r.ai_model || '', talk_rep_pct: wRep + wCust ? Math.round(100 * wRep / (wRep + wCust)) : '', segments_n: turns.length || '',
   };
   if (note.csv) Object.assign(rec, note.csv);
+  rec.value_why = valueWhy(rec.value_inr, rec.value_source); rec.outcome_src = outcomeSrc; rec.critical = note.critical ? JSON.stringify(note.critical) : '';
   if (note.csv && (note.csv.value_inr || note.csv.value_source)) { const cl = calls.at(-1); if (cl) { if (note.csv.value_inr) cl.value = +note.csv.value_inr; if (note.csv.value_source) cl.source = note.csv.value_source; } }
   if (note.csv && note.csv.outcome) { const cl = calls.at(-1); if (cl) cl.outcome = note.csv.outcome; } // the refresh list shows the result the dashboard will show
   if (rec.keywords) mark('keywords', 'objection themes used as keywords');

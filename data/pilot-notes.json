@@ -1,5 +1,5 @@
 {
-  "note": "Team notes for the pilot day, from the Zocus WhatsApp group, plus what Claude read from the recordings at each refresh. One entry per conversation, keyed by the conversation number. Fields: rep (nickname), customer, segment, model / models (as the customer saw them), fuel, colour, quote (yes, no or promised: whether a quotation was given), priorities (what the customer cares about, when the automatic reading is wrong), value (rupees, set by hand), remarks (shown on the conversation), prices (what was quoted: m = model or variant, p = rupees or text, b = basis, at = time in the recording), tr_en (English for key transcript lines, keyed by the line's time), csv (any CSV column to override, for example objection_quote_en), stage (exploring, finalising or after_booking), payment, visit (first or repeat), history (what happened before this visit and where we know it from), arrived (counter punch-in time, HH:MM), need_form (answers from Mahindra's need-analyzer form), stock (want, have, inhand = yes, no or unknown, alt = what else was offered, at), objections (t, at, q = customer's line in English, a = the rep's answer, v = answered, partly or open, tip = suggested better line), followups (written by hand: t, at, due, q, d = message, s = 1 when it is our suggestion and not a promise), crm (variant, payment, delivery_wanted, exchange, registration), kind (delivery = a conversation after the sale, not a sales pitch), result_label, drop (true to leave the call out) with why. backend_only: true (14 Nov, 5 pm) means the dashboard shows only what the backend analysis says about objections, follow-ups and stock; the hand-written stock, objections and followups below are kept for later but not used. test_drive_note (text shown next to the test drive in the panel). crm (variant, seating, occupation, purchase_type, payment, delivery_wanted, exchange, owned, registration, likely_purchase, enquiry_type, source): extra values for the CRM record that are said in the recording. merges: a list of {parts: [first recording, next recording], label}: one customer visit recorded in several parts becomes one row (see docs/PILOT.md). Empty until the second recording of the #275 customer is analysed.",
+  "note": "Team notes for the pilot day, from the Zocus WhatsApp group, plus what Claude read from the recordings at each refresh. One entry per conversation, keyed by the conversation number. Fields: rep (nickname), customer, segment, model / models (as the customer saw them), fuel, colour, quote (yes, no or promised: whether a quotation was given), priorities (what the customer cares about, when the automatic reading is wrong), value (rupees, set by hand), remarks (shown on the conversation), prices (what was quoted: m = model or variant, p = rupees or text, b = basis, at = time in the recording), tr_en (English for key transcript lines, keyed by the line's time), csv (any CSV column to override, for example objection_quote_en), stage (exploring, finalising or after_booking), payment, visit (first or repeat), history (what happened before this visit and where we know it from), arrived (counter punch-in time, HH:MM), need_form (answers from Mahindra's need-analyzer form), stock (want, have, inhand = yes, no or unknown, alt = what else was offered, at), objections (t, at, q = customer's line in English, a = the rep's answer, v = answered, partly or open, tip = suggested better line), followups (written by hand: t, at, due, q, d = message, s = 1 when it is our suggestion and not a promise), crm (variant, payment, delivery_wanted, exchange, registration), kind (delivery = a conversation after the sale, not a sales pitch), result_label, drop (true to leave the call out) with why. backend_only: true (14 Nov, 5 pm) means the dashboard shows only what the backend analysis says about objections, follow-ups and stock; the hand-written stock, objections and followups below are kept for later but not used. test_drive_note (text shown next to the test drive in the panel). crm (variant, seating, occupation, purchase_type, payment, delivery_wanted, exchange, owned, registration, likely_purchase, enquiry_type, source): extra values for the CRM record that are said in the recording. merges: a list of {parts: [first recording, next recording], label}: one customer visit recorded in several parts becomes one row (see docs/PILOT.md). Empty until the second recording of the #275 customer is analysed. critical (t, due, why): the floor's call that a conversation needs a critical follow-up; it becomes the first follow-up with a red pill.",
   "backend_only": true,
   "calls": {
     "261": {
@@ -145,7 +145,7 @@
       ],
       "fuel": "Diesel",
       "colour": "White",
-      "remarks": "Several phone calls interrupted the rep and the customer. A finance person (Mahindra Finance) joined the conversation.",
+      "remarks": "Several phone calls interrupted the rep and the customer. A finance person (Mahindra Finance) joined the conversation. The result is shown as Will return until the dealer confirms a booking: the recording (ended 11:04 am) has the customer confirming after the stock check, and the only \"sale: yes\" is a tag in the Zocus app set by the recording account at 2:28 pm. To confirm with the dealer: booking taken, amount paid.",
       "prices": [
         {
           "m": "Bolero B8, white",
@@ -177,7 +177,8 @@
         "objection_quote_en": "Drop the 21,500, come on.",
         "objection_reply_en": "How can I drop 21,500, sir? There is no discount. There is no margin in the car, where would I take it from? And I do not have a car in stock.",
         "customer_type": "Wants a white Bolero B8 with finance",
-        "f_budget": "About 5 lakh loan and 6 lakh in cash (said at 16:05)"
+        "f_budget": "About 5 lakh loan and 6 lakh in cash (said at 16:05)",
+        "outcome": "followup"
       },
       "tr_en": {
         "0:34": "The fancy number costs 18,000 rupees.",
@@ -427,7 +428,7 @@
         "Features",
         "Price and offers"
       ],
-      "remarks": "An early enquiry about electric cars. The customer drives about 50 km a day and was shown the XUV 3XO EV (AX5 and AX7L, 39 kWh); the rep also described the BE 6, XEV 9e and XEV 9S. Questions were about range, warranty, battery replacement, the glass roof, tyres, ground clearance and charging. The customer asked for brochures on WhatsApp (3XO, 9e, 9S, BE 6). No budget, buying date or booking came up, and no quotation was given: prices were said aloud as rough amounts. The customer pressed twice on what the 75% figure is counted from, the company's 650 km claim or 500 km (14:50 and 15:40); the rep said 500. The petrol, diesel and CNG 3XO came up once (8:10) as other versions.",
+      "remarks": "An early enquiry about electric cars. The customer drives about 50 km a day and was shown the XUV 3XO EV (AX5 and AX7L, 39 kWh); the rep also described the BE 6, XEV 9e and XEV 9S. Questions were about range, warranty, battery replacement, the glass roof, tyres, ground clearance and charging. The customer asked for brochures on WhatsApp (3XO, 9e, 9S, BE 6). No budget, buying date or booking came up, and no quotation was given: prices were said aloud as rough amounts. The customer pressed twice on what the 75% figure is counted from, the company's 650 km claim or 500 km (14:50 and 15:40); the rep said 500. The petrol, diesel and CNG 3XO came up once (8:10) as other versions. The result is shown as Will return: the recording ends with the customer asking for brochures and nothing decided, the AI reads it as considering, and the only \"sale: no\" is a tag in the Zocus app set by the recording account at 2:27 pm.",
       "prices": [
         {
           "m": "XUV 3XO EV, first model (AX5)",
@@ -475,7 +476,8 @@
       "csv": {
         "customer_quote_en": "But you say the company claims that on a continuous full charge you should get 75% of your range, right? 75% of what: 650 or 500?",
         "objection_quote_en": "But you say the company claims that on a continuous full charge you should get 75% of your range, right? 75% of what: 650 or 500?",
-        "objection_reply_en": "Of 500 plus. I already told you."
+        "objection_reply_en": "Of 500 plus. I already told you.",
+        "outcome": "followup"
       },
       "tr_en": {
         "0:08": "Has the 400 EV been stopped?",
@@ -1032,7 +1034,8 @@
       },
       "crm": {
         "variant": "Pack Two (the older model)"
-      }
+      },
+      "rep": "Lead rep"
     },
     "278": {
       "model": "Scorpio N",
@@ -1537,6 +1540,11 @@
       "crm": {
         "variant": "9e Pack Three (top model)",
         "delivery_wanted": "Immediately (36:18, 38:50)"
+      },
+      "critical": {
+        "t": "The customer side said they would check the price in Ahmedabad and confirm",
+        "due": "",
+        "why": "From the floor (Abhishek, 7:09 pm): very close to converting. In the recording: the customer side wanted 30.50 lakh all in against the rep's final on-road 31.89 lakh; they said they would go to Ahmedabad if they got Ruby Velvet at 30.50 (34:45, 39:04); Ruby Velvet takes about two weeks here (29:52); white and black are in stock here (33:30, 44:22)."
       }
     }
   },
