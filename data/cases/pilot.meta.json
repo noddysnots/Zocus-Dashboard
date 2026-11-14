@@ -1,11 +1,11 @@
 {
  "dayNote": "From the floor (Abhishek, 11:48 am): today's traffic is mostly customers finalising the model, choosing accessories and finalising payment. On a normal day it is mostly early enquiries, so today's numbers are not typical.",
  "store": "Mahindra showroom (pilot)",
- "exportedAt": "2026-11-14T07:29:41.760Z",
- "exportedLocal": "2026-11-14 12:59",
+ "exportedAt": "2026-11-14T11:16:24.068Z",
+ "exportedLocal": "2026-11-14 16:46",
  "date": "2026-11-14",
- "recorded": 5,
- "shown": 4,
+ "recorded": 6,
+ "shown": 5,
  "analysing": [],
  "failed": [],
  "unscored": [],
@@ -20,7 +20,8 @@
  "valueSources": {
   "budget": 1,
   "call": 1,
-  "none": 2
+  "none": 2,
+  "indicative": 1
  },
  "history": [
   {
@@ -38,11 +39,15 @@
   {
    "at": "2026-11-14 12:41",
    "shown": 4
+  },
+  {
+   "at": "2026-11-14 16:37",
+   "shown": 5
   }
  ],
  "reps": [
   {
-   "name": "Speed Racer",
+   "name": "Jitenbhai",
    "recorded": 2
   },
   {
@@ -51,6 +56,10 @@
   },
   {
    "name": "Hardik",
+   "recorded": 1
+  },
+  {
+   "name": "Lead rep",
    "recorded": 1
   }
  ]

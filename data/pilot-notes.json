@@ -1,8 +1,8 @@
 {
-  "note": "Team notes for the pilot day, from the Zocus WhatsApp group, plus what Claude read from the recordings at each refresh. One entry per conversation, keyed by the conversation number. Fields: rep (nickname), customer, segment, model / models (as the customer saw them), fuel, colour, quote (yes, no or promised: whether a quotation was given), priorities (what the customer cares about, when the automatic reading is wrong), value (rupees, set by hand), remarks (shown on the conversation), prices (what was quoted: m = model or variant, p = rupees or text, b = basis, at = time in the recording), tr_en (English for key transcript lines, keyed by the line's time), csv (any CSV column to override, for example objection_quote_en), stage (exploring, finalising or after_booking), payment, kind (delivery = a conversation after the sale, not a sales pitch), result_label, drop (true to leave the call out) with why.",
+  "note": "Team notes for the pilot day, from the Zocus WhatsApp group, plus what Claude read from the recordings at each refresh. One entry per conversation, keyed by the conversation number. Fields: rep (nickname), customer, segment, model / models (as the customer saw them), fuel, colour, quote (yes, no or promised: whether a quotation was given), priorities (what the customer cares about, when the automatic reading is wrong), value (rupees, set by hand), remarks (shown on the conversation), prices (what was quoted: m = model or variant, p = rupees or text, b = basis, at = time in the recording), tr_en (English for key transcript lines, keyed by the line's time), csv (any CSV column to override, for example objection_quote_en), stage (exploring, finalising or after_booking), payment, visit (first or repeat), history (what happened before this visit and where we know it from), arrived (counter punch-in time, HH:MM), need_form (answers from Mahindra's need-analyzer form), stock (want, have, inhand = yes, no or unknown, alt = what else was offered, at), objections (t, at, q = customer's line in English, a = the rep's answer, v = answered, partly or open, tip = suggested better line), followups (written by hand: t, at, due, q, d = message, s = 1 when it is our suggestion and not a promise), crm (variant, payment, delivery_wanted, exchange, registration), kind (delivery = a conversation after the sale, not a sales pitch), result_label, drop (true to leave the call out) with why.",
   "calls": {
     "261": {
-      "rep": "Speed Racer",
+      "rep": "Jitenbhai",
       "models": [
         "Scorpio N",
         "XUV 7XO"
@@ -80,7 +80,62 @@
         "9:36": "It comes to 16,42,000.",
         "9:45": "There are small differences: no roof rails, no spoiler, 4 speakers instead of 6. I can give you the car for 16,09,000."
       },
-      "stage": "finalising"
+      "stage": "finalising",
+      "history": "The customer referred to an earlier quotation (7:57), so this may not be the first contact. Not confirmed by the floor.",
+      "stock": {
+        "want": "Scorpio-N, manual",
+        "have": "The rep said there is a waiting period on the Scorpio (5:40). How long was not said.",
+        "alt": "The rep offered a lower variant, the Z2 with fewer features at 16,09,000 (9:45). No car in stock was offered.",
+        "at": "5:40",
+        "inhand": "no"
+      },
+      "objections": [
+        {
+          "t": "Asked for a discount",
+          "at": "5:38",
+          "q": "Is there any discount?",
+          "a": "There is no discount on the Scorpio, there is a waiting period. When do you want the car? (Then offered a discount on insurance through the 3+3 plan, 5:51.)",
+          "v": "partly",
+          "tip": "Before saying no, ask what figure the customer has in mind and what the other quotation included, then show what this on-road price already covers."
+        },
+        {
+          "t": "Price is higher than an earlier quotation",
+          "at": "7:57",
+          "q": "(The customer had an earlier, lower quotation.)",
+          "a": "Yes, it has gone up. Prices rose after March, and insurance rates too. The automatic is now 19,98,000 ex-showroom (8:11).",
+          "v": "partly",
+          "tip": "Show the old and new figures side by side, line by line, so the customer sees exactly what changed."
+        },
+        {
+          "t": "Also thinking about a Kia",
+          "at": "8:46",
+          "q": "(The rep asked whether the customer was thinking of another make, a Kia.)",
+          "a": "Looking at a Kia is fine, but Mahindra is best on suspension and engine, so think about it once.",
+          "v": "partly",
+          "tip": "Ask which Kia and which variant, then compare the two on the things this customer cares about, with the on-road price of each."
+        }
+      ],
+      "followups": [
+        {
+          "t": "Send the Scorpio-N quotation on WhatsApp (base Z2 and Z8 Select manual)",
+          "at": "8:46",
+          "due": "today",
+          "q": "I will put the car quotation on your WhatsApp number.",
+          "d": "Namaste, as discussed today, here is the Scorpio-N quotation for the Z2 and the Z8 Select manual. Please tell me which one you would like to take forward."
+        },
+        {
+          "t": "Call to ask when the car is needed and tell the waiting period",
+          "s": 1,
+          "due": "tomorrow",
+          "d": "Namaste, did you get the Scorpio-N quotation? If you tell me by when you need the car, I can check the waiting period for the variant you prefer."
+        }
+      ],
+      "crm": {
+        "variant": "Z2, Z4, Z8 Select (manual)",
+        "payment": "Loan, about 50% down payment discussed (3:02)",
+        "delivery_wanted": "",
+        "exchange": ""
+      }
     },
     "262": {
       "rep": "Black and White Stripe",
@@ -142,14 +197,84 @@
         "16:15": "I will tell you within an hour. I will get confirmation from Bhavnagar.",
         "16:57": "I will call you on this number."
       },
-      "stage": "finalising"
+      "stage": "finalising",
+      "visit": "repeat",
+      "history": "The customer says they asked here earlier and have taken two cars before; this is the third (5:57).",
+      "stock": {
+        "want": "Bolero B8, white, with the 2000 fancy number",
+        "have": "No white B8 at this showroom. The rep will check Bhavnagar; otherwise about a month (8:18).",
+        "alt": "Black came up (11:04, 14:07); the customer wants white only.",
+        "at": "8:18",
+        "inhand": "no"
+      },
+      "objections": [
+        {
+          "t": "Wants 21,500 taken off",
+          "at": "5:20",
+          "q": "Drop that 21,500.",
+          "a": "How can I drop 21,500, sir? There is no discount and no margin in the car. (The rep had already dropped the 12,500 warranty, 5:14, and arranged three years of full insurance, 4:13.)",
+          "v": "partly",
+          "tip": "Say first what has already been given (12,500 warranty dropped, 3-year full insurance), then ask if the booking can be done today at this figure."
+        },
+        {
+          "t": "Delivery time: about a month here",
+          "at": "8:18",
+          "q": "(The customer wants the car quickly; the AI notes another dealer had promised 15 days.)",
+          "a": "We do not have the car right now. I will check in Bhavnagar; if it is there I will get it here. If not, a month, and I will do it as fast as I can.",
+          "v": "partly",
+          "tip": "Give a date, not \"about a month\", and say when you will call back with the Bhavnagar answer."
+        },
+        {
+          "t": "Insurance premium not known yet",
+          "at": "6:30",
+          "q": "(The customer wanted the insurance amount.)",
+          "a": "I have to get the premium worked out with the engine and chassis number. Give me an hour and I will confirm.",
+          "v": "partly",
+          "tip": "Keep an indicative premium for each model at the desk so a figure can be given in the conversation."
+        }
+      ],
+      "followups": [
+        {
+          "t": "Confirm the white Bolero B8 with Bhavnagar and call the customer",
+          "at": "16:15",
+          "due": "within an hour",
+          "q": "I will tell you within an hour. I will get confirmation from Bhavnagar.",
+          "d": "Namaste, I have checked on the white Bolero B8. I will share the delivery date with you now on a call."
+        },
+        {
+          "t": "Share the insurance premium for three years of full cover",
+          "at": "6:30",
+          "due": "within an hour",
+          "q": "Give me an hour and I will confirm.",
+          "d": "Namaste, the insurance premium for three years of full cover on your Bolero B8 is ready. I am sending the figure."
+        },
+        {
+          "t": "Send the accessories list",
+          "at": "6:15",
+          "due": "today",
+          "q": "There are many accessories; I will give you the whole list.",
+          "d": "Namaste, here is the full accessories list for the Bolero B8. Tell me what you would like fitted."
+        },
+        {
+          "t": "Record the booking amount and the promised delivery date",
+          "s": 1,
+          "due": "today",
+          "d": ""
+        }
+      ],
+      "crm": {
+        "variant": "B8",
+        "payment": "About 5 lakh loan (Mahindra Finance) and 6 lakh cash (16:05)",
+        "delivery_wanted": "As early as possible",
+        "exchange": ""
+      }
     },
     "263": {
       "drop": true,
       "why": "not a sales conversation"
     },
     "264": {
-      "rep": "Speed Racer",
+      "rep": "Jitenbhai",
       "kind": "delivery",
       "result_label": "Delivery dispute",
       "models": [
@@ -225,7 +350,63 @@
         "2:50": "There are no accessories worth 30,000 that I need; whatever I need I can buy. And if I want that shade, how much extra would I pay?"
       },
       "stage": "after_booking",
-      "payment": "Final payment still to be settled: the rep asked whether it would be cash or online, the customer said cash (both possible), and the rep asked for the balance to be worked out. Insurance and RTO follow once payment is in. The customer says only two amounts were left to pay."
+      "payment": "Final payment still to be settled: the rep asked whether it would be cash or online, the customer said cash (both possible), and the rep asked for the balance to be worked out. Insurance and RTO follow once payment is in. The customer says only two amounts were left to pay.",
+      "visit": "repeat",
+      "history": "From the floor (12:54 pm): the car was already sold; the dispute was about accessory fitting during handover today.",
+      "objections": [
+        {
+          "t": "Wants the 30,000 coating cancelled",
+          "at": "6:11",
+          "q": "Then cancel the 30,000 coating.",
+          "a": "There is no such rule. (Later, 11:53: we cannot reduce the deal from how the car was booked. 17:11: the coating cannot be cancelled.)",
+          "v": "open",
+          "tip": "A dispute this close to delivery should go to the manager at once, with two choices ready: accessories of the same value, or the coating done later."
+        },
+        {
+          "t": "Lives about 400 km away and will not come back here for the coating or service",
+          "at": "19:47",
+          "q": "Why would I come here, 400 kilometres? A showroom is about 100 km from me.",
+          "a": "You have to get the coating done here. You can do it whenever you want afterwards (20:13).",
+          "v": "open",
+          "tip": "Check whether the coating can be arranged at a Mahindra workshop near the customer before saying it must be done here."
+        },
+        {
+          "t": "Offers to settle at 20,000",
+          "at": "11:36",
+          "q": "If it cannot be cancelled and we do not need the whole set, let us settle at 20,000.",
+          "a": "That cannot be done. We cannot reduce the deal from how the car was booked (11:53).",
+          "v": "open",
+          "tip": "Take the offer to the manager instead of refusing at the desk; the customer spoke of cancelling the whole car over this amount."
+        }
+      ],
+      "followups": [
+        {
+          "t": "Settle the coating dispute before delivery (nothing was agreed)",
+          "s": 1,
+          "due": "before handover",
+          "d": ""
+        },
+        {
+          "t": "Fit the chosen accessories by evening, in time for delivery",
+          "at": "14:32",
+          "due": "by evening",
+          "q": "Look at this list, all of it can be fitted and will reach you by evening.",
+          "d": ""
+        },
+        {
+          "t": "Work out and collect the balance payment (cash or online)",
+          "at": "7:07",
+          "due": "before handover",
+          "q": "Work out how much of your payment is still balance.",
+          "d": ""
+        }
+      ],
+      "crm": {
+        "variant": "",
+        "payment": "Balance still to be settled; cash or online (7:01)",
+        "delivery_wanted": "Today (handover day)",
+        "exchange": ""
+      }
     },
     "266": {
       "rep": "Hardik",
@@ -391,6 +572,235 @@
         "24:16": "It is built on that platform and tested: five-star rating, the battery kept at 90 degrees, kept in water, no blast; everything tested. The 3XO you saw is built on the petrol-diesel platform; this one has its own EV platform.",
         "24:40": "Is that the base one, and no diesel or petrol comes in this?",
         "24:43": "Diesel and petrol do not come in this at all. Only one variant: EV."
+      },
+      "stock": {
+        "want": "An electric car for about 50 km a day; asked about a bigger battery",
+        "have": "Stock and waiting time did not come up.",
+        "alt": "When the customer asked for a bigger battery, the rep showed the higher models: BE 6, XEV 9e and XEV 9S (6:14, 16:03).",
+        "at": "6:14",
+        "inhand": "unknown"
+      },
+      "objections": [
+        {
+          "t": "Range: is it really 280 km?",
+          "at": "3:47",
+          "q": "What range did you say? 200?",
+          "a": "280 is the company's figure. After that it depends on how you drive. How much do you drive?",
+          "v": "partly",
+          "tip": "Give one real figure from customers' cars for city driving, and say where it comes from."
+        },
+        {
+          "t": "Battery replacement cost",
+          "at": "9:55",
+          "q": "And battery replacement: if there is any problem, how is it worked out?",
+          "a": "About 30% of the on-road price is the battery, so about 10 lakh. But you get a lifetime battery warranty, up to 15 years (10:16).",
+          "v": "partly",
+          "tip": "Lead with the warranty, and show the warranty page instead of quoting a replacement cost first."
+        },
+        {
+          "t": "75% battery promise: 75% of what?",
+          "at": "14:50",
+          "q": "75% of what: 650 or 500?",
+          "a": "Of 500 plus. I already told you.",
+          "v": "partly",
+          "tip": "The customer asked this twice (also 15:40). Show the written warranty wording; a spoken figure did not settle it."
+        },
+        {
+          "t": "Charging on a two-phase connection",
+          "at": "19:09",
+          "q": "Will it not work on two-phase?",
+          "a": "It will, with the normal 3.5 charger, but that takes 24 hours (19:16). A three-phase connection is needed for the faster chargers.",
+          "v": "answered",
+          "tip": ""
+        }
+      ],
+      "followups": [
+        {
+          "t": "Send the brochure PDFs on WhatsApp: 3XO EV, XEV 9e, XEV 9S (and BE 6)",
+          "at": "22:28",
+          "due": "today",
+          "q": "I will send you the PDF. Give me your mobile number.",
+          "d": "Namaste, here are the brochures for the XUV 3XO EV, XEV 9e, XEV 9S and BE 6 that we discussed today. Tell me which one you would like to know more about."
+        },
+        {
+          "t": "Call to ask which model the customer prefers and the budget",
+          "s": 1,
+          "due": "in 2 days",
+          "d": "Namaste, did you get a chance to look at the brochures? Which model suits you best? I can then share the exact on-road price."
+        }
+      ],
+      "crm": {
+        "variant": "3XO EV AX5 / AX7L shown",
+        "payment": "",
+        "delivery_wanted": "",
+        "exchange": ""
+      }
+    },
+    "272": {
+      "rep": "Lead rep",
+      "model": "XUV 3XO",
+      "models": [
+        "XUV 3XO"
+      ],
+      "colour": "Red",
+      "stage": "finalising",
+      "quote": "yes",
+      "visit": "repeat",
+      "history": "From the floor (3:42 pm): this was not the first visit. The customer had already taken a test drive and was more or less final on the 3XO, wanted a red car delivered by December end, and gets an RTO benefit as a government employee. In this recording the customer says January for delivery (5:42).",
+      "remarks": "A short visit to settle the final price and delivery of a red XUV 3XO. The customer is choosing between the RevX A and the AX5 and also asked for a RevX C quotation. Asked about original accessories (spoiler, connected tail lamp), alloy wheels, BH-series registration, insurance and the extended warranty. The rep sent the RevX A and AX5 quotations and the BH document list on WhatsApp during the conversation, so the on-road figures were not said aloud. The rep asked a colleague for the alloy price. No booking was made; the customer said they would come back.",
+      "prices": [
+        {
+          "m": "Alloy wheels (set)",
+          "p": 55000,
+          "b": "a colleague's estimate",
+          "at": "1:13"
+        },
+        {
+          "m": "RTO with BH registration",
+          "p": 20000,
+          "b": "about; instead of the regular RTO",
+          "at": "4:04"
+        },
+        {
+          "m": "Saving on RTO against the regular figure",
+          "p": "40,000 to 42,000",
+          "b": "comes off the quotation",
+          "at": "4:11"
+        },
+        {
+          "m": "Insurance: 3+3 against 1+2",
+          "p": "10,000 to 15,000",
+          "b": "difference; 3+3 is in the quotation",
+          "at": "4:40"
+        },
+        {
+          "m": "Shield extended warranty",
+          "p": 17500,
+          "b": "optional, can be removed",
+          "at": "4:45"
+        },
+        {
+          "m": "Accessories pack in the quotation",
+          "p": 30000,
+          "b": "adjusted to what is actually fitted",
+          "at": "5:01"
+        }
+      ],
+      "stock": {
+        "want": "XUV 3XO RevX A (or AX5), red, delivery in January (5:42)",
+        "have": "Red has to be ordered. White, black and blue are available (5:48). The AX5 is not at the showroom now (6:26).",
+        "alt": "The rep said white, black or blue would be available (5:48). The customer did not take it up; the conversation moved to the RevX C quotation.",
+        "at": "5:48",
+        "inhand": "no"
+      },
+      "objections": [
+        {
+          "t": "Discount on insurance",
+          "at": "4:18",
+          "q": "And is there a discount on the insurance in this?",
+          "a": "The quotation has three years of full insurance (3+3). The 1+2 plan is only 10,000 to 15,000 less (4:40).",
+          "v": "partly",
+          "tip": "Say the two totals, with 3+3 and with 1+2, so the customer can choose."
+        },
+        {
+          "t": "Wants only two accessories, not the 30,000 pack",
+          "at": "4:57",
+          "q": "I want that taken off; I only want those two things fitted.",
+          "a": "It will be adjusted to what you fit: if it comes to 20,000, then 10,000 comes off.",
+          "v": "answered",
+          "tip": ""
+        },
+        {
+          "t": "The 17,500 Shield charge",
+          "at": "4:45",
+          "q": "And this 17,500 for Shield?",
+          "a": "That is the extended warranty. Keep it if you need it, otherwise it comes off.",
+          "v": "answered",
+          "tip": ""
+        },
+        {
+          "t": "Red is not in stock",
+          "at": "5:47",
+          "q": "I want red.",
+          "a": "Red will have to be ordered. White, black or blue you will get. Red sells less here, so we do not order it.",
+          "v": "partly",
+          "tip": "Give the date a red car would arrive if booked today, and ask whether January still works; offer the colours in stock as a quicker choice."
+        }
+      ],
+      "followups": [
+        {
+          "t": "Send the RevX C quotation",
+          "at": "6:11",
+          "due": "today",
+          "q": "I will send the quotation for this too.",
+          "d": "Namaste, here is the quotation for the XUV 3XO RevX C that you asked for, along with the RevX A and AX5 sent earlier."
+        },
+        {
+          "t": "Send photos of the wheel cap options (black and silver)",
+          "at": "5:35",
+          "due": "today",
+          "q": "There are two to four options; I will send you photos.",
+          "d": "Namaste, here are the wheel cap options for the 3XO, in black and in silver."
+        },
+        {
+          "t": "Check when a red 3XO can arrive and tell the customer",
+          "s": 1,
+          "due": "tomorrow",
+          "d": "Namaste, I have checked on the red XUV 3XO. If we book now, the expected delivery is ____. Shall I go ahead?"
+        }
+      ],
+      "crm": {
+        "variant": "RevX A (also AX5, RevX C)",
+        "payment": "",
+        "delivery_wanted": "January (said at 5:42); the floor note says December end",
+        "exchange": "",
+        "registration": "BH series (government employee)"
+      },
+      "csv": {
+        "fuel": "",
+        "customer_type": "Repeat visit, finalising a red 3XO",
+        "customer_quote_en": "And what is the waiting on this? If I book, I want it in January."
+      },
+      "tr_en": {
+        "0:13": "So in accessories, will I get that spoiler as an original part?",
+        "0:18": "Yes, whatever you want fitted, you will get.",
+        "0:20": "Original, right? Like the ones that come on the others?",
+        "0:23": "Exactly the same, everything comes from the company and is company-fitted. The connected tail light too.",
+        "0:30": "And what is the price of the alloys for it?",
+        "0:35": "Just ask and tell me the price. (Then asks for some water.)",
+        "0:43": "I will have water brought. (To a colleague, in Gujarati:) How much are the alloys for the 3XO?",
+        "1:07": "55.",
+        "1:13": "The alloy wheels are 55,000.",
+        "1:19": "(Unclear word.) Tell me your number, I will send the pricing details.",
+        "1:58": "And please send which documents are needed for BH registration.",
+        "2:02": "I will send that too. Do you have a government job?",
+        "2:06": "Government job.",
+        "3:00": "I have sent you the documents needed for BH registration. I will send the pricing. With BH registration your RTO charge will come down. You want the RevX A (optional), right?",
+        "4:04": "The RTO here is put in as regular, so it will come down. It will be around 20,000, a little more or less; please check.",
+        "4:11": "Yes, around 20. The regular RTO is written here, so 40,000 to 42,000 will come off this.",
+        "4:18": "And is there a discount on the insurance in this?",
+        "4:21": "The insurance in this is the three-year full one. You get three years of full insurance.",
+        "4:26": "Will it be the same if I want to take a different one?",
+        "4:29": "There is 1+2 and there is 3+3. With 3+3 you get three years full. With 1+2 you get one year full and the rest...",
+        "4:38": "No, which one have you put in here?",
+        "4:40": "I have put 3+3 for now. There is no big difference, only 10,000 or 15,000.",
+        "4:45": "And this 17,500 for Shield?",
+        "4:47": "That is the extended warranty. If you need it you can keep it, otherwise it comes off.",
+        "4:53": "If I want it in accessories, can that be done?",
+        "4:57": "I want that taken off; I only want those two things fitted.",
+        "5:01": "Yes, it will be adjusted to what you fit. It is put in as 30; if what you fit comes to 20, then 10,000 comes off. Customers generally choose up to about 30,000, so that is what is kept: spoiler, connected tail lamp, fog lamp, wheel cap...",
+        "5:24": "The wheel cap comes with it, the black one?",
+        "5:30": "You will have to buy the wheel cap.",
+        "5:35": "There are two to four options; I will send you photos. It comes in black and in silver.",
+        "5:42": "And what is the waiting on this? If I book, I want it in January.",
+        "5:45": "You will get it. Which colour do you want?",
+        "5:47": "I want red.",
+        "5:48": "Red. Red will have to be ordered. If you want white or black, a colour like that, you will get it. Blue as well. Red sells less here, so we do not order it.",
+        "6:07": "And please also send the one for this, the RevX C.",
+        "6:11": "I will send the quotation for this too.",
+        "6:26": "AX5? The AX5 is not here right now. There is no big difference between this and the AX5: this has black alloys, that has diamond-cut ones; this has black leatherette seat covers, that has fabric; this has a panoramic sunroof, that a single-pane sunroof. That is all the difference between the RevX A and the AX5.",
+        "6:48": "All right then, I will come and tell you.",
+        "6:51": "Yes sir. I have sent you both, the AX5 and the RevX A."
       }
     }
   },
