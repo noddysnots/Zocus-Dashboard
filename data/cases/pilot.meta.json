@@ -1,18 +1,11 @@
 {
  "store": "Mahindra showroom (pilot)",
- "exportedAt": "2026-11-14T06:13:06.126Z",
- "exportedLocal": "2026-11-14 11:43",
+ "exportedAt": "2026-11-14T06:19:48.061Z",
+ "exportedLocal": "2026-11-14 11:49",
  "date": "2026-11-14",
  "recorded": 4,
- "shown": 2,
- "analysing": [
-  {
-   "id": 264,
-   "at": "2026-11-14 11:22",
-   "rep": "Rep not tagged",
-   "min": 20
-  }
- ],
+ "shown": 3,
+ "analysing": [],
  "failed": [],
  "unscored": [],
  "leftOut": [
@@ -25,7 +18,8 @@
  "suggestDrop": [],
  "valueSources": {
   "budget": 1,
-  "call": 1
+  "call": 1,
+  "none": 1
  },
  "history": [
   {
@@ -35,12 +29,16 @@
   {
    "at": "2026-11-14 11:08",
    "shown": 2
+  },
+  {
+   "at": "2026-11-14 11:46",
+   "shown": 3
   }
  ],
  "reps": [
   {
    "name": "Speed Racer",
-   "recorded": 1
+   "recorded": 2
   },
   {
    "name": "Black and White Stripe",

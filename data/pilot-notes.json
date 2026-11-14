@@ -1,19 +1,57 @@
 {
-  "note": "Team notes for the pilot day, from the Zocus WhatsApp group, plus what Claude read from the recordings at each refresh. One entry per conversation, keyed by the conversation number. Fields: rep (nickname), customer, segment, model / models (as the customer saw them), fuel, colour, value (rupees, set by hand), remarks (shown on the conversation), prices (what was quoted: m = model or variant, p = rupees or text, b = basis, at = time in the recording), tr_en (English for key transcript lines, keyed by the line's time), csv (any CSV column to override, for example objection_quote_en), drop (true to leave the call out) with why.",
+  "note": "Team notes for the pilot day, from the Zocus WhatsApp group, plus what Claude read from the recordings at each refresh. One entry per conversation, keyed by the conversation number. Fields: rep (nickname), customer, segment, model / models (as the customer saw them), fuel, colour, value (rupees, set by hand), remarks (shown on the conversation), prices (what was quoted: m = model or variant, p = rupees or text, b = basis, at = time in the recording), tr_en (English for key transcript lines, keyed by the line's time), csv (any CSV column to override, for example objection_quote_en), kind (delivery = a conversation after the sale, not a sales pitch), result_label, drop (true to leave the call out) with why.",
   "calls": {
     "261": {
       "rep": "Speed Racer",
-      "models": ["Scorpio N", "XUV 7XO"],
+      "models": [
+        "Scorpio N",
+        "XUV 7XO"
+      ],
       "fuel": "Petrol|Diesel",
       "remarks": "Several phone calls interrupted the rep and the customer.",
       "prices": [
-        { "m": "XUV 7XO petrol, base", "p": 1750000, "b": "on-road, about", "at": "0:49" },
-        { "m": "Scorpio-N base (Z2)", "p": 1650000, "b": "about; insurance still to change", "at": "9:24" },
-        { "m": "Scorpio-N Z4", "p": 1642000, "b": "as said", "at": "9:36" },
-        { "m": "Scorpio-N Z2, with fewer features", "p": 1609000, "b": "final offer", "at": "9:45" },
-        { "m": "Scorpio-N Z8 Select, manual", "p": 2125000, "b": "about", "at": "4:02" },
-        { "m": "Scorpio-N Z8 Select, automatic", "p": 2275000, "b": "about", "at": "4:02" },
-        { "m": "Scorpio-N, automatic quotation", "p": 1998000, "b": "ex-showroom, since March the prices rose", "at": "8:11" }
+        {
+          "m": "XUV 7XO petrol, base",
+          "p": 1750000,
+          "b": "on-road, about",
+          "at": "0:49"
+        },
+        {
+          "m": "Scorpio-N base (Z2)",
+          "p": 1650000,
+          "b": "about; insurance still to change",
+          "at": "9:24"
+        },
+        {
+          "m": "Scorpio-N Z4",
+          "p": 1642000,
+          "b": "as said",
+          "at": "9:36"
+        },
+        {
+          "m": "Scorpio-N Z2, with fewer features",
+          "p": 1609000,
+          "b": "final offer",
+          "at": "9:45"
+        },
+        {
+          "m": "Scorpio-N Z8 Select, manual",
+          "p": 2125000,
+          "b": "about",
+          "at": "4:02"
+        },
+        {
+          "m": "Scorpio-N Z8 Select, automatic",
+          "p": 2275000,
+          "b": "about",
+          "at": "4:02"
+        },
+        {
+          "m": "Scorpio-N, automatic quotation",
+          "p": 1998000,
+          "b": "ex-showroom, since March the prices rose",
+          "at": "8:11"
+        }
       ],
       "csv": {
         "value_inr": 1609000,
@@ -44,15 +82,37 @@
     },
     "262": {
       "rep": "Black and White Stripe",
-      "models": ["Bolero B8"],
+      "models": [
+        "Bolero B8"
+      ],
       "fuel": "Diesel",
       "colour": "White",
       "remarks": "Several phone calls interrupted the rep and the customer. A finance person (Mahindra Finance) joined the conversation.",
       "prices": [
-        { "m": "Bolero B8, white", "p": 1121500, "b": "after dropping the 12,500 warranty", "at": "5:14" },
-        { "m": "Fancy number 2000", "p": 18000, "b": "extra", "at": "0:34" },
-        { "m": "Accessories", "p": "10,000 to 18,000", "b": "optional", "at": "6:15" },
-        { "m": "3-year full insurance (1+2 plan)", "p": "premium to be checked", "b": "to be quoted", "at": "6:30" }
+        {
+          "m": "Bolero B8, white",
+          "p": 1121500,
+          "b": "after dropping the 12,500 warranty",
+          "at": "5:14"
+        },
+        {
+          "m": "Fancy number 2000",
+          "p": 18000,
+          "b": "extra",
+          "at": "0:34"
+        },
+        {
+          "m": "Accessories",
+          "p": "10,000 to 18,000",
+          "b": "optional",
+          "at": "6:15"
+        },
+        {
+          "m": "3-year full insurance (1+2 plan)",
+          "p": "premium to be checked",
+          "b": "to be quoted",
+          "at": "6:30"
+        }
       ],
       "csv": {
         "customer_quote_en": "Drop the 21,500, come on.",
@@ -80,6 +140,79 @@
         "16:57": "I will call you on this number."
       }
     },
-    "263": { "drop": true, "why": "not a sales conversation" }
+    "263": {
+      "drop": true,
+      "why": "not a sales conversation"
+    },
+    "264": {
+      "rep": "Speed Racer",
+      "kind": "delivery",
+      "result_label": "Delivery dispute",
+      "models": [
+        "Scorpio N"
+      ],
+      "remarks": "Customer dispute on delivery day, not a sales pitch. The customer was taking delivery of a Scorpio N and was choosing accessories before delivery, which led to a dispute over the ceramic coating bundled into the booking deal.",
+      "prices": [
+        {
+          "m": "Ceramic coating in the booking deal",
+          "p": 30000,
+          "b": "as agreed at booking; the customer wants it cancelled or done elsewhere",
+          "at": "2:50"
+        },
+        {
+          "m": "Insurance upgrade from 1+2 to 3+3 years",
+          "p": 1100,
+          "b": "extra on the quotation",
+          "at": "1:15"
+        },
+        {
+          "m": "7D matting",
+          "p": 10500,
+          "b": "accessory",
+          "at": "4:14"
+        },
+        {
+          "m": "Comfort kit",
+          "p": 3500,
+          "b": "accessory",
+          "at": "10:25"
+        },
+        {
+          "m": "Pedal cover",
+          "p": 500,
+          "b": "accessory",
+          "at": "10:25"
+        }
+      ],
+      "csv": {
+        "customer_type": "Delivery today, coating dispute",
+        "summary_next": "Settle the coating dispute before delivery: nothing was agreed."
+      },
+      "tr_en": {
+        "1:15": "About the quotation I sent: it has 1+2 years of insurance. If you add 1,100 rupees it becomes 3+3: three years of own-damage and three years third party. It is to your benefit.",
+        "2:26": "And the coating?",
+        "2:32": "Do not keep the service here. Get it done somewhere closer to us.",
+        "2:47": "Instead of the coating you can take accessories.",
+        "2:50": "There are no accessories worth 30,000 that I need. I can buy what I want. And what would the sun shade cost extra?",
+        "4:14": "This is the 7D matting, it costs 10,500. This is the whole list.",
+        "6:11": "Then cancel the 30,000 coating.",
+        "6:21": "There is no such rule. If you want it, you have to come here. Insurance, then the RTO process; after the payment is made we go ahead.",
+        "10:25": "There is a pedal cover for 500 rupees, scuff plates front and back, and a comfort kit for 3,500 rupees, the headrest pillow.",
+        "11:36": "The whole 30,000 does not come to anything we need. If it cannot be cancelled, give us 20,000 off.",
+        "11:53": "That cannot be done. We cannot reduce the deal from how the car was booked.",
+        "12:15": "If you want the coating, bring the car in for the first service and I will get it done then.",
+        "14:32": "Look at this list, all of it can be fitted and will reach you by evening.",
+        "15:52": "The coating will be minus. I told you that if you want accessories in place of the coating, you can take them.",
+        "16:44": "No, not the company: whatever was agreed at booking time stays as it is. I told you that at booking.",
+        "17:00": "Then do it tomorrow. Only these two payments were left; you trusted that we would take the car.",
+        "17:08": "If you cannot do that, you can at least cancel it.",
+        "17:11": "No, we cannot cancel.",
+        "17:25": "We can even cancel the whole car, but we are not cancelling this 30,000.",
+        "18:04": "The deal is fine, we are not refusing. Get it done in Palanpur. It is a Mahindra, it can be done anywhere. Why should I always go to Jodhpur?",
+        "18:46": "The car will not come here for service.",
+        "19:47": "Do not cancel, but at least arrange for Palanpur. Why would I come 400 kilometres? A showroom is 100 km from me.",
+        "20:13": "You have to get the coating done here. You can do it whenever you want afterwards."
+      }
+    }
   }
 }
