@@ -30,7 +30,7 @@ Original blocks, in the original order, with the original card style:
 | Stage chips (under the number cards) | Exploring · Finalising · After booking, with counts; tap to filter | always on a one-day pilot |
 | The day so far (before Reps) | one slim timeline of the day | always on a one-day pilot |
 
-Also inside the original blocks: the open promises are the entries of "Do these next" (copy-message buttons in the same rows); the floor's note for the day is one muted sentence under the briefing; the after-booking conversation is a row in Latest conversations with a purple pill.
+Also inside the original blocks: the open promises are the entries of "Do these next" (copy-message buttons in the same rows); the after-booking conversation is a row in Latest conversations with a purple pill. The floor's day note (`dayNote` in meta) is kept in the data file but not shown on Overview (it took too much space on phones).
 
 **Removed on purpose** (they made the Overview busy): three journey cards, a day-note box, a large "After the sale" card, a separate "Promises to keep" card. Their detail lives in the conversation panel, the Follow-ups page and the "After the booking" tab.
 

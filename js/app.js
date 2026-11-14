@@ -627,7 +627,6 @@ function dayTimeline(L){if(!L.length)return '';
 
 const STAGES_J={exploring:['Exploring','early enquiries'],finalising:['Finalising model and price','model, variant, price, finance'],after_booking:['After booking','accessories, payment, delivery']};
 const stageChip=c=>c.jstage&&STAGES_J[c.jstage]?`<span class="chip2 stg stg-${c.jstage}">${STAGES_J[c.jstage][0]}</span>`:'';
-const floorNote=()=>ZD.meta&&ZD.meta.dayNote?`<p class="floornote">${esc(ZD.meta.dayNote)}</p>`:'';
 /* three small additions to the original Overview, only when there is something to say */
 function alertLine(D){if(!D.length)return '';const c=D[0];
  const detail=`${esc(c.resultLabel||'After the sale')} at ${ftime(c.at)}${(c.sumOutcome||c.sumNext)?' · '+esc(clipTxt(c.sumOutcome||c.sumNext,150)):''}`;
@@ -717,7 +716,7 @@ function renderHomeRich(){const L=cur(),D=DELV(),LD=allCur(),s=stats(L),rows=rep
  return `${alertLine(D)}<div class="homegrid"><section class="hero" data-tour="brief">
   <span class="mono">${ic('spark',14)} AI briefing · ${esc(ZD.store)} · ${WDL[TODAY.getDay()]} ${fdate(TODAY)}</span>
   <h1>${greet()}</h1>
-  <p class="lede">${richLede(L,open.filter(x=>!x.p.s).length,D.length)}</p>${floorNote()}
+  <p class="lede">${richLede(L,open.filter(x=>!x.p.s).length,D.length)}</p>
   </section>${timelessPanel(s)}</div>
   <div class="waveband" data-wave-anchor aria-hidden="true"><span class="wavehint">Live voice waves · hover or click</span></div>
  ${richKpis(L,D,s)}
