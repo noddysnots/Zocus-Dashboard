@@ -803,6 +803,104 @@
         "6:48": "All right then, I will come and tell you.",
         "6:51": "Yes sir. I have sent you both, the AX5 and the RevX A."
       }
+    },
+    "275": {
+      "model": "XUV 3XO EV",
+      "models": [
+        "XUV 3XO EV",
+        "XUV 3XO CNG",
+        "Scorpio Classic"
+      ],
+      "fuel": [
+        "Electric",
+        "CNG"
+      ],
+      "stage": "exploring",
+      "test_drive": "yes",
+      "quote": "yes",
+      "remarks": "An early enquiry: electric or CNG XUV 3XO for about 100 km a day, a 5-seater. The electric car was not at the showroom, so the AX5 EV and AX7L were described but not shown; a CNG test drive was offered (8:00) and the rep offered to introduce an EV sales consultant (8:37). The customer said diesel is not wanted and compared with the Tata Altroz CNG. From the floor (Abhishek, after the call): the AI summary's last line is wrong, because a test drive was lined up and the customer went on it. The transcript supports that: at 7:28 a test drive of the top model was asked about and the rep said it can be done, there is no speech from about 10:00 to 11:44 and from 12:20 to 13:02, and around 12:12 the rep says \"that one is for the test drive\". The AI also marked the recording partial, so the drive itself is probably not captured. Which car was driven is not stated. The stage is our reading (a customer still choosing between EV and CNG), not the team's.",
+      "prices": [
+        {
+          "m": "XUV 3XO EV AX5",
+          "p": 1550000,
+          "b": "about; basis not said",
+          "at": "0:36"
+        },
+        {
+          "m": "XUV 3XO EV AX7L",
+          "p": 1650000,
+          "b": "around; basis not said",
+          "at": "0:36"
+        },
+        {
+          "m": "Old Scorpio (S11), top model",
+          "p": 1990000,
+          "b": "on-road, with a 45,000 discount",
+          "at": "13:31"
+        },
+        {
+          "m": "A base model (not named)",
+          "p": 1550000,
+          "b": "about, with a discount of about 30,000",
+          "at": "13:44"
+        }
+      ],
+      "tr_en": {
+        "0:16": "In EV and CNG. How much does the car run every day?",
+        "0:21": "100 km.",
+        "0:22": "100 km. Are you looking at one more car for comparison?",
+        "0:28": "Show me both, the 3XO EV and the CNG.",
+        "0:36": "If you take the EV, only two models come: the AX5 and the AX7L. The AX5 comes to about 15.5 lakh and the AX7L to around 16.5 lakh.",
+        "0:54": "Show me the car.",
+        "0:55": "The EV is not here to see right now.",
+        "1:19": "And if you need CNG, the CNG is the best car.",
+        "1:26": "The CNG gives an average of 24 to 25. The other benefit is powerful pickup: the petrol has 200 Nm of torque and the CNG also gives 200 Nm.",
+        "1:39": "How much torque does the EV have?",
+        "1:48": "(As heard) There is no torque in the EV. (The companion had just said \"400 something\".)",
+        "1:53": "The CNG has more than that. You probably have solar at home?",
+        "1:59": "Yes, we have solar but it is not in use at the moment. Maybe for the subsidy.",
+        "2:09": "The electric car takes about 7 to 8 hours to charge. Put it on at night and it is full by morning. If you drive 70 to 80 km, the car runs on electric.",
+        "2:21": "How much range?",
+        "2:23": "You will get 285 km. The company claims 351.",
+        "2:29": "It claims 351 but 285 is what runs.",
+        "2:33": "Yes, 285. That too depends on the mode.",
+        "2:38": "In the city or on the highway?",
+        "3:06": "How much range in the city?",
+        "3:09": "In the city it depends on the mode; there are modes like Fearless and Fast. You will get about 250, at most.",
+        "3:19": "What is the warranty on the battery?",
+        "3:23": "8 years or 1,60,000 km.",
+        "3:34": "If the 1,60,000 km is reached first, you do not get the warranty any more. If 8 years are not over and 1,60,000 km is not done, the warranty continues.",
+        "3:45": "If I finish 1,60,000 in three years?",
+        "3:49": "Then the warranty is over.",
+        "3:58": "Is there no car here to see right now? You said the AX5.",
+        "7:28": "Can a test drive be done?",
+        "7:29": "Of what?",
+        "7:31": "The top model.",
+        "7:32": "The top model? It can be done. (Then, about a car on the floor:) This one is a diesel. The AX5 you want to see is the one parked here.",
+        "7:43": "Is this CNG?",
+        "7:45": "No, diesel. It gives an average of 21 to 22 with the same good performance.",
+        "7:55": "We are not taking diesel. So, the EV.",
+        "8:00": "If you want a CNG test drive, I can arrange that. The EV is not here right now, so I cannot show you the car.",
+        "8:11": "No problem. Is this the same one?",
+        "8:32": "Yes, that is the AX5.",
+        "8:37": "That is the 9S, a 7-seater electric car. If you wish, I can have you meet another EV sales consultant, because I cannot explain that product well enough; I look after diesel and petrol cars.",
+        "9:51": "At how much did you say the 3XO EV, 15?",
+        "9:54": "Around 15.5.",
+        "12:12": "Bring it. That one is for the test drive.",
+        "13:06": "Will you take the top model, 5 door?",
+        "13:12": "If you want 5 door, the base model comes to around 16.5 lakh. (The model is not named.)",
+        "13:20": "And is the old one available as a model?",
+        "13:25": "No, no. The old Scorpio.",
+        "13:27": "Has that stopped or is it still on?",
+        "13:29": "It is still on.",
+        "13:30": "How much is that?",
+        "13:31": "If you take the top model, the on-road price is 19,90,000 and there is a discount of 45,000 on it.",
+        "13:41": "19,90,000 on-road, with a 45,000 discount.",
+        "13:43": "And the base model?",
+        "13:44": "The base model will come to around 15.5 lakh, with a discount of about 30,000.",
+        "13:54": "What does this one run on, CNG, diesel or petrol?",
+        "13:57": "Only diesel."
+      }
     }
   },
   "daynote": "From the floor (Abhishek, 11:48 am): today's traffic is mostly customers finalising the model, choosing accessories and finalising payment. On a normal day it is mostly early enquiries, so today's numbers are not typical."
