@@ -8,7 +8,7 @@ It is enforced by three checks you run before every push (see the end).
 
 **The six pages and the menu**: Overview, Insights, Team, Coaching, Conversations, Follow-ups. No page is added, renamed or removed.
 
-**The standard stores** (the sample jewellery store, Mira, Horizon, and the real test stores Tanishq, TVS two-wheeler) look exactly as they did before the pilot work (recorded on commit `6e0f797`): same headings, same number cards, same figures. `tests/contract.json` holds the recorded menu, headings and number cards.
+**This build is pilot-only:** the dashboard ships **Mahindra showroom (pilot)** alone. Sample, demo and other test-store CSVs were removed; `tests/contract.json` checks pilot and `pilot@dealer` only.
 
 **Accepted change, 14 Nov 2026:** stores whose vertical is `car` use car-dealer wording (Booking conversion, Bookings won, showroom, booked). This applies to the Mahindra test store and the pilot.
 
@@ -89,5 +89,6 @@ Price tables in the conversation panel show the exact rupee figure (for example 
 
 - **Pilot count wording:** Data menu and live bar say "8 sales conversations · 1 after booking" so they match Team's "Conversations recorded" (8). Delivery-day #264 is not a sales conversation.
 - **CRM records page:** `crm.html` (top-bar CRM icon next to Data, and from the Data menu). Sales.mai-style phone forms filled from `crm_json`, read-only, filterable by rep. Pilot reps shown as **Sachin** (CSV R1 / Black and White Stripe) and **Vishvaraj** (CSV R2 / Lead rep).
-- **Conversations labels (14 Nov, evening):** list and search use `cname` ("Customer at 5:51 pm"), never the CSV "Customer N" counter; reps use display names (Sachin / Vishvaraj); "Who came in and who booked" groups free-text `customer_type` into a short fixed set (floor wording stays in the panel); "(model not named)" is cleaned in list labels; `~` on a value still means typical model price, not a quote.
+- **Conversations labels (14 Nov, evening):** list and search use `cname` ("Customer at 5:51 pm"), never the CSV "Customer N" counter; reps use display names (Sachin / Vishvaraj); "Who came in and who booked" groups free-text `customer_type` into a short fixed set (floor wording stays in the panel); "(model not named)" is stripped from product/model labels everywhere; long model lines are clipped in the list; the list omits the duplicate time column on the pilot; the Updates strip keeps one entry per clock time; `~` on a value still means typical model price, not a quote.
+- **Pilot-only data (14 Nov, late):** other stores and sample/demo CSVs removed from the shipped tree; Data menu no longer offers a sample store.
 
