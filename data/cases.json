@@ -13,7 +13,8 @@
       "group": "pilot",
       "snapshot": true,
       "notes": "data/pilot-notes.json",
-      "note": "The pilot day. Recordings are in the Zocus company; the pilot is every recording on this date minus the calls dropped in data/pilot-notes.json. Set name to the dealership name when known."
+      "note": "The pilot day. Recordings are in the Zocus company; the pilot is every recording on this date minus the calls dropped in data/pilot-notes.json. Set name to the dealership name when known.",
+      "repFull": true
     },
     {
       "id": "tanishq",

@@ -220,7 +220,7 @@ function setChoice(v){try{localStorage.setItem(CHOICE_KEY,v)}catch(e){}}
 /* Stores = groups of real test conversations described in data/cases.json. A store is listed only if its CSV (data/cases/<id>.csv) is present. */
 async function loadStores(){
   try{const r=await fetch(CASES_URL,{cache:'no-store'});if(!r.ok)return [];const j=await r.json(),out=[];
-    await Promise.all((j.stores||[]).map(async st=>{try{const file=st.file||'data/cases/'+st.id+'.csv',c=await fetch(file,{cache:'no-store'});if(!c.ok)return;const text=await c.text();if(/^\s*<(!doctype|html)/i.test(text))return;let meta=null;try{const m=await fetch(file.replace(/\.csv$/,'.meta.json'),{cache:'no-store'});if(m.ok)meta=await m.json()}catch(e){}out.push({id:st.id,name:st.name,vertical:st.vertical||'',featured:(st.featured||[]).map(n=>'ZC-'+n),text,meta,isDefault:!!st.default,timeless:!!st.timeless,snapshot:!!st.snapshot,empty:parseCSV(text).length<2,group:st.group||(st.timeless?'test':'pilot')})}catch(e){}}));
+    await Promise.all((j.stores||[]).map(async st=>{try{const file=st.file||'data/cases/'+st.id+'.csv',c=await fetch(file,{cache:'no-store'});if(!c.ok)return;const text=await c.text();if(/^\s*<(!doctype|html)/i.test(text))return;let meta=null;try{const m=await fetch(file.replace(/\.csv$/,'.meta.json'),{cache:'no-store'});if(m.ok)meta=await m.json()}catch(e){}out.push({id:st.id,name:st.name,vertical:st.vertical||'',featured:(st.featured||[]).map(n=>'ZC-'+n),text,meta,isDefault:!!st.default,timeless:!!st.timeless,snapshot:!!st.snapshot,repFull:!!st.repFull,empty:parseCSV(text).length<2,group:st.group||(st.timeless?'test':'pilot')})}catch(e){}}));
     const order=(j.stores||[]).map(x=>x.id);return out.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id))}catch(e){return []}}
 function setStore(id){setChoice(id);try{sessionStorage.setItem('zocus-skip-splash','1')}catch(e){}location.reload()}
 /* For the pilot the site opens on the pilot store only (also …/?dealer); …/?all shows every store, demos and upload.
@@ -251,7 +251,7 @@ async function load(){
   const st=stores.find(x=>x.id===pick)||(!pick?stores.find(x=>x.isDefault):null);
   if(LOCKED&&!st){fatal('The pilot data is not available yet. Please try again in a little while.');throw new Error('dealer link: no pilot store')}
   if(st&&st.empty&&st.snapshot)return emptyDay(st,stores,rec);
-  if(st){const b=build(st.text,st.id+'.csv');if(b.ok){res=b;res.ds.isSample=false;res.ds.storeId=st.id;res.ds.featured=st.featured;res.ds.meta=st.meta;res.ds.timeless=st.timeless;res.ds.snapshot=st.snapshot;res.ds.group=st.group;if(!res.ds.vertical)res.ds.vertical=st.vertical;if(st.snapshot)res.ds.store=st.name}}
+  if(st){const b=build(st.text,st.id+'.csv');if(b.ok){res=b;res.ds.isSample=false;res.ds.storeId=st.id;res.ds.featured=st.featured;res.ds.meta=st.meta;res.ds.timeless=st.timeless;res.ds.snapshot=st.snapshot;if(st.repFull)res.ds.REPS.forEach(r=>{r.first=r.name});res.ds.group=st.group;if(!res.ds.vertical)res.ds.vertical=st.vertical;if(st.snapshot)res.ds.store=st.name}}
   if(LOCKED&&!res){fatal('The pilot data could not be read. Please try again in a little while.');throw new Error('dealer link: pilot store invalid')}
   if(!res&&rec&&rec.text&&pick!=='sample'){const b=build(rec.text,rec.name);if(b.ok){res=b;res.ds.isSample=false;res.ds.storeId='upload'}}
   if(!res){
