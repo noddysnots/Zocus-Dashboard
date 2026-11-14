@@ -28,6 +28,7 @@ function parseCSV(text){
   row.push(f);if(row.some(x=>x.trim()!==''))rows.push(row);
   return rows}
 const normHeader=h=>{h=String(h).trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');return ALIAS[h]||h};
+const jsonOf=(s,d)=>{try{return s?JSON.parse(s):(d===undefined?[]:d)}catch(e){return d===undefined?[]:d}};
 const slug=s=>String(s).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'x';
 function uniqueId(base,used){let id=base,n=2;while(used.has(id))id=base+'-'+n++;used.add(id);return id}
 const yes=v=>/^(y|yes|true|1|done)$/i.test(String(v||'').trim());
@@ -67,13 +68,14 @@ function build(text,name){
     if(!oc){bad('outcome "'+get(r,'outcome')+'" must be sold, followup or lost.');continue}
     let value=get(r,'value_inr')===''?0:num(get(r,'value_inr'));if(isNaN(value)){bad('value_inr "'+get(r,'value_inr')+'" is not a number.');continue}
     const sk={};let bad2=false;
-    let score=num(get(r,'score'));
+    const unscored=get(r,'scored').toLowerCase()==='no';
+    let score=unscored?0:num(get(r,'score'));
     const given=Object.entries(SKILL_COLS).map(([k,col])=>[k,num(get(r,col))]);
-    if(isNaN(score)){const ok=given.filter(g=>!isNaN(g[1]));if(ok.length===5)score=Math.round(ok.reduce((a,g)=>a+g[1],0)/5);else{bad('score "'+get(r,'score')+'" is not a number from 0 to 100.');continue}}
+    if(!unscored&&isNaN(score)){const ok=given.filter(g=>!isNaN(g[1]));if(ok.length===5)score=Math.round(ok.reduce((a,g)=>a+g[1],0)/5);else{bad('score "'+get(r,'score')+'" is not a number from 0 to 100.');continue}}
     if(score<0||score>100){bad('score '+score+' is outside 0 to 100.');continue}
-    for(const [k,v] of given){if(isNaN(v)){sk[k]=Math.round(score)}else if(v<0||v>100){bad(SKILL_COLS[k]+' '+v+' is outside 0 to 100.');bad2=true;break}else sk[k]=Math.round(v)}
+    for(const [k,v] of given){if(unscored){sk[k]=0}else if(isNaN(v)){sk[k]=Math.round(score)}else if(v<0||v>100){bad(SKILL_COLS[k]+' '+v+' is outside 0 to 100.');bad2=true;break}else sk[k]=Math.round(v)}
     if(bad2)continue;
-    raw.push({r,at,rep,oc,value:Math.round(value),sk,score:Math.round(score)});
+    raw.push({r,at,rep,oc,value:Math.round(value),sk,score:Math.round(score),scored:!unscored});
   }
   if(errors.length)return {errors};
   if(!raw.length)return {errors:[{row:1,msg:'No usable rows found.'}]};
@@ -120,7 +122,7 @@ function build(text,name){
     const dur=num(get(r,'duration_min'));
     const due=parseDate(get(r,'followup_due'));
     return {id:i+1,ref:get(r,'conversation_id')||('row-'+(i+2)),rep:repMap[x.rep],at:x.at,d:Math.round((todayMid-new Date(x.at.getFullYear(),x.at.getMonth(),x.at.getDate()).getTime())/DAY),
-      persona:perMap[cl],product:prodMap[pl],inStock:!no(get(r,'in_stock')),skills:x.sk,score:x.score,competitor:comp,outcome:x.oc,reason,stage,value:x.value,
+      persona:perMap[cl],product:prodMap[pl],inStock:!no(get(r,'in_stock')),skills:x.sk,score:x.score,scored:x.scored,competitor:comp,outcome:x.oc,reason,stage,value:x.value,
       dur:isNaN(dur)||dur<=0?15:Math.round(dur),customer:get(r,'customer_name')||'Customer',phone:get(r,'customer_phone')||null,
       kw:get(r,'keywords').split('|').map(s=>s.trim()).filter(Boolean),done:false,
       cq:get(r,'customer_quote'),cqEn:get(r,'customer_quote_en'),
@@ -131,7 +133,12 @@ function build(text,name){
       aiCoach:get(r,'ai_coaching').split('|').map(t=>t.trim()).filter(Boolean),aiQuote:get(r,'ai_coaching_quote'),
       aiPromises:get(r,'ai_commitments').split('|').map(t=>t.trim()).filter(Boolean),aiNext:get(r,'ai_next_action'),
       aiNotes:get(r,'ai_notes').split('|').map(t=>t.trim()).filter(Boolean),
-      aiChecks:get(r,'ai_checks').split(' | ').map(t=>{const m=t.trim().match(/^(MET|NOT_MET):\s*(.*?)\s*\((\w+)\)\.?\s*(.*)$/);return m?{ok:m[1]==='MET',label:m[2],id:m[3],why:m[4]}:null}).filter(Boolean),
+      aiChecks:get(r,'ai_checks').split(' | ').map(t=>{const m=t.trim().match(/^(MET|PARTLY|NOT_MET):\s*(.*?)\s*\((\w+)\)\.?\s*([\s\S]*)$/);if(!m)return null;const qi=m[4].indexOf('\u275D'),why=qi>=0?m[4].slice(0,qi).trim():m[4],quote=qi>=0?m[4].slice(qi+1).replace(/\u275E\s*$/,'').trim():'';return {ok:m[1]==='MET',mark:m[1]==='MET'?'done':m[1]==='PARTLY'?'partly':'missed',label:m[2],id:m[3],why,quote}}).filter(Boolean),
+      endAt:parseDate(get(r,'ended_at')),analysedAt:parseDate(get(r,'analysed_at')),
+      sumNeed:get(r,'sum_need'),sumHappened:get(r,'sum_happened'),sumOutcome:get(r,'sum_outcome'),sumWhy:get(r,'sum_why'),sumNext:get(r,'sum_next'),
+      promises:jsonOf(get(r,'promises_json')),concerns:jsonOf(get(r,'concerns_json')),prices:jsonOf(get(r,'prices_json')),trEn:jsonOf(get(r,'tr_en'),{}),
+      flags:get(r,'flags').split('|').map(s=>s.trim()).filter(Boolean),remarks:get(r,'remarks'),
+      fBudget:get(r,'f_budget'),fPref:get(r,'f_preference'),fTiming:get(r,'f_timing'),fComp:get(r,'f_competitor'),
       valueSrc:get(r,'value_source').toLowerCase(),
       models:get(r,'models_considered').split('|').map(s=>s.trim()).filter(Boolean),mgroup:get(r,'model_group').toLowerCase(),fuel:get(r,'fuel').split('|').map(s=>s.trim()).filter(Boolean),colour:get(r,'colour').split('|').map(s=>s.trim()).filter(Boolean),
       quote:get(r,'quote_given').toLowerCase(),td:get(r,'test_drive').toLowerCase(),avail:get(r,'availability').toLowerCase()==='yes',availQ:get(r,'availability_quote'),prio:get(r,'priorities').split('|').map(s=>s.trim()).filter(Boolean),intent:get(r,'intent').toLowerCase(),decision:get(r,'decision').toLowerCase(),transcript:get(r,'transcript'),talkRep:get(r,'talk_rep_pct')===''?null:num(get(r,'talk_rep_pct')),
@@ -144,7 +151,7 @@ function build(text,name){
   const ns=rr.filter(r=>!/^(sold|yes|won)$/i.test(get(r,'outcome'))),nsFilled=c=>ns.length?ns.filter(r=>get(r,c)!=='').length/ns.length>=.3:false;
   const has={stock:filled('in_stock'),competitor:filled('competitor'),offer:filled('competitor_offer'),reason:nsFilled('reason'),stage:nsFilled('stage_reached'),
     followups:filled('followup_due'),replies:filled('objection_reply'),types:filled('customer_type'),
-    ai:CONVS.some(c=>c.aiCoach.length||c.aiPromises.length||c.aiNext||c.aiNotes.length),checks:CONVS.some(c=>c.aiChecks.length),valueSrc:'value_source' in idx,floor:'quote_given' in idx,transcript:CONVS.some(c=>c.transcript)};
+    ai:CONVS.some(c=>c.aiCoach.length||c.aiPromises.length||c.aiNext||c.aiNotes.length),checks:CONVS.some(c=>c.aiChecks.length),valueSrc:'value_source' in idx,floor:'quote_given' in idx,rubric:CONVS.some(c=>c.aiChecks.some(x=>x.mark==='partly')),times:'ended_at' in idx,promises:CONVS.some(c=>c.promises.length),transcript:CONVS.some(c=>c.transcript)};
   return {ok:true,name,warnings,
     ds:{has,vertical:(get(first,'vertical')||'').toLowerCase(),today,store:get(first,'store_name')||'Your store',owner:get(first,'owner_name')||'',REPS,PRODUCTS,PERSONAS,COMPS,CONVS,customReasons,hasObjection,rawText:text,file:name}}}
 

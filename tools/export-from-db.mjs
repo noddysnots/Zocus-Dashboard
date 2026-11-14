@@ -107,19 +107,43 @@ function carReason(t) {
 }
 const TEST_DRIVE_RE = /\b(took|taken|had|did|done|after|finished|completed|back from|went for|gone for)\b[^.?!]{0,40}test[- ]?(drive|ride)|test[- ]?(drive|ride)[^.?!]{0,25}\b(done|taken|completed|felt|went)\b|test[- ]?drove/i;
 const CHK_CAR = { D1: 'Asked what the car is for', D2: 'Confirmed the model or body type', D3: 'Asked the budget', D4: 'Confirmed variant, fuel and features wanted', P1: 'Gave a correct fact about the car', P2: 'Addressed the customer\'s priority', P3: 'Explained the value', O1: 'Acknowledged the objection', O2: 'Explored the objection', O3: 'Answered the objection', C1: 'Handled the comparison with another brand', SOP1: 'Stayed respectful', SOP2: 'Used the showroom offer', N1: 'Agreed a next step and contact' };
+/* ---------- automotive rubric (points-score-v3): 10 checks, each done / partly / missed ---------- */
+const RUB_POINTS = { done: 100, partly: 50, missed: 0 };
+const RUB_SKILL = { need: 'need', budget: 'budget', options: 'pitch', value_proof: 'pitch', price_offers: 'objection', concerns: 'objection', decision_timing: 'close', ask: 'close', next_step: 'close' }; // 'experience' (test drive) is shown but not scored: the dealer says it matters little
+const RUB_LABEL = { need: 'Understood what the customer wants', budget: 'Asked the budget', decision_timing: 'Found out when and how they decide', options: 'Showed the right options', experience: 'Offered a test drive or showroom visit', value_proof: 'Explained why this car is worth it', price_offers: 'Gave a clear price and offers', concerns: 'Answered the customer\'s concerns', ask: 'Asked for the booking', next_step: 'Agreed a next step with a date' };
+const RUB_ORDER = ['need', 'budget', 'options', 'experience', 'value_proof', 'price_offers', 'concerns', 'decision_timing', 'ask', 'next_step'];
+const toks = s => new Set(String(s || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/).filter(w => w.length > 3));
+const jac = (a, b) => { const A = toks(a), B = toks(b); let i = 0; A.forEach(w => B.has(w) && i++); return i / Math.max(1, Math.min(A.size, B.size)); };
+/* every price said on a price line, not only the last one */
+function priceLines(turns) {
+  const out = [];
+  for (const t of turns) for (const s of String(t.text || '').split(/(?<=[.?!।])\s+/)) {
+    if (!PRICE_RE.test(s) || NOT_PRICE.test(s)) continue;
+    for (const v of rupeeFigures(s)) out.push({ v, text: s.trim().slice(0, 140) });
+  }
+  return out;
+}
+/* the customer's budget as a number (midpoint of "16-17 lakh"), ignoring the down payment */
+function budgetMid(text) {
+  const t = String(text || '').replace(/,/g, '');
+  const rg = t.match(/(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)\s*(lakh|lac|crore|cr)/i);
+  if (rg) { const u = /^c/i.test(rg[3]) ? 1e7 : 1e5; return (+rg[1] + +rg[2]) / 2 * u; }
+  const v = rupeeFigures(t.replace(/[^;.]*\b(down ?payment|advance|loan)\b[^;.]*/gi, ' ')); return v.length ? v[0] : 0;
+}
 /* ---------- What the floor said matters (14 Nov): models compared, fuel, colour, quotation given, availability, what the customer cares about ---------- */
 const COLOURS = ['everest white', 'galaxy grey', 'stealth black', 'napoli black', 'deep forest', 'tango red', 'desert fury', 'dazzling silver', 'red rage', 'nebula blue', 'battleship grey', 'white', 'black', 'grey', 'gray', 'silver', 'red', 'blue', 'green', 'brown', 'beige', 'bronze', 'orange', 'yellow', 'maroon', 'safed', 'kaala', 'kali', 'laal'];
 const COLOUR_NAME = { gray: 'grey', safed: 'white', kaala: 'black', kali: 'black', laal: 'red' };
 const COLOUR_RE = new RegExp('\\b(' + COLOURS.join('|') + ')\\b(?=\\s+(colou?r|shade|one|wala|wali|mein|car|thar|scorpio|xuv|is|chahiye|in|option))|\\b(colou?r|shade|rang)\\b[^.?!]{0,30}\\b(' + COLOURS.join('|') + ')\\b', 'gi');
 const PRIORITY = [
-  ['Performance', /\b(power|powerful|pick-?up|torque|performance|engine|bhp|4x4|four[- ]wheel|off[- ]?road|highway|speed|turbo|diesel engine)\b/i],
+  ['Performance', /\b(power|powerful|pick-?up|torque|performance|engine|bhp|4x4|four[- ]wheel|off[- ]?road|highway|speed|turbo|diesel engine|suspension)\b/i],
   ['Safety', /\b(safety|safe|airbags?|ncap|adas|star rating|5[- ]star|five[- ]star)\b/i],
   ['Features', /\b(features?|sunroof|touch ?screen|infotainment|camera|360|music|speakers?|ventilated|connected|alexa)\b/i],
   ['Space', /\b(space|spacious|seater|third row|boot|legroom|family of)\b/i],
   ['Comfort', /\b(comfort|comfortable|suspension|ride quality|smooth|seats? (are|is))\b/i],
   ['Mileage', /\b(mileage|average|fuel efficien\w*|km ?per ?(l|litre)|kmpl|running cost)\b/i],
-  ['Price and offers', /\b(price|discount|offers?|emi|budget|expensive|cheap|costly|on[- ]?road)\b/i],
-  ['Availability', /\b(waiting|wait period|available|availability|in stock|stock|delivery)\b/i],
+  ['Price and offers', /\b(price|discount|offers?|budget|expensive|cheap|costly|on[- ]?road|kimat|bhav|daam|vima|insurance|fer pade)\b/i],
+  ['Loan and finance', /\b(loan|finance|emi|down ?payment|instal?lment|bank)\b/i],
+  ['Availability', /\b(waiting|wait period|available|availability|in stock|stock|delivery|nikli|aavse)\b/i],
   ['Resale', /\b(resale)\b/i],
   ['Service', /\b(service|maintenance|warranty|service centre)\b/i]];
 const AVAIL_RE = /waiting (period|time|list|chal|hai|of \d|for (the )?(car|delivery|stock))|wait (of|for) (about |around )?\d+ (days?|weeks?|months?)|\bin stock\b|out of stock|stock (mein|me|nahi|hai)|not available|availability|delivery (date|time|by|in)|kab (tak )?(milegi|milega|delivery)|(\d+|two|three|four|six) (weeks?|months?) (wait|delivery)/i;
@@ -132,7 +156,7 @@ async function runExport(o) {
 if (o.org != null) { const h = findOrg(o.org); if (h.length !== 1) { console.log(`${o.storeName || o.org}: skipped, ${h.length ? 'more than one company matches' : 'no company matches'} "${o.org}" (known: ${orgs.map(x => x.name).join(' | ')})`); return; } org = h[0]; tz = org.timezone || 'Asia/Kolkata'; }
 const rows = await q(`
   select s.id, s.captured_at, s.ended_at, s.customer_name, s.customer_phone, s.summary, s.sale_tag, s.outcome, u.name rep, l.name store, ar.result,
-    tv.segments, tv.text transcript, ar.provider ai_provider, ar.model ai_model, s.ai_held, s.qualification_status::text quality,
+    tv.segments, tv.text transcript, ar.completed_at analysed_at, ar.provider ai_provider, ar.model ai_model, s.ai_held, s.qualification_status::text quality,
     (select c.result from category_projections c where c.session_id=s.id and c.state='complete' order by c.id desc limit 1) cat,
     (select m.duration_ms from interaction_media m where m.session_id=s.id and m.state='ready' order by m.id desc limit 1) media_ms,
     (select result from speaker_role_assessments a where a.session_id=s.id order by a.id desc limit 1) roles,
@@ -152,6 +176,7 @@ const owner = o.ownerName != null ? o.ownerName : /administrator|admin$/i.test(o
 
 const fmt = (d, time = true) => { const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(d)).map(x => [x.type, x.value])); return `${p.year}-${p.month}-${p.day}` + (time ? ` ${p.hour}:${p.minute}` : ''); };
 const fld = (res, key) => { const f = (res?.fields || []).find(x => x.key === key); const v = f?.value; return v == null ? '' : typeof v === 'string' ? v : (v.text ?? v.value ?? JSON.stringify(v)); };
+const clipE = (s, n = 200) => { const t = clip(s, 5000); return t.length > n ? t.slice(0, n - 1).trimEnd() + '…' : t; };
 const clip = (s, n = 220) => (s || '').replace(/\s+/g, ' ').replace(/^(visitor|advisor|customer|staff|rep|salesperson)\s*:\s*/i, '').trim().slice(0, n);
 const pct = (m, n) => (m + n ? Math.round(100 * m / (m + n)) : null);
 const money = t => { const m = String(t || '').replace(/,/g, '').match(/(\d+(?:\.\d+)?)\s*(lakh|lac|l|crore|cr|k)?/i); if (!m) return ''; let v = +m[1]; const u = (m[2] || '').toLowerCase(); if (u === 'k') v *= 1e3; else if (/^l/.test(u)) v *= 1e5; else if (/^c/.test(u)) v *= 1e7; return Math.round(v); };
@@ -162,7 +187,7 @@ const CHK = { D1: 'need', D2: 'need', D4: 'need', D3: 'budget', P1: 'pitch', P2:
 const SOP = { discovery: 'need', product_knowledge: 'pitch', objection_handling: 'objection', competitor_handling: 'objection' };
 const reasonCode = t => { const s = (t || '').toLowerCase(); if (!s) return ''; if (/family|approval|discuss|husband|wife|mother|parents/.test(s)) return 'family'; if (/competitor|another|other jeweller|elsewhere/.test(s)) return 'competitor'; if (/budget|price|cost|making|charge|discount|expensive/.test(s)) return 'budget'; if (/design|style|pattern/.test(s)) return 'design'; if (/stock|unavailable|size/.test(s)) return 'stock'; if (/browsing|just looking/.test(s)) return 'browse'; return clip(t, 60); };
 
-const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'customer_quote_en', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_quote_en', 'objection_reply', 'objection_reply_en', 'objection_at_sec', 'followup_due', 'followup_done', 'rep_tenure', 'store_name', 'owner_name', 'zocus_url', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'value_source', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision'];
+const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'customer_quote_en', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_quote_en', 'objection_reply', 'objection_reply_en', 'objection_at_sec', 'followup_due', 'followup_done', 'rep_tenure', 'store_name', 'owner_name', 'zocus_url', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'value_source', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision', 'ended_at', 'analysed_at', 'scored', 'sum_need', 'sum_happened', 'sum_outcome', 'sum_why', 'sum_next', 'promises_json', 'concerns_json', 'flags', 'remarks', 'prices_json', 'f_budget', 'f_preference', 'f_timing', 'f_competitor', 'tr_en'];
 const DERIVED = {}; const mark = (col, how) => { (DERIVED[col] ||= { how, n: 0 }).n++; };
 const exported = new Set(), unscored = []; let fixtureN = 0, heldN = 0, partialN = 0;
 const skip = { range: 0, noOutcome: 0, noScore: 0, dropped: 0 }, src = { checks: 0, 'analysis review': 0 }, srcN = {}, calls = [];
@@ -189,31 +214,47 @@ for (const r of rows) {
 
   // skills
   const tally = {}; let m = 0, n = 0, source = null;
-  if (sc?.eligibility?.eligible) for (const o of sc.observations || []) { const k = CHK[o.checkId]; if (!k || !['MET', 'NOT_MET'].includes(o.state)) continue; const t = tally[k] ||= [0, 0]; o.state === 'MET' ? (t[0]++, m++) : (t[1]++, n++); }
-  if (m + n) source = 'checks';
-  else { m = n = 0; for (const k in tally) delete tally[k]; for (const s of res.sop || []) { const k = SOP[s.dimensionId]; if (!k || !['observed', 'not_observed'].includes(s.assessment)) continue; const t = tally[k] ||= [0, 0]; s.assessment === 'observed' ? (t[0]++, m++) : (t[1]++, n++); } if (m + n) source = 'analysis review'; }
-  if (!source) { skip.noScore++; unscored.push(r.id); continue; }
-  const sk = Object.fromEntries(Object.entries(tally).map(([k, [a, b]]) => [k, pct(a, b)]));
+  let rubric = null;
+  if (sc?.eligibility?.eligible && Array.isArray(sc.checks) && sc.checks.length) {
+    rubric = sc.checks.filter(c => c.id in RUB_POINTS || c.mark in RUB_POINTS).filter(c => RUB_POINTS[c.mark] != null);
+    const acc = {}; let sum = 0, cnt = 0;
+    for (const c of rubric) { const k = RUB_SKILL[c.id]; if (!k) continue; (acc[k] ||= []).push(RUB_POINTS[c.mark]); sum += RUB_POINTS[c.mark]; cnt++; }
+    for (const k in acc) tally[k] = Math.round(acc[k].reduce((a, b) => a + b, 0) / acc[k].length);
+    if (cnt) { source = 'rubric'; var rubricScore = Math.round(sum / cnt); }
+  }
+  if (!source && sc?.eligibility?.eligible) for (const o of sc.observations || []) { const k = CHK[o.checkId]; if (!k || !['MET', 'NOT_MET'].includes(o.state)) continue; const t = tally[k] ||= [0, 0]; o.state === 'MET' ? (t[0]++, m++) : (t[1]++, n++); }
+  if (!source && m + n) source = 'checks';
+  else if (!source && !(isCar && o.notes)) { m = n = 0; for (const k in tally) delete tally[k]; for (const s of res.sop || []) { const k = SOP[s.dimensionId]; if (!k || !['observed', 'not_observed'].includes(s.assessment)) continue; const t = tally[k] ||= [0, 0]; s.assessment === 'observed' ? (t[0]++, m++) : (t[1]++, n++); } if (m + n) source = 'analysis review'; }
+  /* a car pilot call with no real rubric score is still shown, as "not scored", instead of an invented number */
+  const scored = !!source;
+  if (!source && !(isCar && o.notes)) { skip.noScore++; unscored.push(r.id); continue; }
   const budgetText = fld(res, 'budget');
-  if (sk.budget == null) { sk.budget = budgetText ? 100 : 0; mark('score_budget', 'proxy: was a budget captured in the conversation (100) or not (0)'); }
-  if (sk.close == null) { sk.close = outcome === 'sold' || hasNext ? 100 : 0; mark('score_close', 'proxy: sale closed or a next step / follow-up set (100), otherwise 0'); }
-  const have = Object.values(sk).filter(v => v != null);
-  const overall = source === 'checks' ? pct(m, n) : Math.round(have.reduce((a, b) => a + b, 0) / have.length);
-  src[source]++;
+  let sk = {}, overall = '';
+  if (scored) {
+    sk = source === 'rubric' ? { ...tally } : Object.fromEntries(Object.entries(tally).map(([k, [a, b]]) => [k, pct(a, b)]));
+    if (sk.budget == null) { sk.budget = budgetText ? 100 : 0; mark('score_budget', 'proxy: was a budget captured in the conversation (100) or not (0)'); }
+    if (sk.close == null) { sk.close = outcome === 'sold' || hasNext ? 100 : 0; mark('score_close', 'proxy: sale closed or a next step / follow-up set (100), otherwise 0'); }
+    const have = Object.values(sk).filter(v => v != null);
+    overall = source === 'rubric' ? rubricScore : source === 'checks' ? pct(m, n) : Math.round(have.reduce((a, b) => a + b, 0) / have.length);
+    src[source] = (src[source] || 0) + 1;
+  } else { skip.unscoredShown = (skip.unscoredShown || 0) + 1; mark('score', 'not scored: no usable rubric result for this call, so no score is shown'); }
+
 
   // speaker turns. Label by the AI's role guess only: the account that recorded (rep_id) is NOT the person speaking, so never use its name here.
-  const roleOf = Object.fromEntries((r.roles?.speakers || []).map(x => [x.label, x.role === 'rep' ? 'Rep' : x.role === 'customer' ? 'Customer' : (x.role === 'other_staff' || x.role === 'assisting_staff') ? 'Other staff' : 'Unidentified']));
+  const ROLE = { rep: 'Rep', customer: 'Customer', customer_companion: "Customer's companion", background: 'Background', other_staff: 'Other staff', assisting_staff: 'Other staff', unidentified: 'Other voice' };
+  const roleOf = Object.fromEntries((r.roles?.speakers || []).map(x => [x.label, ROLE[x.role] || 'Other voice']));
   const ts = ms => { const t = Math.floor(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
   const turns = []; for (const g of Array.isArray(r.segments) ? r.segments : []) { const who = roleOf[g.speaker] || g.speaker || ''; const last = turns.at(-1); if (last && last.who === who && last.text.length < 600) last.text += ' ' + (g.text || '').trim(); else turns.push({ who, at: g.startMs || 0, text: (g.text || '').trim() }); }
   const transcript = turns.length > 1 ? turns.map(t => `[${ts(t.at)}] ${t.who}: ${t.text.replace(/\s+/g, ' ')}`).join('\n') : (r.transcript || '').replace(/\s+/g, ' ').trim();
-  const wRep = (r.roles?.speakers || []).filter(x => x.role === 'rep' || x.role === 'assisting_staff').reduce((a, x) => a + (x.words || 0), 0), wCust = (r.roles?.speakers || []).filter(x => x.role === 'customer').reduce((a, x) => a + (x.words || 0), 0);
+  const wRep = (r.roles?.speakers || []).filter(x => x.role === 'rep' || x.role === 'assisting_staff').reduce((a, x) => a + (x.words || 0), 0), wCust = (r.roles?.speakers || []).filter(x => x.role === 'customer' || x.role === 'customer_companion').reduce((a, x) => a + (x.words || 0), 0);
   const durSec = turns.length ? Math.round((r.segments.at(-1).endMs || 0) / 1000) : 0;
   const fullText = turns.length > 1 ? turns.map(t => t.text).join(' ') : (r.transcript || ''), sumText = r.summary || res.summary || '';
   const sayTurns = turns.length > 1 ? turns : [{ who: '', text: fullText }];
 
   // car: which model was discussed (notes win, else the most-mentioned model in the transcript)
   const models = isCar ? carModels([fullText, sumText, fld(res, 'preference')].join(' . ')) : [];
-  const noteModel = note.model ? (carModels(String(note.model))[0]?.m || { label: String(note.model).trim() }) : null;
+  const asModel = x => { const mm = carModels(String(x))[0]?.m; return mm ? { ...mm, label: String(x).trim() } : { label: String(x).trim() }; };
+  const noteModel = note.model ? asModel(note.model) : null;
   const mainModel = noteModel || models[0]?.m || null, alsoModels = models.map(x => x.m.label).filter(l => l !== mainModel?.label);
   if (isCar && mainModel && !noteModel) mark('product', 'car model read from the transcript: the most-mentioned model from data/price-list.json');
 
@@ -223,10 +264,15 @@ for (const r of rows) {
   if (oc.amountMinor != null) setV(Number(oc.amountMinor) / 100, 'recorded');
   /* the AI's own value: basis says whether it is a price quoted in the conversation or the customer's budget */
   if (rr.value?.amountMinor != null) setV(Number(rr.value.amountMinor) / 100, /budget/i.test(rr.value.basis || '') ? 'budget' : 'call');
-  const priceLine = isCar ? saidInCall(sayTurns, PRICE_RE) : null;
+  /* value: when several prices were quoted, take the AI's own value, else the price nearest the customer's budget (else the last one said) */
+  const allPrices = isCar ? priceLines(sayTurns) : [];
+  const distinctPrices = [...new Set(allPrices.map(p => p.v))];
+  const bMid = isCar ? budgetMid(budgetText) || budgetMid(saidInCall(sayTurns, BUDGET_RE)?.text || '') : 0;
+  const nearBudget = distinctPrices.length > 1 && bMid ? distinctPrices.slice().sort((a, b) => Math.abs(a - bMid) - Math.abs(b - bMid))[0] : 0;
+  const priceLine = isCar ? (nearBudget ? { v: nearBudget, text: (allPrices.find(p => p.v === nearBudget) || {}).text || '' } : saidInCall(sayTurns, PRICE_RE)) : null;
   if (isCar) {
-    if (priceLine) setV(priceLine.v, 'call');
-    setV(rupeeFigures(budgetText).at(-1) || saidInCall(sayTurns, BUDGET_RE)?.v || 0, 'budget');
+    if (priceLine) setV(priceLine.v, distinctPrices.length > 1 ? 'call' : 'call');
+    setV(budgetMid(budgetText) || saidInCall(sayTurns, BUDGET_RE)?.v || 0, 'budget');
     if (mainModel?.range) setV((mainModel.range[0] + mainModel.range[1]) / 2, 'indicative');
   } else if (budgetText && money(budgetText)) setV(money(budgetText), 'budget');
   const VS_HOW = { call: 'price said in the conversation', budget: 'customer-stated budget, used where no price was said', indicative: 'no price said: midpoint of the model\'s indicative band in data/price-list.json', team: 'entered by the team in the notes file' };
@@ -246,17 +292,18 @@ for (const r of rows) {
     if (i >= 0) { at = Math.round(segs[i].startMs / 1000); const nx = segs.slice(i + 1).find(s => s.speaker !== segs[i].speaker); if (nx) { reply = clip(nx.text, 300); mark('objection_reply', 'next speaker\'s line in the transcript after the objection'); } mark('objection_at_sec', 'start of the objection segment in the transcript'); }
   }
     // ---- floor details (car stores): what the dealer said matters ----
-  const custText = (turns.some(t => t.who === 'Customer') ? turns.filter(t => t.who === 'Customer').map(t => t.text).join(' . ') : fullText);
+  const custText = (turns.some(t => t.who === 'Customer') ? turns.filter(t => t.who === 'Customer' || t.who === "Customer's companion").map(t => t.text).join(' . ') : fullText);
   const asList = v => Array.isArray(v) ? v : String(v || '').split(/\s*[|,\/]\s*|\s+vs\s+/i).filter(Boolean);
-  const noteModels = note.models ? asList(note.models).map(x => carModels(x)[0]?.m || { label: x.trim() }) : null;
+  const noteModels = note.models ? asList(note.models).map(asModel) : null;
   const considered = isCar ? (noteModels || [...(noteModel ? [noteModel] : []), ...models.map(x => x.m)].filter((m, i, a) => a.findIndex(y => y.label === m.label) === i)) : [];
   const fuel = isCar ? (note.fuel ? asList(note.fuel) : fuelOf(fullText + ' ' + sumText, considered)) : [];
   const colours = isCar ? (note.colour ? asList(note.colour) : [...new Set([...fullText.matchAll(COLOUR_RE)].map(m => (m[1] || m[4] || '').toLowerCase()).filter(Boolean).map(c => COLOUR_NAME[c] || c))]) : [];
   const promisesTxt = (res.commitments || []).map(c => c.text || '').join(' . ');
   const quote = !isCar ? '' : note.quote ? (/^(y|yes|given|true)/i.test(String(note.quote)) ? 'yes' : /promis/i.test(String(note.quote)) ? 'promised' : 'no')
-    : (outcome === 'sold' || vsrc === 'call' || !!priceLine || QUOTE_GIVEN_RE.test(fullText)) ? 'yes' : (QUOTE_PROMISE_RE.test(promisesTxt) || QUOTE_PROMISE_RE.test(fullText)) ? 'promised' : 'no';
+    : (outcome === 'sold' || vsrc === 'call' || !!priceLine || QUOTE_GIVEN_RE.test(fullText) || sayTurns.some(t => (t.who === 'Rep' || !t.who) && /\b\d{1,2}[.,]?\d*\s*(lakh|lac)\b|\bon[- ]?road\b|\bex[- ]?showroom\b/i.test(t.text))) ? 'yes' : (QUOTE_PROMISE_RE.test(promisesTxt) || QUOTE_PROMISE_RE.test(fullText)) ? 'promised' : 'no';
   const testDrive = !isCar ? '' : note.test_drive != null ? (/^(y|yes|true)/i.test(String(note.test_drive)) ? 'yes' : 'no') : TEST_DRIVE_RE.test(fullText + ' . ' + sumText) ? 'yes' : /test[- ]?(drive|ride)/i.test(fullText) ? 'offered' : 'no';
-  const availLine = isCar ? (sayTurns.flatMap(t => String(t.text || '').split(/(?<=[.?!।])\s+/)).find(s => AVAIL_RE.test(s)) || '') : '';
+  const availAI = [...(res.objections || []).map(x => x.theme), rr.rootCause].filter(Boolean).find(s => /stock|delivery|waiting|availab/i.test(s)) || '';
+  const availLine = isCar ? (availAI || sayTurns.flatMap(t => String(t.text || '').split(/(?<=[.?!।])\s+/)).find(s => AVAIL_RE.test(s)) || '') : '';
   const priorities = isCar ? (note.priorities ? asList(note.priorities) : PRIORITY.filter(([, re]) => re.test(custText)).map(([k]) => k)) : [];
   const intent = isCar ? (note.intent || rr.intent || '') : '';
   const decision = !isCar ? '' : considered.length === 1 ? 'decided' : considered.length >= 2 && considered.length <= 3 ? 'choosing' : 'exploring';
@@ -277,7 +324,7 @@ for (const r of rows) {
   const NOTE_SKIP = isCar ? /source coverage|not attributable|no matching|jewell?ery|catalogu?e|tanishq|\bgold\b/i : /source coverage|not attributable|no matching/i;
   const aiNotes = uniq((res.sop || []).filter(x => x.note && !NOTE_SKIP.test(x.note)).map(x => x.note));
   const CHK_LABEL = isCar ? CHK_CAR : { D1: 'Asked the occasion or purpose', D2: 'Confirmed the category or type', D3: 'Asked the budget', D4: 'Confirmed specifications', P1: 'Gave a correct product fact', P2: 'Addressed the customer\'s priority', P3: 'Explained the value', O1: 'Acknowledged the objection', O2: 'Explored the objection', O3: 'Answered the objection', C1: 'Handled the competitor comparison', SOP1: 'Stayed respectful', SOP2: 'Used the store offer or hook', N1: 'Agreed a next step and contact' };
-  const seenChk = new Set(), aiChecks = (sc?.observations || []).filter(x => ['MET', 'NOT_MET'].includes(x.state)).filter(x => { const k = x.checkId + x.state; if (seenChk.has(k)) return false; seenChk.add(k); return true; })
+  const seenChk = new Set(), aiChecks = rubric ? RUB_ORDER.map(id => rubric.find(c => c.id === id)).filter(Boolean).map(c => `${({ done: 'MET', partly: 'PARTLY', missed: 'NOT_MET' })[c.mark]}: ${RUB_LABEL[c.id] || c.id} (${c.id}). ${clip(String(c.reason || '').replace(/\|/g, '/'), 220)}${c.evidence?.[0]?.quote ? ' ❝' + clip(String(c.evidence[0].quote).replace(/\|/g, '/'), 160) + '❞' : ''}`).join(' | ') : (sc?.observations || []).filter(x => ['MET', 'NOT_MET'].includes(x.state)).filter(x => { const k = x.checkId + x.state; if (seenChk.has(k)) return false; seenChk.add(k); return true; })
     .map(x => `${x.state}: ${CHK_LABEL[x.checkId] || x.checkId} (${x.checkId})${x.reason ? '. ' + clip(String(x.reason).replace(/\|/g, '/'), 180) : ''}`).join(' | ');
 
   // who: team notes win; then "Rep / Customer" typed in the app's customer box; the recording account is only a last resort
@@ -287,12 +334,22 @@ for (const r of rows) {
   if (!custName && o.notes) custName = 'Customer ' + (dayIds.indexOf(r.id) + 1);
   const product = isCar ? (mainModel?.label || 'Model not decided') : (fld(res, 'preference') || 'Not captured');
   const weak = []; if (+dmin && +dmin < 3) weak.push('under 3 minutes'); if (r.quality && r.quality !== 'complete') weak.push('recording marked ' + r.quality); if (res.relevance?.status && res.relevance.status !== 'relevant') weak.push('AI: not a sales conversation'); if (rr.outcomeReason === 'truncated') weak.push('ends mid-conversation'); if ((r.roles?.speakers || []).length && !wCust) weak.push('no customer voice found');
-  calls.push({ id: r.id, at: fmt(r.captured_at).slice(11), min: dmin, rep: repName, customer: custName, model: product, value, source: vsrc, outcome, models: considered.map(m => m.label).join(' vs '), fuel: fuel.join('/'), quote, td: testDrive, avail: availLine ? clip(availLine, 100) : '', said: vsrc === 'call' ? clip(rr.value?.evidence?.at(-1)?.quote || priceLine?.text || '', 120) : '', weak });
+  calls.push({ id: r.id, at: fmt(r.captured_at).slice(11), min: dmin, rep: repName, customer: custName, model: product, value, source: vsrc, outcome, scored, prices: distinctPrices, models: considered.map(m => m.label).join(' vs '), fuel: fuel.join('/'), quote, td: testDrive, avail: availLine ? clip(availLine, 100) : '', said: vsrc === 'call' ? clip(rr.value?.evidence?.at(-1)?.quote || priceLine?.text || '', 120) : '', weak });
 
+  // ---- what the backend gave us beyond the summary line: five-part summary, promises with drafts, concerns, flags ----
+  const sumParts = (() => { const t = String(r.summary || res.summary || ''), o2 = {}, ms = [...t.matchAll(/(Customer need|What happened|Outcome|Why|Next step):\s*/g)]; ms.forEach((mm, i) => { o2[mm[1]] = t.slice(mm.index + mm[0].length, i + 1 < ms.length ? ms[i + 1].index : undefined).trim(); }); if (!ms.length) o2['What happened'] = t.trim(); return o2; })();
+  const fus = Array.isArray(res.followupOpportunities) ? res.followupOpportunities : [], usedF = new Set();
+  const promises = (res.actions || []).map(a => { let bi = -1, bs = 0.3; fus.forEach((f, i) => { if (usedF.has(i)) return; const s = jac(a.title, f.title); if (s > bs) { bs = s; bi = i; } }); if (bi >= 0) usedF.add(bi); const f = fus[bi]; return { t: a.title, d: f?.draft || a.draft || '', q: clipE(a.evidence?.[0]?.quote, 220), k: f?.timing?.kind || '', ph: f?.timing?.phrase || '' }; });
+  fus.forEach((f, i) => { if (!usedF.has(i)) promises.push({ t: f.title, d: f.draft || '', q: clip(f.evidence?.[0]?.quote, 160), k: f.timing?.kind || '', ph: f.timing?.phrase || '' }); });
+  const dueOf = txt => { const s = String(txt || ''); let mm; if ((mm = s.match(/within (about |around )?(an|one|1|two|2|\d+) (hour|hours|minutes?|mins?|days?)/i))) return 'within ' + (mm[1] ? 'about ' : '') + ({ an: 'an', one: 'an', 1: 'an' }[mm[2].toLowerCase()] || mm[2]) + ' ' + mm[3].replace(/^hours?$/i, mm[2].toLowerCase().match(/^(an|one|1)$/) ? 'hour' : 'hours'); return ''; };
+  promises.forEach(p => { p.due = dueOf(p.t + ' ' + (res.commitments || []).map(c => c.text).join(' ')); if (!p.due && /stock/i.test(p.k)) p.due = 'when stock is confirmed'; });
+  const concerns = (sc?.concerns || []).map(c => ({ t: c.concern, s: c.status })).map(c => { const ob = (res.objections || []).map(x => ({ x, s: jac(c.t, x.theme) })).sort((a, b) => b.s - a.s)[0]; return { ...c, a: ob && ob.s > 0.3 ? clip(ob.x.resolution || '', 240) : '' }; });
+  (res.objections || []).forEach(x => { if (!concerns.some(c => jac(c.t, x.theme) > 0.3)) concerns.push({ t: x.theme, s: x.resolution ? 'partly' : 'open', a: clip(x.resolution || '', 240) }); });
+  const flagsAI = (res.warnings || []).filter(w => !/jewell?ery|catalogu?e|tanishq/i.test(w)).map(w => /interrupt|someone else|other person/i.test(w) ? 'Phone calls or other conversations interrupted the recording' : /multi-person|several people|multiple people|excluded spans/i.test(w) ? 'Several people were speaking' : clip(w, 120));
   exported.add(r.id); fixtureN += r.ai_provider === 'fictional_fixture' ? 1 : 0; heldN += r.ai_held ? 1 : 0; partialN += r.quality && r.quality !== 'complete' ? 1 : 0;
   const rec = {
     conversation_id: 'ZC-' + r.id, captured_at: fmt(r.captured_at), rep_name: repName, outcome, value_inr: value, value_source: vsrc, product,
-    score: overall, score_need: sk.need ?? '', score_budget: sk.budget ?? '', score_pitch: sk.pitch ?? '', score_objection: sk.objection ?? '', score_close: sk.close ?? '',
+    scored: scored ? 'yes' : 'no', score: overall, score_need: sk.need ?? '', score_budget: sk.budget ?? '', score_pitch: sk.pitch ?? '', score_objection: sk.objection ?? '', score_close: sk.close ?? '',
     reason: outcome === 'sold' ? '' : (isCar ? carReason(lossFinal) : reasonCode(lossFinal)), stage_reached: stageReached,
     customer_name: pii && !pub ? custName : '', customer_phone: pii && !pub ? r.customer_phone || '' : '', duration_min: dmin,
     customer_type: note.segment || (isCar ? carSegment([fld(res, 'profile'), fld(res, 'purpose'), fld(res, 'preference')].join(' . ')) : occasionOf(r.cat) || fld(res, 'profile') || fld(res, 'purpose')),
@@ -308,8 +365,13 @@ for (const r of rows) {
     ai_checks: aiChecks, transcript: pub ? '' : transcript, vertical: o.vertical || (org.vertical === 'jewellery' && !o.ids ? 'jewellery' : org.vertical || ''),
     models_considered: considered.map(m => m.label).join('|'), model_group: modelGroup(mainModel), fuel: fuel.join('|'), colour: colours.join('|'), quote_given: quote, test_drive: testDrive,
     availability: isCar ? (availLine ? 'yes' : 'no') : '', availability_quote: clip(availLine, 200), priorities: priorities.join('|'), intent, decision,
+    ended_at: r.ended_at ? fmt(r.ended_at) : '', analysed_at: r.analysed_at ? fmt(r.analysed_at) : '', sum_need: sumParts['Customer need'] || '', sum_happened: sumParts['What happened'] || '', sum_outcome: sumParts['Outcome'] || '', sum_why: sumParts['Why'] || '', sum_next: sumParts['Next step'] || '',
+    promises_json: promises.length ? JSON.stringify(promises) : '', concerns_json: concerns.length ? JSON.stringify(concerns) : '', flags: [...new Set(flagsAI)].join('|'), remarks: note.remarks || '', prices_json: note.prices ? JSON.stringify(note.prices) : '',
+    f_budget: fld(res, 'budget'), f_preference: fld(res, 'preference'), f_timing: fld(res, 'timing'), f_competitor: fld(res, 'competitor'), tr_en: note.tr_en ? JSON.stringify(note.tr_en) : '',
     quality: r.quality && r.quality !== 'complete' ? r.quality : '', ai_model: r.ai_model || '', talk_rep_pct: wRep + wCust ? Math.round(100 * wRep / (wRep + wCust)) : '', segments_n: turns.length || '',
   };
+  if (note.csv) Object.assign(rec, note.csv);
+  if (note.csv && (note.csv.value_inr || note.csv.value_source)) { const cl = calls.at(-1); if (cl) { if (note.csv.value_inr) cl.value = +note.csv.value_inr; if (note.csv.value_source) cl.source = note.csv.value_source; } }
   if (rec.keywords) mark('keywords', 'objection themes used as keywords');
   out.push(head.map(h => rec[h] ?? ''));
 }
@@ -373,7 +435,7 @@ L.push(`- **Row quality:** ${partialN} partial or unassessable recordings, ${hel
 L.push(`- **Recorded vs shown:** ${meta.recorded} recorded, ${meta.shown} shown, ${meta.analysing.length} still being analysed, ${meta.unscored.length} too short or unclear to score, ${meta.failed.length} failed upload`);
 L.push(`- **Left out:** ${skip.range} outside the date range, ${skip.dropped} dropped by the team (notes file), ${skip.noOutcome} with no recorded outcome and no follow-up, ${skip.noScore} with no assessable score`);
 if (isCar) L.push(`- **Where values came from:** ${Object.entries(srcN).map(([k, n]) => `${n} ${({ call: 'said in the call', budget: 'customer budget', indicative: 'indicative by model', team: 'entered by team', recorded: 'recorded in the app', none: 'value not known' })[k] || k}`).join(', ')}`);
-L.push(`- **Where scores came from:** ${src.checks} conversations from the AI rubric checks, ${src['analysis review']} from the analysis review (observed / not observed). Real rubric scores are only produced for conversations the scorer judged eligible.`, '');
+L.push(`- **Where scores came from:** ${src.rubric || 0} from the automotive rubric (10 checks), ${src.checks || 0} from older rubric checks, ${src['analysis review'] || 0} from the analysis review (observed / not observed). Real rubric scores are only produced for conversations the scorer judged eligible.`, '');
 L.push('## What is filled', '', '| Column | Filled | Powers |', '|---|---|---|');
 for (const f of fill) L.push(`| ${f.column} | ${Math.round(100 * f.n / total)}% | ${IMPACT[f.column] || ''} |`);
 L.push('', '## Worked out by formula (not stored as such in the database)', '');

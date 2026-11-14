@@ -4,20 +4,99 @@
   "min": 300000,
   "max": 6000000,
   "models": [
-    { "id": "xuv7xo", "label": "XUV 7XO", "aliases": ["xuv 7xo", "xuv 7 xo", "7xo", "xuv 700", "xuv seven hundred", "xuv7oo"], "range": [1399000, 2579000], "bestSeller": true },
-    { "id": "scorpion", "label": "Scorpio N", "aliases": ["scorpio n", "scorpio en"], "range": [1349000, 2550000], "bestSeller": true },
-    { "id": "sclassic", "label": "Scorpio Classic", "aliases": ["scorpio classic", "scorpio"], "range": [1299000, 1700000], "bestSeller": true },
-    { "id": "roxx", "label": "Thar Roxx", "aliases": ["thar roxx", "thar rocks", "thar rox", "roxx"], "range": [1259000, 2261000] },
-    { "id": "thar", "label": "Thar", "aliases": ["thar"], "range": [999000, 1760000] },
-    { "id": "xuv3xoev", "label": "XUV 3XO EV", "aliases": ["xuv 3xo ev", "3xo ev", "3xo electric"], "range": [1389000, 1496000], "ev": true },
-    { "id": "xuv3xo", "label": "XUV 3XO", "aliases": ["xuv 3xo", "xuv 3 xo", "3xo", "xuv 300", "xuv three hundred"], "range": [779000, 1504000] },
-    { "id": "xuv400", "label": "XUV400", "aliases": ["xuv 400", "xuv four hundred"], "range": [1549000, 1769000], "ev": true },
-    { "id": "bneoplus", "label": "Bolero Neo Plus", "aliases": ["bolero neo plus", "neo plus"], "range": [1099000, 1309000] },
-    { "id": "bneo", "label": "Bolero Neo", "aliases": ["bolero neo"], "range": [885000, 1049000] },
-    { "id": "bolero", "label": "Bolero", "aliases": ["bolero"], "range": [800000, 990000] },
-    { "id": "be6", "label": "BE 6", "aliases": ["BE 6", "BE 6e", "BE Six"], "range": [1890000, 2854000], "caseSensitive": true, "ev": true },
-    { "id": "xev9e", "label": "XEV 9e", "aliases": ["xev 9e", "xev 9 e"], "range": [2190000, 3050000], "ev": true },
-    { "id": "xev9s", "label": "XEV 9S", "aliases": ["xev 9s", "xev 9 s"], "range": [1995000, 2945000], "ev": true }
+    {
+      "id": "xuv7xo",
+      "label": "XUV 7XO",
+      "aliases": ["xuv 7xo", "xuv 7 xo", "7xo", "xuv 700", "xuv seven hundred", "xuv7oo"],
+      "range": [1399000, 2579000],
+      "bestSeller": true
+    },
+    {
+      "id": "scorpion",
+      "label": "Scorpio N",
+      "aliases": ["scorpio n", "scorpio en", "scorpio", "scorpion n"],
+      "range": [1349000, 2550000],
+      "bestSeller": true
+    },
+    {
+      "id": "sclassic",
+      "label": "Scorpio Classic",
+      "aliases": ["scorpio classic", "classic"],
+      "range": [1299000, 1700000],
+      "bestSeller": true
+    },
+    {
+      "id": "roxx",
+      "label": "Thar Roxx",
+      "aliases": ["thar roxx", "thar rocks", "thar rox", "roxx"],
+      "range": [1259000, 2261000]
+    },
+    {
+      "id": "thar",
+      "label": "Thar",
+      "aliases": ["thar"],
+      "range": [999000, 1760000]
+    },
+    {
+      "id": "xuv3xoev",
+      "label": "XUV 3XO EV",
+      "aliases": ["xuv 3xo ev", "3xo ev", "3xo electric"],
+      "range": [1389000, 1496000],
+      "ev": true
+    },
+    {
+      "id": "xuv3xo",
+      "label": "XUV 3XO",
+      "aliases": ["xuv 3xo", "xuv 3 xo", "3xo", "xuv 300", "xuv three hundred"],
+      "range": [779000, 1504000]
+    },
+    {
+      "id": "xuv400",
+      "label": "XUV400",
+      "aliases": ["xuv 400", "xuv four hundred"],
+      "range": [1549000, 1769000],
+      "ev": true
+    },
+    {
+      "id": "bneoplus",
+      "label": "Bolero Neo Plus",
+      "aliases": ["bolero neo plus", "neo plus"],
+      "range": [1099000, 1309000]
+    },
+    {
+      "id": "bneo",
+      "label": "Bolero Neo",
+      "aliases": ["bolero neo"],
+      "range": [885000, 1049000]
+    },
+    {
+      "id": "bolero",
+      "label": "Bolero",
+      "aliases": ["bolero"],
+      "range": [800000, 990000]
+    },
+    {
+      "id": "be6",
+      "label": "BE 6",
+      "aliases": ["BE 6", "BE 6e", "BE Six"],
+      "range": [1890000, 2854000],
+      "caseSensitive": true,
+      "ev": true
+    },
+    {
+      "id": "xev9e",
+      "label": "XEV 9e",
+      "aliases": ["xev 9e", "xev 9 e"],
+      "range": [2190000, 3050000],
+      "ev": true
+    },
+    {
+      "id": "xev9s",
+      "label": "XEV 9S",
+      "aliases": ["xev 9s", "xev 9 s"],
+      "range": [1995000, 2945000],
+      "ev": true
+    }
   ],
   "competitors": ["Tata", "Hyundai", "Maruti", "Kia", "Toyota", "MG", "Honda", "Skoda", "Volkswagen", "Renault", "Nissan", "Citroen", "Jeep"],
   "competitorModels": {

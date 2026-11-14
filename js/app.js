@@ -85,7 +85,7 @@ function greet(){const h=new Date().getHours();return (h<12?'Good morning':h<17?
 const lc=s=>s.charAt(0).toLowerCase()+s.slice(1);
 const fdate=dt=>dt.getDate()+' '+MON[dt.getMonth()];
 function ftime(dt){let h=dt.getHours();const m=dt.getMinutes(),ap=h>=12?'pm':'am';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+ap}
-function when(c){if(TL)return '#'+refNo(c)+' · '+fdate(c.at);if(SNAP)return ftime(c.at);if(c.d===0)return 'Today, '+ftime(c.at);if(c.d===1)return 'Yesterday, '+ftime(c.at);return fdate(c.at)+', '+ftime(c.at)}
+function when(c){if(TL)return '#'+refNo(c)+' · '+fdate(c.at);if(SNAP)return RICH?tRange(c):ftime(c.at);if(c.d===0)return 'Today, '+ftime(c.at);if(c.d===1)return 'Yesterday, '+ftime(c.at);return fdate(c.at)+', '+ftime(c.at)}
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 const sumv=a=>a.reduce((s,c)=>s+c.value,0);
 const plural=(n,w)=>n+' '+w+(n===1?'':'s');
@@ -162,7 +162,7 @@ function floorActions(L){const acts=[],af=o=>o;
  return acts}
 /* TL = real test calls recorded on random days. SNAP = one day shown as a single snapshot (the pilot).
    Both are FLAT: no time controls, no trends, no comparisons. */
-const TL=!!ZD.timeless,SNAP=!!ZD.snapshot,FLAT=TL||SNAP,SP=(v,o)=>FLAT?'':ZC.spark(v,o);
+const TL=!!ZD.timeless,SNAP=!!ZD.snapshot,RICH=SNAP&&!!(ZD.has&&ZD.has.times),FLAT=TL||SNAP,SP=(v,o)=>FLAT?'':ZC.spark(v,o);
 try{const p=localStorage.getItem('zocus-period');if(RANGES[p]&&p!=='all')S.period=p}catch(e){}
 if(FLAT||(ZD.storeId&&ZD.storeId!=='sample'&&ZD.spanDays>30))S.period='all';else if(ZD.spanDays<3)S.period='today';
 const refNo=c=>String(c.ref).replace(/\D/g,'')||String(c.ref);
@@ -178,8 +178,8 @@ const dayDate=()=>new Date(TODAY.getTime()-R().lo*DAY);
 const cmpTxt=()=>rangeDays()===1?'last '+WD[dayDate().getDay()]:'previous';
 function setPeriod(v){if(!RANGES[v]||v===S.period)return;S.period=v;S.page=0;delete S.cf.day;delete S.cf.hour;if(v!=='all')try{localStorage.setItem('zocus-period',v)}catch(e){}render();Waves.pulse()}
 function stats(list){const n=list.length,sold=list.filter(c=>c.outcome==='sold'),lost=list.filter(c=>c.outcome!=='sold');
- const skill={};SKILLS.forEach(s=>skill[s.id]=n?Math.round(list.reduce((a,c)=>a+c.skills[s.id],0)/n):0);
- return {n,sold:sold.length,notSold:lost.length,conv:n?sold.length/n:0,soldValue:sumv(sold),lostValue:sumv(lost.filter(c=>c.outcome==='lost')),openValue:sumv(lost.filter(c=>c.outcome==='followup')),score:n?Math.round(list.reduce((a,c)=>a+c.score,0)/n):0,skill}}
+ const sc=list.filter(c=>c.scored!==false),m=sc.length,skill={};SKILLS.forEach(s=>skill[s.id]=m?Math.round(sc.reduce((a,c)=>a+c.skills[s.id],0)/m):0);
+ return {n,sold:sold.length,notSold:lost.length,conv:n?sold.length/n:0,soldValue:sumv(sold),lostValue:sumv(lost.filter(c=>c.outcome==='lost')),openValue:sumv(lost.filter(c=>c.outcome==='followup')),score:m?Math.round(sc.reduce((a,c)=>a+c.score,0)/m):0,skill}}
 function repRows(list){const store=stats(list);
  return REPS.map(r=>{const L=list.filter(c=>c.rep===r.id),s=stats(L);
    let weak=null,gap=0;SKILLS.forEach(k=>{const g=s.skill[k.id]-store.skill[k.id];if(weak===null||g<gap){weak=k.id;gap=g}});
@@ -191,7 +191,7 @@ function repRows(list){const store=stats(list);
 const NAV=[['home','Overview','home'],['insights','Insights','insights'],['team','Team','team'],['coaching','Coaching','coach'],['conversations','Conversations','conv'],['followups','Follow-ups','calls']];
 function parseRep(){let h=(location.hash||'').slice(1);try{h=decodeURIComponent(h)}catch(e){}const m=h.match(/^(rep|coach)-(.+?)(?:\/(overview|coaching|conversations))?$/);return m&&REP[m[2]]?{id:m[2],tab:m[3]||(m[1]==='coach'?'coaching':'overview')}:null}
 function routeName(){const r=parseRep();if(r)return 'rep-'+r.id;const h=(location.hash||'#home').slice(1);return NAV.some(n=>n[0]===h)?h:'home'}
-function renderNav(){const rt=routeName(),base=rt.startsWith('rep-')?(S.from==='coaching'?'coaching':'team'):rt,due=followups().length;
+function renderNav(){const rt=routeName(),base=rt.startsWith('rep-')?(S.from==='coaching'?'coaching':'team'):rt,due=RICH?openPromises(CONVS).filter(x=>!x.done).length:followups().length;
  const item=(n,m)=>`<a href="#${n[0]}" ${n[0]===base?'aria-current="page"':''} ${n[0]==='insights'?'data-tour="nav-insights"':n[0]==='coaching'?'data-tour="nav-coaching"':''}>${m?ic(n[2],20):''}<span>${m&&n[0]==='conversations'?'Chats':n[1]}</span>${n[0]==='followups'&&due?`<span class="dot num">${due}</span>`:''}</a>`;
  document.getElementById('nav').innerHTML=NAV.filter(n=>!(TL&&n[0]==='followups')).map(n=>item(n,false)).join('');
  document.getElementById('bnav').innerHTML=NAV.filter(n=>!(TL&&n[0]==='followups')).map(n=>item(n,true)).join('');
@@ -239,7 +239,7 @@ function snapBar(){if(!SNAP)return '';const m=ZD.meta||{},bits=[`<b>${WDL[TODAY.
  if(m.exportedLocal){const d=String(m.exportedLocal).slice(0,10),same=!m.date||d===String(m.date).slice(0,10);bits.push('updated '+(same?'':fdate(new Date(d+'T12:00'))+', ')+clock(m.exportedLocal))}
  bits.push(plural(CONVS.length,'conversation'));
  if(m.analysing&&m.analysing.length)bits.push(`<b>${m.analysing.length} being analysed</b>`);
- const lo=m.leftOut||[];if(lo.length){const by={};lo.forEach(x=>by[x.why]=(by[x.why]||0)+1);bits.push(`${lo.length} left out (${Object.entries(by).map(([k,n])=>(n>1?n+' × ':'')+esc(lc(k))).join(', ')})`)}
+ const lo=ZD.locked?[]:(m.leftOut||[]);if(lo.length){const by={};lo.forEach(x=>by[x.why]=(by[x.why]||0)+1);bits.push(`${lo.length} left out (${Object.entries(by).map(([k,n])=>(n>1?n+' × ':'')+esc(lc(k))).join(', ')})`)}
  const H=(m.history||[]).filter(h=>h.shown>0);
  return `<div class="livebar"><div class="livehead"><span class="livedot" aria-hidden="true"></span><span>${bits.join(' · ')}</span></div>${H.length>1?`<div class="snaplog"><span class="mono">Updates</span>${H.map(h=>`<span class="num"><b>${clock(h.at)}</b> ${plural(h.shown,'conversation')}</span>`).join('')}</div>`:''}</div>`}
 /* Where a rupee value came from. Indicative values (the model's typical price) are marked with ~ wherever they are shown. */
@@ -265,12 +265,13 @@ function timeCard(L,title){if(!L.length)return '';const tot=L.reduce((a,c)=>a+c.
 function dayCards(L){if(!SNAP||!L.length)return '';const rows=repRows(L);
  const reps=`<section class="card"><div class="card-h"><h2>Reps ${esc(periodTxt())}</h2><button class="link" data-go="#team">Full team${ic('right',14)}</button></div><div class="tblwrap"><table class="tbl"><thead><tr><th>Rep</th><th class="r">Chats</th><th class="r">Talk time</th><th class="r">Score</th><th>Results</th></tr></thead><tbody>${rows.map(r=>{const a=L.filter(c=>c.rep===r.rep.id);return `<tr class="click" data-go="#rep-${r.rep.id}"><td><b>${esc(r.rep.name)}</b></td><td class="r num">${a.length}</td><td class="r num">${mins(a.reduce((x,c)=>x+c.dur,0))}</td><td class="r num">${r.s.score}</td><td style="min-width:120px">${ZC.miniSplit([{name:Wd.sold,n:a.filter(c=>c.outcome==='sold').length,color:ZC.OUTCOME.sold},{name:'Will return',n:a.filter(c=>c.outcome==='followup').length,color:ZC.OUTCOME.followup},{name:Wd.lost,n:a.filter(c=>c.outcome==='lost').length,color:ZC.OUTCOME.lost}])}</td></tr>`}).join('')}</tbody></table></div></section>`;
  const latest=[...L].sort((a,b)=>b.at-a.at).slice(0,5);
- return `<div class="homegrid2">${reps}${timeCard(L)}</div><section class="card"><div class="card-h"><h2>Latest conversations</h2><button class="link" data-go="#conversations">All ${L.length}${ic('right',14)}</button></div><div class="clist">${latest.map(c=>`<button class="crow dense latest" data-conv="${c.id}">${ring(c.score,30)}<strong>${esc(PRODUCTS[c.product].label)}</strong><small>${esc(clipTxt((c.sum&&c.sum.happened)||'',150))}</small><span class="c-rep">${esc(REP[c.rep].first)} · ${c.dur} min</span><span>${outcomePill(c)}</span><span class="d num">${ftime(c.at)}</span></button>`).join('')}</div>${pendingHtml()}</section>`}
-function pendingHtml(){const m=ZD.meta;if(!m||!SNAP)return '';const row=(x,t)=>`<div class="crow dense pending"><span class="pdot" aria-hidden="true"></span><strong>${t}</strong><small>${esc(x.rep)}${x.min?' · '+x.min+' min':''}</small><span class="d num">${esc((x.at||'').slice(11))}</span></div>`;
+ return `<div class="homegrid2">${reps}${timeCard(L)}</div><section class="card"><div class="card-h"><h2>Latest conversations</h2><button class="link" data-go="#conversations">All ${L.length}${ic('right',14)}</button></div><div class="clist">${latest.map(c=>`<button class="crow dense latest" data-conv="${c.id}">${rg(c,30)}<strong>${esc(PRODUCTS[c.product].label)}</strong><small>${esc(clipTxt((c.sum&&c.sum.happened)||'',150))}</small><span class="c-rep">${esc(REP[c.rep].first)} · ${c.dur} min</span><span>${outcomePill(c)}</span><span class="d num">${ftime(c.at)}</span></button>`).join('')}</div>${pendingHtml()}</section>`}
+function pendingHtml(){const m=ZD.meta;if(!m||!SNAP)return '';const row=(x,t)=>`<div class="crow dense pending"><span class="pdot" aria-hidden="true"></span><strong>${t}</strong><small>${esc(x.rep==='Rep not tagged'?'Rep not noted':x.rep)}${x.min?' · '+x.min+' min':''}</small><span class="d num">${esc((x.at||'').slice(11))}</span></div>`;
  const h=(m.analysing||[]).map(x=>row(x,'Being analysed')).join('')+(m.unscored||[]).map(x=>row(x,'Too short or unclear to score')).join('')+(m.failed||[]).map(x=>row(x,'Upload failed, needs re-upload')).join('');
  return h?`<div class="clist pendlist">${h}</div>`:''}
 function kpi(o){return `<button class="card kpi" ${o.filter?`data-filter='${JSON.stringify(o.filter)}'`:`data-go="${o.go}"`}><div class="row"><span class="label">${o.label}</span><span class="tag">${o.tag}</span></div><div class="val num">${o.val}</div><div class="row"><span class="sub">${o.sub}</span>${o.delta}</div></button>`}
 function renderHome(){
+ if(RICH)return renderHomeRich();
  const L=cur(),P=prev(),s=stats(L),p=stats(P),acts=computeActions(L),rows=repRows(L);
  const big=leaks(L).reduce((a,b)=>MORE(b,a)?b:a);
  const short={good:'Top',neutral:'On track',bad:'Coach'};
@@ -291,7 +292,7 @@ function renderHome(){
   <div class="pulse">${rows.map(r=>`<button class="pchip" data-go="#rep-${r.rep.id}">${ring(r.s.score,54)}<b>${r.rep.first}</b><span class="pill ${r.status[0]}">${r.thin?plural(r.s.n,'chat'):short[r.status[0]]}</span></button>`).join('')}</div>
   <p class="hint" style="margin:10px 0 0">Ring shows conversation score out of 100. ${Wd.Store} average ${s.score}.${rows.some(r=>r.thin)?' Reps with fewer than 3 conversations are not rated yet.':' Tap a rep to coach.'}</p>${featuredHtml()}</section></div>${dayCards(L)}`}
 function featuredHtml(){const f=(ZD.featured||[]).map(r=>CONVS.find(c=>c.ref===r)).filter(Boolean);if(!f.length)return '';
- return `<div class="card-h" style="margin:14px 0 8px"><h2>Start here</h2><span class="hint">Real test conversations</span></div><div class="featured">${f.map(c=>`<button class="feat" data-conv="${c.id}">${ring(c.score,40)}<span style="min-width:0"><b>${esc(PRODUCTS[c.product].label)}</b><span class="m">${esc(REP[c.rep].first)} · ${c.dur} min · ${esc(clipTxt((c.sum&&c.sum.happened)||'',90))}</span></span></button>`).join('')}</div>`}
+ return `<div class="card-h" style="margin:14px 0 8px"><h2>Start here</h2><span class="hint">Real test conversations</span></div><div class="featured">${f.map(c=>`<button class="feat" data-conv="${c.id}">${rg(c,40)}<span style="min-width:0"><b>${esc(PRODUCTS[c.product].label)}</b><span class="m">${esc(REP[c.rep].first)} · ${c.dur} min · ${esc(clipTxt((c.sum&&c.sum.happened)||'',90))}</span></span></button>`).join('')}</div>`}
 const clipTxt=(s,n)=>s.length>n?s.slice(0,n-1).trimEnd()+'…':s;
 
 /* ---------- Insights: one tab at a time, one AI line on top ---------- */
@@ -316,7 +317,10 @@ function renderInsights(){
  const L=cur(),P=prev(),D=insightData(L,P);
  const tabs=[['drop',Wd.noBuy],['want','What they want'],['comp','Competition'],['types','Customer types']].concat(CAR?[['after','After the booking']]:[]);
  let lead='',body='';
- if(S.tab==='drop'){const r0=D.reasons[0],big=leaks(L).reduce((a,b)=>MORE(b,a)?b:a);
+ if(S.tab==='drop'&&RICH&&L.length<8){const nb=L.filter(c=>c.outcome!=='sold');
+  lead=nb.length?`<b>${nb.length} of ${plural(L.length,'customer')}</b> have not booked yet. With so few conversations the reasons are shown one by one, as the AI read them.`:'Everyone booked so far.';
+  body=nb.map(c=>`<div class="whyrow"><div><b>${esc(cname(c))}</b> <span class="hint">${tRange(c)} · ${esc(rname(REP[c.rep]))}</span><p style="margin:4px 0 0">${esc(c.sumWhy||(c.sum&&c.sum.why)||'No reason recorded.')}</p></div><button class="btn sm" data-conv="${c.id}">Open${ic('right',14)}</button></div>`).join('')||'<p class="hint">Nothing to explain.</p>';
+ }else if(S.tab==='drop'){const r0=D.reasons[0],big=leaks(L).reduce((a,b)=>MORE(b,a)?b:a);
   lead=`Most customers leave <b>${AFTER[big.k]}</b>. The ${FLOOR?'most common':'costliest'} reason is <b>${lc(REASONS[r0.k].label)}</b>, ${r0.v?inr(r0.v)+' across ':''}${plural(r0.n,'customer')}. ${BEST[r0.k].real||ZD.isSample?`${REP[BEST[r0.k].rep].first} has an answer that works.`:''}`;
   body=`<div class="ins2"><div><div class="card-h"><h2>Where ${Wd.sales} leak</h2><span class="hint">Tap a red line to see those customers</span></div>${funnel(L)}</div>
   <div><div class="card-h" style="margin:0 0 4px"><h2>${FLOOR?'Reasons, by customers':'Reasons, by money lost'}</h2></div>`+
@@ -491,7 +495,7 @@ function repConvs(id,row){const f=S.rcf||{};
 
 /* ---------- Conversations ---------- */
 function convRow(c,own){const p=PRODUCTS[c.product];
- return `<button class="crow dense" data-conv="${c.id}">${ring(c.score,30)}<strong>${esc(c.customer)}</strong><small>${FLOOR?esc((c.models.length?c.models.join(' vs '):p.label)+' · '+(QT[c.quote]||'')):esc(p.label)+' · '+esc(PER[c.persona].label)}${own?'':' · '+c.dur+' min'}</small><span class="c-rep">${own?c.dur+' min':repLink(c.rep,REP[c.rep].name)}</span><span class="c-val num">${valTxt(c)}</span><span>${outcomePill(c)}</span><span class="d num">${when(c)}</span></button>`}
+ return `<button class="crow dense" data-conv="${c.id}">${rg(c,30)}<strong>${esc(c.customer)}</strong><small>${FLOOR?esc((c.models.length?c.models.join(' vs '):p.label)+' · '+(QT[c.quote]||'')):esc(p.label)+' · '+esc(PER[c.persona].label)}${own?'':' · '+c.dur+' min'}</small><span class="c-rep">${own?c.dur+' min':repLink(c.rep,REP[c.rep].name)}</span><span class="c-val num">${valTxt(c)}</span><span>${outcomePill(c)}</span><span class="d num">${when(c)}</span></button>`}
 function cfLabel(k,v){return {rep:()=>'Rep: '+REP[v].first,outcome:()=>'Result: '+({sold:Wd.sold,followup:'Will return',lost:Wd.lost}[v]),persona:()=>PER[v].label,product:()=>PRODUCTS[v].label,reason:()=>REASONS[v].label,stage:()=>'Left after: '+STAGES[v],comp:()=>'Mentioned '+COMP[v].label,kw:()=>'Said "'+v+'"',quote:()=>({yes:'Quotation given',no:'Left without a quotation',promised:'Quotation promised'})[v],intent:()=>'Intent: '+v,mgroup:()=>MG[v],prio:()=>'Cares about '+lc(v),fuel:()=>'Fuel: '+v,avail:()=>'Asked about availability',decision:()=>DEC[v]||v,day:()=>'On '+fdate(new Date(TODAY.getTime()-v*DAY)),hour:()=>'At '+((+v%12)||12)+(+v<12?' am':' pm')}[k]()}
 function filtered(skipDay){const f=S.cf,q=(f.q||'').toLowerCase().trim();
  return cur().filter(c=>(skipDay||((f.day===undefined||c.d===+f.day)&&(f.hour===undefined||c.at.getHours()===+f.hour)))&&(!f.rep||c.rep===f.rep)&&(!f.outcome||c.outcome===f.outcome)&&(!f.persona||c.persona===f.persona)&&(!f.product||c.product===f.product)&&(!f.reason||c.reason===f.reason)&&(f.stage===undefined||f.stage===''||(c.stage===+f.stage&&c.outcome!=='sold'))&&(!f.comp||c.competitor===f.comp)&&(!f.kw||c.kw.includes(f.kw))&&(!f.quote||(f.quote==='no'?c.quote!=='yes':c.quote===f.quote))&&(!f.intent||c.intent===f.intent)&&(!f.mgroup||mg(c)===f.mgroup)&&(!f.prio||c.prio.includes(f.prio))&&(!f.fuel||c.fuel.includes(f.fuel))&&(!f.avail||c.avail)&&(!f.decision||c.decision===f.decision)&&
@@ -521,7 +525,7 @@ function renderConversations(){const list=sortConvs(filtered()),tot=cur().length
  const sel=(k,opts,ph)=>`<select id="f-${k}" data-cf="${k}" aria-label="${ph}"><option value="">${ph}</option>${opts.map(o=>`<option value="${o[0]}" ${S.cf[k]===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select>`;
  const pages=Math.max(1,Math.ceil(list.length/PAGE));S.page=clamp(S.page,0,pages-1);const from=S.page*PAGE,shown=list.slice(from,from+PAGE);
  return phead('Conversations',`${list.length} of ${tot} conversations ${inTxt()}. Charts and list follow the same filters.`)+
- `<details class="xband" data-xk="conv-analytics" ${ZC.isOpen('conv-analytics',true)?'open':''}><summary><span class="mono">Analytics</span><span class="x-s">${list.length?`${pct(list.filter(c=>c.outcome==='sold').length/list.length)} ${Wd.bought} · ${inr(sumv(list))} discussed`:''}</span>${ic('chev',16)}</summary>${convAnalytics(list)}</details>
+ `<details class="xband" ${RICH&&tot<8?'hidden':''} data-xk="conv-analytics" ${ZC.isOpen('conv-analytics',true)?'open':''}><summary><span class="mono">Analytics</span><span class="x-s">${list.length?`${pct(list.filter(c=>c.outcome==='sold').length/list.length)} ${Wd.bought} · ${inr(sumv(list))} discussed`:''}</span>${ic('chev',16)}</summary>${convAnalytics(list)}</details>
  ${S.cf.rep&&REP[S.cf.rep]?(()=>{const r=REP[S.cf.rep],rs=stats(cur().filter(c=>c.rep===r.id)),st=stats(cur());return `<div class="card cstrip">${ring(rs.score,40)}<div class="grow"><b>${esc(r.name)}</b><span class="hint num">Score ${rs.score} (${Wd.store} ${st.score}) · closes ${pct(rs.conv)} (${Wd.store} ${pct(st.conv)}) · ${plural(rs.n,'conversation')}</span></div><button class="btn sm" data-go="#rep-${r.id}">Open profile${ic('right',14)}</button><button class="btn sm" data-go="#rep-${r.id}/coaching">Coaching plan</button></div>`})():''}
  <section class="card clistc"><div class="filters stick"><input id="f-q" data-cf="q" type="search" placeholder="Customer, phone, rep, product or number" value="${esc(S.cf.q||'')}">${sel('rep',REPS.map(r=>[r.id,r.name]),'All reps')}${sel('outcome',[['sold',Wd.sold],['followup','Will return'],['lost',Wd.lost]],'All results')}${FLOOR?sel('quote',[['yes','Quotation given'],['no','No quotation'],['promised','Promised only']],'Any quotation'):''}<select data-sort aria-label="Sort by">${[['date','Newest first'],['value','Highest value'],['score','Lowest score'],['scorehi','Highest score']].map(o=>`<option value="${o[0]}" ${S.sort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>
  ${active.length?`<div class="activechips" style="margin-top:12px">${active.map(k=>`<button class="achip" data-act="unfilter" data-k="${k}">${esc(cfLabel(k,S.cf[k]))}${ic('x',14)}</button>`).join('')}<button class="link" data-act="clearf">Clear all</button></div>`:''}
@@ -573,11 +577,93 @@ const aiCard=c=>{if(!(c.aiCoach.length||c.aiPromises.length||c.aiNext||c.aiNotes
   (c.aiNotes.length?`<div class="aihead">Notes</div>${c.aiNotes.map(t=>`<div class="aitip">${esc(t)}</div>`).join('')}`:'');
  const n=c.aiCoach.length;
  return ZC.xcard('ai-'+c.id,'What the AI said',(n?n+' coaching tip'+(n>1?'s':''):'Notes')+(c.aiPromises.length?' · '+c.aiPromises.length+' promise'+(c.aiPromises.length>1?'s':''):''),body,{open:true,cls:'aicard'})};
+/* ---------- Rich pilot view: the conversation is the unit. Used by one-day (snapshot) stores whose CSV carries times, rubric and promises. ---------- */
+const h12=h=>(h%24)%12||12,ap=h=>(h%24)<12?'am':'pm';
+const MK={done:['good','Done'],partly:['warn','Partly'],missed:['bad','Missed']};
+const cname=c=>/^Customer( \d+)?$/.test(c.customer)?'Customer at '+ftime(c.at):c.customer;
+const rname=r=>r.name==='Rep not tagged'?'Rep not noted':r.name;
+const tRange=c=>{if(!c.endAt)return ftime(c.at);const a=ftime(c.at),b=ftime(c.endAt);return (a.slice(-2)===b.slice(-2)?a.slice(0,-3):a)+' to '+b};
+const clk=(c,s)=>ftime(new Date(c.at.getTime()+s*1000));
+const SIDE=/^(Background|Other voice)$/;
+const rg=(c,sz)=>c.scored===false?`<span class="noscore" style="width:${sz}px;height:${sz}px" title="Score not available yet">–</span>`:ring(c.score,sz);
+const PDONE=new Set((()=>{try{return JSON.parse(localStorage.getItem('zocus-pdone-'+(ZD.storeId||''))||'[]')}catch(e){return []}})());
+const savePdone=()=>{try{localStorage.setItem('zocus-pdone-'+ZD.storeId,JSON.stringify([...PDONE]))}catch(e){}};
+function openPromises(L){const out=[];L.forEach(c=>c.promises.forEach((p,i)=>{const key=c.id+':'+i;out.push({c,p,i,key,done:PDONE.has(key)})}));return out.sort((a,b)=>a.c.at-b.c.at)}
+function dueBy(c,p){const s=p.due||'';let m,mn=null;if((m=s.match(/(\d+|an|one) hours?/i)))mn=(/^\d+$/.test(m[1])?+m[1]:1)*60;else if((m=s.match(/(\d+) min/i)))mn=+m[1];return mn==null||!c.endAt?null:new Date(c.endAt.getTime()+mn*6e4)}
+const promiseRow=(x,full)=>{const c=x.c,p=x.p,by=dueBy(c,p);
+ return `<div class="prom ${x.done?'done':''}"><div class="pm"><b>${esc(p.t)}</b><span class="hint">${esc(cname(c))} · ${esc(rname(REP[c.rep]))} · call ended ${ftime(c.endAt||c.at)}${p.due?` · <b>${esc(p.due)}</b>${by?' (by '+ftime(by)+')':''}`:''}</span>
+  ${full&&p.q?`<div class="quote key"><div class="hi">"${esc(p.q)}"</div><div class="by">What was said</div>${jumpBtn(c,p.q)}</div>`:''}${full&&p.d?`<div class="draft">${esc(p.d)}</div>`:''}</div>
+  <div class="btnrow">${p.d?`<button class="btn sm" data-act="copy" data-text="${esc(p.d)}">${ic('copy',14)}Copy message</button>`:''}<button class="btn sm" data-conv="${c.id}">Open</button><button class="btn sm ${x.done?'':'primary'}" data-act="pdone" data-key="${x.key}">${x.done?'Undo':'Mark done'}</button></div></div>`};
+function dayTimeline(L){if(!L.length)return '';
+ const end=c=>(c.endAt||new Date(c.at.getTime()+c.dur*6e4)).getTime(),t0=Math.min(...L.map(c=>c.at.getTime())),t1=Math.max(...L.map(end));
+ const a=new Date(t0-10*6e4);a.setMinutes(a.getMinutes()<30?0:30,0,0);const b=new Date(t1+10*6e4);b.setMinutes(b.getMinutes()<=30?30:60,0,0);
+ const lo=a.getTime(),sp=Math.max(b.getTime()-lo,36e5),ticks=[];const t=new Date(lo);if(t.getMinutes())t.setHours(t.getHours()+1,0,0,0);for(;t.getTime()<=lo+sp;t.setHours(t.getHours()+1))ticks.push(new Date(t));
+ const blocks=L.map(c=>{const s=c.at.getTime(),w=Math.max((end(c)-s)/sp*100,1.6);return `<button class="tlb" data-conv="${c.id}" style="left:${((s-lo)/sp*100).toFixed(2)}%;width:${w.toFixed(2)}%;background:${ZC.OUTCOME[c.outcome]}" title="${esc(tRange(c)+' · '+rname(REP[c.rep])+' · '+({sold:Wd.sold,followup:'Will return',lost:Wd.lost})[c.outcome])}" aria-label="${esc(cname(c)+', '+tRange(c))}"><span>${w>9?esc(REP[c.rep].first):''}</span></button>`}).join('');
+ return `<section class="card tlcard"><div class="card-h"><h2>The day so far</h2><span class="hint">Each block is one conversation, from start to end. Empty stretches had no recording.</span></div>
+  <div class="tl">${blocks}${ticks.map(d=>`<i class="tlt" style="left:${((d.getTime()-lo)/sp*100).toFixed(2)}%"></i>`).join('')}</div>
+  <div class="tlax">${ticks.map(d=>`<span style="left:${((d.getTime()-lo)/sp*100).toFixed(2)}%">${h12(d.getHours())} ${ap(d.getHours())}</span>`).join('')}</div>
+  ${ZC.legend([{name:Wd.sold,color:ZC.OUTCOME.sold},{name:'Will return',color:ZC.OUTCOME.followup},{name:Wd.lost,color:ZC.OUTCOME.lost}])}</section>`}
+function convCard(c){const chips=[...c.models,...c.fuel,...c.colour].map(t=>`<span class="chip2">${esc(t)}</span>`).join(''),
+ dots=c.scored?c.aiChecks.map(x=>`<i class="cdot ${x.mark}" title="${esc(x.label+': '+(MK[x.mark]||['',''])[1])}"></i>`).join(''):'';
+ const price=c.value?`${valTxt(c)} <span class="hint">${esc(valSrc(c))}</span>`:'<span class="hint">no price yet</span>',bl=c.concerns.slice(0,2).map(x=>x.t).join(' · ');
+ return `<div class="card ccd" role="button" tabindex="0" data-conv="${c.id}"><div class="ccd-h"><span class="ccd-t num">${tRange(c)}</span><span class="hint">${c.dur} min · ${esc(rname(REP[c.rep]))}</span>${outcomePill(c)}</div>
+  <p class="ccd-need">${esc(clipTxt(c.sumNeed||(c.sum&&c.sum.wanted)||'',230))}</p>${chips?`<div class="ccd-chips">${chips}</div>`:''}
+  <div class="ccd-row"><div><small>Price</small>${price}</div>${bl?`<div><small>Customer's concerns</small>${esc(clipTxt(bl,120))}</div>`:''}<div><small>Next</small>${esc(clipTxt(c.sumNext||(c.sum&&c.sum.next)||'',130))}</div></div>
+  <div class="ccd-dots">${dots}<span class="hint">${c.scored?`${c.aiChecks.filter(x=>x.mark==='done').length} of ${c.aiChecks.length} checks done`:'Score not available yet'}</span></div></div>`}
+function richLede(L,open){const n=L.length;if(!n)return 'No conversations yet.';const q=L.filter(c=>c.quote==='yes').length,b=L.filter(c=>c.outcome==='sold').length;
+ return `<b>${plural(n,'conversation')} so far</b> (${mins(L.reduce((a,c)=>a+c.dur,0))}). ${q===n?(n===1?'The customer':'Every customer')+' left with a quotation':q+' of '+n+' customers left with a quotation'}${b?`, ${b} booked`:', none booked yet'}. ${open?`<b>${plural(open,'promise')} to keep.</b>`:'No promises waiting.'}`}
+function modelsLine(L){const m={};L.forEach(c=>c.models.forEach(x=>m[x]=(m[x]||0)+1));const e=Object.entries(m).sort((a,b)=>b[1]-a[1]);return e.length?`<p class="hint" style="margin:0 2px 14px">Models talked about: ${e.map(([k,v])=>`<b style="color:var(--ink)">${esc(k)}</b> ${v}`).join(' · ')}</p>`:''}
+function renderHomeRich(){const L=cur(),P=openPromises(L),open=P.filter(x=>!x.done).length,list=[...L].sort((a,b)=>b.at-a.at);
+ const q=L.filter(c=>c.quote==='yes').length,hi=L.filter(c=>c.intent==='high').length;
+ return `<section class="hero" data-tour="brief"><span class="mono">${ic('spark',14)} ${esc(ZD.store)} · ${WDL[TODAY.getDay()]} ${fdate(TODAY)}</span><h1>Today at the showroom</h1><p class="lede">${richLede(L,open)}</p></section>
+ <div class="statline daystrip"><div><b class="num">${L.length}</b><span>customers</span></div><div><b class="num">${q}</b><span>left with a quotation</span></div><div><b class="num">${hi}</b><span>high intent</span></div><div><b class="num">${open}</b><span>promises to keep</span></div></div>
+ ${dayTimeline(L)}
+ <section class="card" data-tour="actions"><div class="card-h"><h2>Promises to keep</h2><span class="hint">${open} open</span></div>${P.length?P.map(x=>promiseRow(x,false)).join(''):'<p class="hint" style="margin:0">Nothing promised so far.</p>'}</section>
+ <section class="card" data-tour="pulse"><div class="card-h"><h2>Conversations</h2><button class="link" data-go="#conversations">All ${L.length}${ic('right',14)}</button></div><div class="ccds">${list.map(convCard).join('')}</div>${pendingHtml()}</section>
+ ${L.length>=8?floorCards(L):modelsLine(L)}`}
+const CHK_GROUP=[['need','Understanding the need',['need']],['budget','Asking the budget',['budget']],['pitch','Showing the right model',['options','experience','value_proof']],['objection','Handling price doubts',['price_offers','concerns']],['close','Closing and next step',['decision_timing','ask','next_step']]];
+function richChecks(c){if(!c.scored||!c.aiChecks.length)return `<p class="hint" style="margin:8px 0 0">Score not available yet.</p>`;
+ return CHK_GROUP.map(([k,t,ids])=>{const xs=ids.map(id=>c.aiChecks.find(x=>x.id===id)).filter(Boolean);if(!xs.length)return '';
+  return `<div class="chkgrp"><div class="chkh"><b>${t}</b>${k!=='pitch'||true?`<span class="hint num">${c.skills[k]} out of 100</span>`:''}</div>${xs.map(x=>`<div class="chk"><span class="pill ${MK[x.mark][0]}">${MK[x.mark][1]}</span><div>${esc(x.label)}${x.id==='experience'?' <span class="hint">(the dealer says this matters less; it is not in the score)</span>':''}${x.why?`<small>${esc(x.why)}</small>`:''}${x.quote?`<div class="chkq">"${esc(x.quote)}"${jumpBtn(c,x.quote)}</div>`:''}</div></div>`).join('')}</div>`}).join('')}
+function richTranscript(c){if(!c.turns)return c.transcript?ZC.xcard('tx-'+c.id,'Transcript',`${c.transcript.split(/\s+/).length} words`,`<pre class="tscript">${esc(c.transcript)}</pre>`,{open:false,cls:'txcard'}):'';
+ const n=c.turns.length,w=c.transcript.split(/\s+/).length;let rows='',side=[],shown=0;
+ const flush=()=>{if(side.length){rows+=`<details class="sidetalk"><summary>Side talk, ${plural(side.length,'line')} (phone calls or people not in the conversation)</summary>${side.map(t=>`<div class="sidel"><time>${clk(c,t.t)}</time><span>${esc(t.text)}</span></div>`).join('')}</details>`;side=[]}};
+ c.turns.forEach(t=>{if(SIDE.test(t.who)){side.push(t);return}flush();const isRep=t.who==='Rep',en=c.trEn&&c.trEn[mmss(t.t)];
+  rows+=`<div class="turn ${isRep?'rep':''}" ${shown>=TCHUNK?'hidden':''}><time title="${mmss(t.t)} into the recording">${clk(c,t.t)}</time><div><b>${esc(isRep?rname(REP[c.rep]):t.who)}</b>${esc(t.text)}${en?`<span class="en">${esc(en)}</span>`:''}</div></div>`;shown++});flush();
+ return ZC.xcard('tx-'+c.id,'Transcript',`${n} turns · ${w} words · English shown for key lines`,
+  `<input class="tsearch" type="search" placeholder="Search this conversation" data-tsearch aria-label="Search this conversation"><div class="turns" data-turns>${rows}</div>${shown>TCHUNK?`<button class="link" data-act="tmore" style="margin-top:8px">Show more of the conversation</button>`:''}<p class="tsnote" data-tcount>${shown>TCHUNK?`Showing the first ${TCHUNK} of ${shown} turns. `:''}Times are the clock time of the line.</p>`,{open:false,cls:'txcard'})}
+function richDrawer(c){const rep=REP[c.rep],sm=summaryFor(c),ms=momentsFor(c),card=(t,b,cls)=>b?`<section class="card ${cls||''}"><span class="eyebrow">${t}</span>${b}</section>`:'';
+ const chip=t=>`<span class="chip2">${esc(t)}</span>`,row=(k,v)=>v?`<dt>${k}</dt><dd>${v}</dd>`:'';
+ const brief=[['Customer need',c.sumNeed||sm.wanted],['What happened',c.sumHappened||sm.happened],['Outcome',c.sumOutcome],['Why',c.sumWhy||sm.why],['Next step',c.sumNext||sm.next]].filter(x=>x[1]);
+ const wants=row('Models',c.models.map(chip).join(' '))+row('Fuel',c.fuel.map(chip).join(' '))+row('Colour',c.colour.map(chip).join(' '))+row('Looking for',esc(c.fPref))+row('Budget',esc(c.fBudget))+row('When',esc(c.fTiming))+row('Compared with',esc(c.fComp));
+ const prices=c.prices.length?`<div class="tblwrap"><table class="tbl pricetbl"><thead><tr><th>Model or variant</th><th class="r">Price</th><th>As said</th><th class="r">At</th></tr></thead><tbody>${c.prices.map(p=>`<tr><td>${esc(p.m)}</td><td class="r num"><b>${typeof p.p==='number'?inr(p.p):esc(p.p)}</b></td><td>${esc(p.b||'')}</td><td class="r num">${esc(p.at||'')}</td></tr>`).join('')}</tbody></table></div>${c.prices.length>2&&c.prices.some(p=>/final offer|since March|insurance still/i.test(p.b))?'<p class="hint" style="margin:8px 0 0">The quote moved during the conversation.</p>':''}`:'';
+ const ST={done:'Answered',partly:'Partly answered',open:'Not answered',answered:'Answered',resolved:'Answered'};
+ const conc=c.concerns.length?c.concerns.map(x=>`<div class="chk"><span class="pill ${/answered|resolved|done/.test(x.s)?'good':x.s==='partly'?'warn':'bad'}">${ST[x.s]||'Partly answered'}</span><div>${esc(x.t)}${x.a?`<small>${esc(x.a)}</small>`:''}</div></div>`).join(''):'';
+ const prom=c.promises.length?c.promises.map((p,i)=>promiseRow({c,p,i,key:c.id+':'+i,done:PDONE.has(c.id+':'+i)},true)).join(''):'';
+ const words=ms.length?`<div style="margin-top:2px">${ms.map(m=>`<div class="moment"><span class="lbl">${esc(m.label.replace('How '+rep.first+' answered','How the rep answered'))} <span class="pill ${m.by==='Customer'?'gold':m.k==='good'?'good':m.k==='miss'?'bad':'neutral'}">${m.by==='Customer'?'Customer':esc(m.by===rep.first?rname(rep):m.by)}</span></span>${m.hi?`<div class="quote ${m.k==='key'?'key':m.k==='miss'?'bad':''}"><div class="hi">"${esc(m.hi)}"</div>${m.en&&m.en!==m.hi?`<div class="en">${esc(m.en)}</div>`:''}${jumpBtn(c,m.hi)}</div>`:`<div class="note">${esc(m.note||'')}</div>`}</div>`).join('')}</div>`:'';
+ const met=c.scored?c.aiChecks.filter(x=>x.mark==='done').length:0;
+ document.getElementById('drawerRoot').innerHTML=`<div class="drawer-scrim" data-act="close"></div><aside class="drawer rich" role="dialog" aria-modal="true" aria-label="Conversation with ${esc(cname(c))}"><span class="grab" aria-hidden="true"></span>
+ <div class="dhead">${rg(c,46)}<div style="flex:1;min-width:0"><h2>${esc(cname(c))} ${outcomePill(c)}</h2><p>${repLink(rep.id,rname(rep))} · <b>${tRange(c)}</b> · ${c.dur} min · #${refNo(c)}${c.phone?' · '+esc(c.phone):''}</p>${c.value?`<p class="dprice"><b class="num">${valTxt(c)}</b> <span class="hint">${esc(valSrc(c))}</span></p>`:''}${c.flags.length?`<div class="dflags">${c.flags.map(f=>`<span class="pill neutral">${esc(f)}</span>`).join('')}</div>`:''}</div><button class="iconbtn" data-act="close" aria-label="Close">${ic('x')}</button></div>
+ <div class="dbody">
+  ${card('In brief',`<dl class="sumgrid" style="margin:10px 0 0">${brief.map(([k,v])=>`<dt>${k}</dt><dd>${k==='Next step'?`<b>${esc(v)}</b>`:esc(v)}</dd>`).join('')}</dl>`)}
+  ${card('What the customer wants',`<dl class="sumgrid" style="margin:10px 0 0">${wants}</dl>`)}
+  ${card('Prices quoted',prices)}
+  ${card('Customer concerns',conc)}
+  ${card('In their words',words)}
+  ${card('Promised',prom)}
+  ${card('How the rep did',`<div class="hint" style="margin:6px 0 0">${c.scored?`${met} of ${c.aiChecks.length} checks done · score ${c.score} out of 100`:''}</div>${richChecks(c)}`)}
+  ${richTranscript(c)}
+  ${card('Notes from the floor',c.remarks?`<p style="margin:8px 0 0">${esc(c.remarks)}</p>`:'')}
+  <div class="card soon"><span class="eyebrow">Audio</span><p>Recorded ${tRange(c)}${c.analysedAt?` · analysed ${ftime(c.analysedAt)}`:''}. Audio playback will be added later.</p></div>
+ </div></aside>`;
+ const cl=document.querySelector('.drawer [data-act="close"].iconbtn');if(cl)cl.focus()}
+function renderFollowupsRich(){const L=CONVS,P=openPromises(L),open=P.filter(x=>!x.done),done=P.filter(x=>x.done);
+ return phead('Follow-ups','Promises made in the conversations today. Each has the message the rep can send.')+(P.length?`<section class="card">${open.map(x=>promiseRow(x,true)).join('')||'<p class="hint" style="margin:0">All promises are marked done.</p>'}</section>${done.length?`<div class="section-t" style="margin-top:18px"><h2>Done</h2></div><section class="card">${done.map(x=>promiseRow(x,false)).join('')}</section>`:''}`:`<section class="card" style="text-align:center;padding:40px"><b>Nothing promised so far</b><p class="hint">Promises the rep makes in a conversation appear here with a ready message.</p></section>`)}
 function openDrawer(id){S.drawer=+id;drawDrawer()}
 function closeDrawer(){S.drawer=null;document.getElementById('drawerRoot').innerHTML=''}
-function drawDrawer(){const c=CONV[S.drawer];if(!c)return;const rep=REP[c.rep],sm=summaryFor(c),ms=momentsFor(c);
+function drawDrawer(){const c=CONV[S.drawer];if(!c)return;if(RICH)return richDrawer(c);const rep=REP[c.rep],sm=summaryFor(c),ms=momentsFor(c);
  document.getElementById('drawerRoot').innerHTML=`<div class="drawer-scrim" data-act="close"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="Conversation with ${esc(c.customer)}"><span class="grab" aria-hidden="true"></span>
- <div class="dhead">${ring(c.score,46)}<div style="flex:1;min-width:0"><h2>${esc(c.customer)} ${outcomePill(c)}</h2><p>${SNAP?'Rep: ':'Recorded by '}${repLink(rep.id,rep.name)} · ${TL?'':'#'+refNo(c)+' · '}${when(c)} · ${c.dur} min${c.talkRep!=null?` · rep voice ${c.talkRep}% of words`:''}${c.phone?' · '+c.phone:''}${ZD.has.valueSrc?' · '+(c.value?valTxt(c)+' ('+valSrc(c)+')':'value not known'):''}</p></div><button class="iconbtn" data-act="close" aria-label="Close">${ic('x')}</button></div>
+ <div class="dhead">${rg(c,46)}<div style="flex:1;min-width:0"><h2>${esc(c.customer)} ${outcomePill(c)}</h2><p>${SNAP?'Rep: ':'Recorded by '}${repLink(rep.id,rep.name)} · ${TL?'':'#'+refNo(c)+' · '}${when(c)} · ${c.dur} min${c.talkRep!=null?` · rep voice ${c.talkRep}% of words`:''}${c.phone?' · '+c.phone:''}${ZD.has.valueSrc?' · '+(c.value?valTxt(c)+' ('+valSrc(c)+')':'value not known'):''}</p></div><button class="iconbtn" data-act="close" aria-label="Close">${ic('x')}</button></div>
  <div class="dbody">
   <section class="card"><span class="eyebrow">In 30 seconds</span><dl class="sumgrid" style="margin:10px 0 0"><dt>Wanted</dt><dd>${esc(sm.wanted)}</dd><dt>What happened</dt><dd>${esc(sm.happened)}</dd><dt>${c.outcome==='sold'?'Why it worked':'Why not closed'}</dt><dd>${esc(sm.why)}</dd>${FLOOR?`<dt>On the floor</dt><dd>${esc([c.models.length?c.models.join(' vs '):'No model named',c.fuel.join('/'),c.colour.length?c.colour.join(', '):'',QT[c.quote]||'',c.td==='yes'?'test drive taken':c.td==='offered'?'test drive talked about':'no test drive',c.avail?'asked about availability':'',c.intent?c.intent+' intent':''].filter(Boolean).join(' · '))}${c.prio.length?`<br><span class="hint">Cares about: ${esc(c.prio.join(', '))}</span>`:''}${c.availQ?`<br><span class="hint">"${esc(clipTxt(c.availQ,140))}"</span>`:''}</dd>`:''}<dt>Next step</dt><dd><b>${esc(sm.next)}</b></dd></dl></section>
   ${aiCard(c)}
@@ -598,7 +684,8 @@ function followups(){const start=new Date(TODAY.getFullYear(),TODAY.getMonth(),T
 function draftFor(c){const titled=/^(mr|mrs|ms|dr|shri|smt)\.?\s/i.test(c.customer),nm=/^Customer( \d+)?$/.test(c.customer)?'':' '+(titled?c.customer:c.customer.split(' ')[0]),r=REP[c.rep],me=r.name==='Rep not tagged'?'the team':r.first,p=PRODUCTS[c.product].label;
  return CAR?`Hi${nm}, this is ${me} from ${ZD.store}. Thank you for visiting us${/not decided|not recorded|not captured/i.test(p)?'':' to see the '+p}. Would you like to book a test drive or get the on-road price this week? I can send the details on WhatsApp.`:
   `Hi${nm}, this is ${me} from ${ZD.store}. The ${lc(p)} you liked is on hold for you. Would you like to visit this week? I can also send photos on WhatsApp.`}
-function renderFollowups(){const all=followups();const grp={overdue:[],today:[],later:[]};all.forEach(f=>grp[f.status].push(f));
+function renderFollowups(){if(RICH)return renderFollowupsRich();
+const all=followups();const grp={overdue:[],today:[],later:[]};all.forEach(f=>grp[f.status].push(f));
  const sect=(k,title,cls)=>grp[k].length?`<div class="fucol"><div class="section-t"><h2>${title}</h2><span class="pill ${cls} num">${grp[k].length} · ${inr(sumv(grp[k].map(f=>f.c)))}</span></div><section class="card">${grp[k].map(f=>{const c=f.c;return `<div class="fu"><div><h3>${esc(c.customer)} ${c.value||!ZD.has.valueSrc?`<span class="pill gold num">${valTxt(c)}</span>`:''}</h3><div class="meta"><span>${PRODUCTS[c.product].label} · ${REASONS[c.reason].label.toLowerCase()}</span><span>Rep: ${repLink(c.rep,REP[c.rep].name)} · visited ${fdate(c.at)}</span><span>${c.phone?`Phone: <span class="phone">${c.phone}</span>`:'<span style="color:var(--bad)">No phone saved</span>'}</span></div><button class="link" style="margin-top:6px" data-conv="${c.id}">See the conversation${ic('right',14)}</button></div>
   <div><div class="draft">${esc(draftFor(c))}</div><div class="btnrow"><button class="btn primary sm" data-act="copy" data-text="${esc(draftFor(c))}">${ic('copy',14)}Copy message</button><button class="btn sm" data-act="done" data-id="${c.id}">${ic('check',14)}Mark called</button></div></div></div>`}).join('')}</section></div>`:'';
  return phead('Follow-ups',`Customers who said they would come back${SNAP?'':', from the last 5 days'}. Zocus drafts the message; your team sends it.`)+
@@ -628,9 +715,9 @@ const TOUR=[
  {sel:null,title:'Welcome'+(ZD.owner?', '+ZD.owner:''),body:`This is your ${Wd.store} briefing. It takes a minute to learn. Follow the glowing spots, like a game tutorial. Tip: move your cursor over the waves, or click to change their colour.`},
  FLAT?null:{sel:'[data-tour="period"]',title:'Pick your time range',body:'Every number on every page follows this switch.'},
  {sel:'[data-tour="brief"]',title:'Read this first',body:`Your AI briefing: how the ${Wd.store} did, and where ${Wd.sales} slipped, in two sentences.`},
- {sel:'[data-tour="kpis"]',title:'Three numbers',body:`Output: did we ${Wd.sell}? Input: did the team record?${FLAT?'':' The arrow compares with the previous period.'} Tap one to dig in.`},
- {sel:'[data-tour="actions"]',title:SNAP?'What to do next':'Your to-do for today',body:'Actions ranked by the money at stake. One tap takes you to the fix.'},
- {sel:'[data-tour="pulse"]',title:'Your team at a glance',body:'Each ring is a rep\'s conversation score. Tap a rep to see what to coach and see examples.'},
+ RICH?null:{sel:'[data-tour="kpis"]',title:'Three numbers',body:`Output: did we ${Wd.sell}? Input: did the team record?${FLAT?'':' The arrow compares with the previous period.'} Tap one to dig in.`},
+ {sel:'[data-tour="actions"]',title:RICH?'Promises to keep':SNAP?'What to do next':'Your to-do for today',body:RICH?'Everything the rep promised a customer, with a message ready to send.':'Actions ranked by the money at stake. One tap takes you to the fix.'},
+ {sel:'[data-tour="pulse"]',title:RICH?'Every conversation':'Your team at a glance',body:RICH?'One card per conversation. Tap one to read the summary, the prices quoted, the promises and the transcript.':'Each ring is a rep\'s conversation score. Tap a rep to see what to coach and see examples.'},
  {sel:'[data-tour="search"]',title:'Find anything',body:'A rep, a customer, a phone number, a product or a reason. Press / anytime.'},
  {sel:'[data-tour="nav-insights"]',title:'Go deeper',body:`Insights shows why customers ${Wd.lostLc}, what they want, what competitors offer, and who your customers are.`},
  {sel:'[data-tour="nav-coaching"]',title:'A coaching plan per rep',body:'Built from where each rep scores low and how your best reps answer the same customers. Includes practice drills from real conversations.'},
@@ -722,6 +809,7 @@ document.addEventListener('click',e=>{
  if(t.dataset.go){e.preventDefault();if(t.dataset.tab)S.tab=t.dataset.tab;closeDrawer();if(location.hash===t.dataset.go)render();else location.hash=t.dataset.go;return}
  const a=t.dataset.act;
  if(a==='period'){setPeriod(t.dataset.v)}
+ else if(a==='pdone'){const k=t.dataset.key;PDONE.has(k)?PDONE.delete(k):PDONE.add(k);savePdone();render()}
  else if(a==='tmore'){tMore()}
  else if(a==='tjump'){tJump(t.dataset.q)}
  else if(a==='tab'){S.tab=t.dataset.v;render();ZM.enter(document.getElementById('itabs'))}
@@ -751,7 +839,7 @@ document.addEventListener('change',e=>{if(e.target.dataset.rangesel!==undefined)
  if(e.target.dataset.sort!==undefined){S.sort=e.target.value;S.page=0;render();return}const k=e.target.dataset.cf;if(k&&k!=='q'){S.cf[k]=e.target.value;if(!e.target.value)delete S.cf[k];S.page=0;render()}});
 document.addEventListener('input',e=>{if(e.target.dataset.tsearch!==undefined){tSearch(e.target.value);return}if(e.target.id==='q'){sIdx=0;drawResults()}else if(e.target.dataset.cf==='q'){S.cf.q=e.target.value;S.page=0;const pos=e.target.selectionStart;render();const i=document.getElementById('f-q');if(i){i.focus();i.setSelectionRange(pos,pos)}}});
 document.addEventListener('keydown',e=>{
- if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('rlink')){e.preventDefault();e.target.click();return}
+ if(e.key==='Enter'&&e.target.classList&&(e.target.classList.contains('rlink')||e.target.classList.contains('ccd'))){e.preventDefault();e.target.click();return}
  if(tourI>=0){if(e.key==='Escape')endTour();else if(e.key==='ArrowRight'){e.preventDefault();if(tourI>=TOUR.length-1)endTour();else{tourI++;showStep()}}else if(e.key==='ArrowLeft'&&tourI>0){e.preventDefault();tourI--;showStep()}return}
  const q=document.getElementById('q');
  if(q){if(e.key==='ArrowDown'){e.preventDefault();sIdx=Math.min(sIdx+1,sItems.length-1);drawResults()}else if(e.key==='ArrowUp'){e.preventDefault();sIdx=Math.max(sIdx-1,0);drawResults()}else if(e.key==='Enter'){e.preventDefault();chooseResult(sIdx)}else if(e.key==='Escape')closePal();return}
@@ -763,5 +851,5 @@ window.addEventListener('scroll',()=>{if(tourI>=0){const st=TOUR[tourI];if(st.se
 render();
 let seen=false;try{seen=localStorage.getItem('zocus-tour-v3')==='1'}catch(e){}
 (window.ZSplash?ZSplash.start:Promise.resolve()).then(()=>ZM.enter(document.getElementById('page')));
-(window.ZSplash?ZSplash.done:Promise.resolve()).then(()=>{if(!seen)setTimeout(startTour,300)});
+(window.ZSplash?ZSplash.done:Promise.resolve()).then(()=>{if(!seen&&!ZD.locked)setTimeout(startTour,300)});
 })();
