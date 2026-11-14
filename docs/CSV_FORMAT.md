@@ -91,4 +91,6 @@ The repo already has `GET /api/v1/organizations/:orgId/interactions/export?forma
 
 ## Car showrooms
 
+Floor columns (car stores, all optional; written by the exporter from the transcript, team notes override): `models_considered` (models named, `|` between), `model_group` (`best` best seller, `other`, `ev`), `fuel` (`Diesel|Petrol|Electric`), `colour`, `quote_given` (`yes` / `promised` / `no`), `test_drive` (`yes` / `offered` / `no`), `availability` (`yes` / `no`) with `availability_quote`, `priorities` (Performance, Safety, Features, Space, Comfort, Mileage, Price and offers, Availability, Resale, Service), `intent` (`high` / `medium` / `low`, the AI's reading), `decision` (`decided` / `choosing` / `exploring`). When `quote_given` is present the Overview leads with customers, high intent and quotations, and the funnel step 3 is "Quotation given".
+
 When `vertical` is `car` the dashboard uses showroom wording (Booked, test drive, on-road price) and the reason codes read: `browse` just enquiring, `stock` long waiting period, `design` not convinced after the test drive, `making` on-road price too high, `budget` over budget or EMI, `competitor` another brand, `family` family approval, `exchange` exchange value too low. `stage_reached` `product_shown` means "test drive done". `product` is the model; `Model not decided` when none was named.

@@ -1,70 +1,23 @@
 {
-  "note": "Indicative on-road price bands per model, used only when no price is said in a conversation. These are the placeholder bands from the team's sample dashboard, NOT this dealer's price list: replace them when the dealer shares theirs. The midpoint of a band is used as the indicative value. Aliases are how the model may appear in a transcript; longer names are matched first (Thar Roxx before Thar).",
+  "note": "Mahindra passenger models with indicative EX-SHOWROOM price bands (rupees), from public listings checked on 14 Nov 2026 (Autocar India, CarWale, Cars24, Wikipedia). Sites disagree by a few lakh and prices change after each revision, so these are indicative only: replace them with the dealer's price list when it arrives. The midpoint of a band is the indicative value for a conversation where a model was named but no price was said. bestSeller = the dealer's top sellers (XUV 7XO and Scorpio, about 70% of sales, per the floor on 14 Nov). Aliases are how the model may appear in a transcript; longer names are matched first.",
   "brand": "Mahindra",
   "min": 300000,
   "max": 6000000,
   "models": [
-    {
-      "id": "roxx",
-      "label": "Thar Roxx",
-      "aliases": ["thar roxx", "thar rocks", "thar rox", "roxx"],
-      "range": [1450000, 2750000]
-    },
-    {
-      "id": "thar",
-      "label": "Thar",
-      "aliases": ["thar"],
-      "range": [1200000, 2200000]
-    },
-    {
-      "id": "xuv3xo",
-      "label": "XUV 3XO",
-      "aliases": ["xuv 3xo", "xuv 3 xo", "3xo", "xuv 300", "xuv three hundred"],
-      "range": [860000, 1750000]
-    },
-    {
-      "id": "xuv7xo",
-      "label": "XUV 7XO",
-      "aliases": ["xuv 7xo", "xuv 7 xo", "7xo", "xuv 700", "xuv seven hundred"],
-      "range": [1650000, 3000000]
-    },
-    {
-      "id": "scorpion",
-      "label": "Scorpio N",
-      "aliases": ["scorpio n", "scorpio en"],
-      "range": [1600000, 2950000]
-    },
-    {
-      "id": "sclassic",
-      "label": "Scorpio Classic",
-      "aliases": ["scorpio classic", "scorpio"],
-      "range": [1580000, 2050000]
-    },
-    {
-      "id": "bneo",
-      "label": "Bolero Neo",
-      "aliases": ["bolero neo", "bolero"],
-      "range": [1050000, 1280000]
-    },
-    {
-      "id": "be6",
-      "label": "BE 6",
-      "aliases": ["BE 6", "BE 6e", "BE Six"],
-      "range": [2150000, 2950000],
-      "caseSensitive": true
-    },
-    {
-      "id": "xev9e",
-      "label": "XEV 9e",
-      "aliases": ["xev 9e", "xev 9 e"],
-      "range": [2300000, 3250000]
-    },
-    {
-      "id": "xev9s",
-      "label": "XEV 9S",
-      "aliases": ["xev 9s", "xev 9 s"],
-      "range": [2250000, 3300000]
-    }
+    { "id": "xuv7xo", "label": "XUV 7XO", "aliases": ["xuv 7xo", "xuv 7 xo", "7xo", "xuv 700", "xuv seven hundred", "xuv7oo"], "range": [1399000, 2579000], "bestSeller": true },
+    { "id": "scorpion", "label": "Scorpio N", "aliases": ["scorpio n", "scorpio en"], "range": [1349000, 2550000], "bestSeller": true },
+    { "id": "sclassic", "label": "Scorpio Classic", "aliases": ["scorpio classic", "scorpio"], "range": [1299000, 1700000], "bestSeller": true },
+    { "id": "roxx", "label": "Thar Roxx", "aliases": ["thar roxx", "thar rocks", "thar rox", "roxx"], "range": [1259000, 2261000] },
+    { "id": "thar", "label": "Thar", "aliases": ["thar"], "range": [999000, 1760000] },
+    { "id": "xuv3xoev", "label": "XUV 3XO EV", "aliases": ["xuv 3xo ev", "3xo ev", "3xo electric"], "range": [1389000, 1496000], "ev": true },
+    { "id": "xuv3xo", "label": "XUV 3XO", "aliases": ["xuv 3xo", "xuv 3 xo", "3xo", "xuv 300", "xuv three hundred"], "range": [779000, 1504000] },
+    { "id": "xuv400", "label": "XUV400", "aliases": ["xuv 400", "xuv four hundred"], "range": [1549000, 1769000], "ev": true },
+    { "id": "bneoplus", "label": "Bolero Neo Plus", "aliases": ["bolero neo plus", "neo plus"], "range": [1099000, 1309000] },
+    { "id": "bneo", "label": "Bolero Neo", "aliases": ["bolero neo"], "range": [885000, 1049000] },
+    { "id": "bolero", "label": "Bolero", "aliases": ["bolero"], "range": [800000, 990000] },
+    { "id": "be6", "label": "BE 6", "aliases": ["BE 6", "BE 6e", "BE Six"], "range": [1890000, 2854000], "caseSensitive": true, "ev": true },
+    { "id": "xev9e", "label": "XEV 9e", "aliases": ["xev 9e", "xev 9 e"], "range": [2190000, 3050000], "ev": true },
+    { "id": "xev9s", "label": "XEV 9S", "aliases": ["xev 9s", "xev 9 s"], "range": [1995000, 2945000], "ev": true }
   ],
   "competitors": ["Tata", "Hyundai", "Maruti", "Kia", "Toyota", "MG", "Honda", "Skoda", "Volkswagen", "Renault", "Nissan", "Citroen", "Jeep"],
   "competitorModels": {

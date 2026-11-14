@@ -12,7 +12,10 @@ const pick = a => a[Math.floor(rnd() * a.length)], ri = (a, b) => Math.floor(a +
 const DAY = '2026-11-14', STORE = 'Apex Motors (fictional demo)', OWNER = 'Mr. Kapoor';
 const PL = JSON.parse(fs.readFileSync(path.join(root, 'data/price-list.json'), 'utf8'));
 const REPS = [{ n: 'Rohan Desai', sk: 80 }, { n: 'Meera Iyer', sk: 76 }, { n: 'Imran Qureshi', sk: 62 }, { n: 'Sneha Patil', sk: 58 }, { n: 'Vikram Nair', sk: 42 }];
-const MODELS = PL.models.map(m => [m.label, Math.round((m.range[0] + m.range[1]) / 2)]);
+const MODELS = PL.models.map(m => [m.label, Math.round((m.range[0] + m.range[1]) / 2), m]);
+const BESTS = MODELS.filter(x => x[2].bestSeller), OTHERS = MODELS.filter(x => !x[2].bestSeller && !x[2].ev), EVS = MODELS.filter(x => x[2].ev);
+const PRI = ['Performance', 'Safety', 'Features', 'Space', 'Comfort', 'Price and offers', 'Mileage', 'Service'], PRI_W = [9, 6, 5, 4, 4, 5, 1, 2];
+const wpick = (a, w) => { let r = rnd() * w.reduce((x, y) => x + y, 0); for (let i = 0; i < a.length; i++) { r -= w[i]; if (r <= 0) return a[i]; } return a[0]; };
 const TYPES = ['First car in the family', 'Family upgrade to a 7-seater', 'Switching to electric', 'Lifestyle and off-road', 'Replacing current car', 'Daily city use'];
 const CUST = ['Karan Malhotra', 'Anjali Rao', 'Farhan Sheikh', 'Divya Menon', 'Sanjay Gupta', 'Pooja Nair', 'Rahul Verma', 'Neha Kulkarni', 'Arvind Joshi', 'Tanvi Shah', 'Manish Bhat', 'Kavya Reddy', 'Suresh Pillai', 'Ritu Arora', 'Gaurav Sinha', 'Ishita Das', 'Naveen Kumar', 'Shweta Jain', 'Deepak Iyer', 'Sunita Rane'];
 const COMPS = [['Tata', 'A bigger festive discount'], ['Hyundai', 'Quicker delivery on the Creta']];
@@ -54,11 +57,11 @@ function transcript(m, dur, ob, phases) {
   return out.sort((a, b) => a[0] - b[0]).map(t => `[${ts(t[0])}] ${t[1]}: ${t[2]}`).join('\n');
 }
 const CH = [['D1', 'Asked what the car is for', 'need'], ['D3', 'Asked the budget', 'budget'], ['D4', 'Confirmed variant, fuel and features wanted', 'need'], ['P2', "Addressed the customer's priority", 'pitch'], ['P3', 'Explained the value', 'pitch'], ['O3', 'Answered the objection', 'objection'], ['N1', 'Agreed a next step and contact', 'close']];
-const TIP = { need: 'Ask what the car is for before showing models: the daily use decides the variant.', budget: 'Confirm the budget and whether a loan is needed before quoting the price.', pitch: 'Tie each feature to what the customer said they care about.', objection: 'Acknowledge the price concern, then compare total cost, not just the sticker price.', close: 'End with a booked next step: test-drive time, or a call date the customer agrees to.' };
+const TIP = { need: 'Ask what the car is for before showing models: the daily use decides the variant.', budget: 'Confirm the budget and whether a loan is needed before quoting the price.', pitch: 'Tie each feature to what the customer said they care about.', objection: 'Acknowledge the price concern, then compare total cost, not just the sticker price.', close: 'End with a written on-road quotation in hand and a call date the customer agrees to.' };
 const slots = [10, 10, 10, 11, 11, 11, 11, 11, 12, 12, 12, 13, 13, 13, 13, 13, 14, 14, 14, 15, 15, 15, 15, 15, 16, 16, 16, 17, 17, 17, 17, 17, 18, 18];
 const rows = [];
 slots.forEach((h, i) => {
-  const rep = REPS[(i * 3 + ri(0, 1)) % REPS.length], mm = pick(MODELS), min = ri(0, 55), at = `${DAY} ${pad(h)}:${pad(min)}`;
+  const rep = REPS[(i * 3 + ri(0, 1)) % REPS.length], ev = rnd() < 0.12, mm = ev ? pick(EVS) : rnd() < 0.68 ? pick(BESTS) : pick(OTHERS), min = ri(0, 55), at = `${DAY} ${pad(h)}:${pad(min)}`;
   const dur = rnd() < 0.18 ? ri(38, 52) : rnd() < 0.5 ? ri(14, 30) : ri(6, 13);
   const noise = ri(-12, 12), score = Math.max(25, Math.min(96, rep.sk + noise + (dur > 30 ? 4 : 0)));
   const sk = { need: score + ri(-8, 8), budget: score + ri(-10, 10), pitch: score + ri(-8, 8), objection: score + ri(-12, 6), close: score + ri(-12, 8) };
@@ -75,22 +78,31 @@ slots.forEach((h, i) => {
   const m = { model: mm[0], price, budget }, tx = transcript(m, dur, ob, phases), turnsN = tx.split('\n').length;
   const [value, source] = undecided ? ['', ''] : priced ? [price, 'call'] : budgeted ? [budget, 'budget'] : [mm[1], 'indicative'];
   const product = undecided ? 'Model not decided' : mm[0];
+  const nAlt = undecided ? 0 : rnd() < 0.45 ? 0 : rnd() < 0.75 ? 1 : 2, pool = (ev ? EVS : MODELS.filter(x => !x[2].ev)).filter(x => x[0] !== mm[0]);
+  const considered = undecided ? [] : [mm[0], ...Array.from({ length: nAlt }, () => pick(pool)[0])].filter((x, j, a) => a.indexOf(x) === j);
+  const fuel = ev ? 'Electric' : undecided ? '' : rnd() < 0.72 ? 'Diesel' : rnd() < 0.85 ? 'Petrol' : 'Diesel|Petrol';
+  const colour = undecided || rnd() < 0.35 ? '' : pick(['Everest White', 'Stealth Black', 'Galaxy Grey', 'Deep Forest', 'Tango Red', 'Napoli Black']).toLowerCase();
+  const avail = rnd() < 0.28, prio = [...new Set(Array.from({ length: ri(1, 3) }, () => wpick(PRI, PRI_W)))].concat(avail ? ['Availability'] : []);
+  const quote = priced ? 'yes' : !undecided && rnd() < 0.35 ? 'promised' : 'no', td = dur > 18 ? 'yes' : rnd() < 0.2 ? 'offered' : 'no';
+  const intent = outcome === 'sold' || (priced && rnd() < 0.6) ? 'high' : undecided ? 'low' : rnd() < 0.5 ? 'medium' : 'high';
   const cust = pick(CUST), checks = CH.map(([id, label, k]) => { const met = rnd() * 100 < sk[k]; return `${met ? 'MET' : 'NOT_MET'}: ${label} (${id}). ${met ? 'The rep did this clearly in the conversation.' : 'The rep did not do this when the opportunity came up.'}`; }).join(' | ');
   const low = Object.entries(sk).sort((a, b) => a[1] - b[1])[0][0];
   rows.push({
     conversation_id: 'ZC-' + (7001 + i), captured_at: at, rep_name: rep.n, outcome, value_inr: value, value_source: source, product, score: Math.round(Object.values(sk).reduce((a, b) => a + b) / 5),
     score_need: sk.need, score_budget: sk.budget, score_pitch: sk.pitch, score_objection: sk.objection, score_close: sk.close,
     reason: outcome === 'sold' ? '' : undecided ? 'browse' : ob.code, stage_reached: stage,
-    customer_name: cust, customer_phone: `98${ri(10, 99)}x ${ri(10000, 99999)}`, duration_min: dur, customer_type: undecided ? 'Not clear' : pick(TYPES), in_stock: ob.code === 'stock' && outcome !== 'sold' && !undecided ? 'no' : 'yes',
-    competitor: comp ? comp[0] : '', competitor_offer: comp ? comp[1] : '', keywords: [ob.t, ...(undecided ? [] : [mm[0]])].join('|'), customer_quote: ob.q,
-    summary_wanted: undecided ? 'Still deciding what kind of car' : `${mm[0]}${source === 'budget' ? ' around ' + inr(budget) : ''}`, summary_happened: undecided ? `${rep.n.split(' ')[0]} asked a few questions; the customer was only enquiring.` : `${rep.n.split(' ')[0]} showed the ${mm[0]}${dur > 18 ? ' and took a test drive' : ''}${priced ? ', then quoted the on-road price' : ''}. ${ob.t}.`, summary_why: outcome === 'sold' ? '' : ob.t, summary_next: outcome === 'sold' ? 'Confirm the delivery date.' : 'Call the customer back and book a test drive.',
-    objection: ob.code, objection_resolved: rnd() * 100 < sk.objection ? 'yes' : 'no', objection_quote: ob.q, objection_reply: ob.a,
+    customer_name: cust, customer_phone: `98${ri(10, 99)}x ${ri(10000, 99999)}`, duration_min: dur, customer_type: undecided ? 'Not clear' : ev ? 'Switching to electric' : pick(TYPES.filter(x => x !== 'Switching to electric')), in_stock: ob.code === 'stock' && outcome !== 'sold' && !undecided ? 'no' : 'yes',
+    competitor: comp ? comp[0] : '', competitor_offer: comp ? comp[1] : '', keywords: [ob.t, ...(undecided ? [] : [mm[0]])].join('|'), customer_quote: undecided ? 'Abhi bas dekh rahe hain, kuch final nahi hai.' : ob.q,
+    summary_wanted: undecided ? 'Still deciding what kind of car' : `${mm[0]}${source === 'budget' ? ' around ' + inr(budget) : ''}`, summary_happened: undecided ? `${rep.n.split(' ')[0]} asked a few questions; the customer was only enquiring.` : `${rep.n.split(' ')[0]} showed the ${mm[0]}${dur > 18 ? ' and took a test drive' : ''}${priced ? ', then quoted the on-road price' : ''}. ${ob.t}.`, summary_why: outcome === 'sold' ? '' : undecided ? 'Just enquiring' : ob.t, summary_next: outcome === 'sold' ? 'Confirm the delivery date.' : quote === 'yes' ? 'Call back on the quotation within two days.' : 'Send the written on-road quotation and call back.',
+    objection: undecided ? '' : ob.code, objection_resolved: rnd() * 100 < sk.objection ? 'yes' : 'no', objection_quote: ob.q, objection_reply: ob.a,
     followup_due: outcome === 'sold' ? '' : '2026-11-16', followup_done: outcome === 'sold' ? '' : 'no', store_name: STORE, owner_name: OWNER,
-    ai_coaching: score < 72 ? `${TIP[low].split(':')[0].split('.')[0]}: ${TIP[low]}` : '', ai_coaching_quote: score < 72 ? ob.q : '', ai_commitments: outcome === 'sold' ? 'Deliver within three weeks | Free first service' : 'Call back with the final on-road price', ai_next_action: outcome === 'sold' ? '' : 'Call back within two days and offer a test drive.', ai_notes: '',
-    ai_checks: checks, transcript: tx, vertical: 'car', talk_rep_pct: Math.round(rep.sk > 70 ? 46 + ri(-4, 4) : 62 + ri(-6, 6)), segments_n: turnsN, quality: '', ai_model: 'demo',
+    ai_coaching: score < 72 ? `${TIP[low].split(':')[0].split('.')[0]}: ${TIP[low]}` : '', ai_coaching_quote: score < 72 ? ob.q : '', ai_commitments: outcome === 'sold' ? 'Deliver within three weeks | Free first service' : 'Call back with the final on-road price', ai_next_action: outcome === 'sold' ? '' : 'Call back within two days with the on-road quotation.', ai_notes: '',
+    ai_checks: checks, transcript: tx, vertical: 'car',
+    models_considered: [...new Set([...(undecided ? [] : [product]), ...considered])].join('|'), model_group: undecided ? '' : mm[2].ev ? 'ev' : mm[2].bestSeller ? 'best' : 'other', fuel, colour, quote_given: quote, test_drive: td,
+    availability: avail ? 'yes' : 'no', availability_quote: avail ? pick(['Diesel automatic mein abhi 6 weeks ki waiting chal rahi hai.', 'This colour has a waiting period of about two months.', 'Kab tak milegi? I need it before Diwali next year.']) : '', priorities: [...new Set(prio)].join('|'), intent, decision: considered.length === 1 ? 'decided' : considered.length >= 2 ? 'choosing' : 'exploring', talk_rep_pct: Math.round(rep.sk > 70 ? 46 + ri(-4, 4) : 62 + ri(-6, 6)), segments_n: turnsN, quality: '', ai_model: 'demo',
   });
 });
-const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'value_source', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_reply', 'followup_due', 'followup_done', 'store_name', 'owner_name', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model'];
+const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'value_source', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_reply', 'followup_due', 'followup_done', 'store_name', 'owner_name', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision'];
 const cell = v => { v = String(v ?? ''); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
 const upTo = hm => rows.filter(r => r.captured_at.slice(11) <= hm).length;
 const meta = {

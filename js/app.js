@@ -30,7 +30,7 @@ const COACH={need:'Ask who it is for and the occasion in the first 2 minutes, be
 REASONS.exchange={label:'Exchange value too low',stage:3,skill:'objection',hi:'',en:''};
 /* ---------- Wording per business type. A car showroom books cars, test-drives them and quotes an on-road price. Labels only; numbers are untouched. ---------- */
 const CAR=ZD.vertical==='car';
-const Wd=CAR?{sold:'Booked',lost:'Did not book',soldLc:'booked',lostLc:'did not book',bought:'booked',store:'showroom',Store:'Showroom',conv:'Booking conversion',closed:'Bookings won',tagged:'Tagged as booked',sale:'booking',sales:'bookings',avgSale:'Avg booking',noBuy:'Why they did not book',product:'Model',pitchShort:'Test drive',afterShown:'after the test drive',leftShown:'After test drive',sell:'book'}:
+const Wd=CAR?{sold:'Booked',lost:'Did not book',soldLc:'booked',lostLc:'did not book',bought:'booked',store:'showroom',Store:'Showroom',conv:'Booking conversion',closed:'Bookings won',tagged:'Tagged as booked',sale:'booking',sales:'bookings',avgSale:'Avg booking',noBuy:'Why they did not book',product:'Model',pitchShort:'Model shown',afterShown:'after the options were shown',leftShown:'After options shown',sell:'book'}:
  {sold:'Sold',lost:'Did not buy',soldLc:'sold',lostLc:'did not buy',bought:'bought',store:'store',Store:'Store',conv:'Sale conversion',closed:'Sales closed',tagged:'Tagged as sold',sale:'sale',sales:'sales',avgSale:'Avg sale',noBuy:'Why they did not buy',product:'Product',pitchShort:'Product',afterShown:'after the product was shown',leftShown:'After product shown',sell:'sell'};
 /* Suggested lines for a car showroom, used only when the day has no good real answer to show. Always labelled as a playbook line, never as a rep's words. */
 const PLAYBOOK=CAR?{
@@ -43,11 +43,11 @@ const PLAYBOOK=CAR?{
  stock:{hi:'Doosra variant stock mein hai, chahein toh aaj hi test drive le lijiye.',en:'Another variant is in stock. You could take a test drive today.'},
  browse:{hi:'Gaadi kaun chalayega, aur roz kitna chalana hota hai?',en:'Who will drive the car, and how much do you drive each day?'}}:{};
 if(CAR){
- SKILLS[2].label='Walkaround and test drive';
- STAGES.splice(0,5,'Talked to a rep','Need understood','Test drive done','Price quoted','Booked');
- const car={browse:['Just enquiring, need not found',0,'need'],stock:['Long waiting period for the variant',1,null],design:['Not convinced after the test drive',2,'pitch'],making:['On-road price too high',3,'objection'],budget:['Over budget, EMI not worked out',3,'budget'],competitor:['Comparing with another brand',3,'objection'],family:['Needs family approval',3,'close'],exchange:['Exchange value too low',3,'objection']};
+ SKILLS[2].label='Showing the right model';
+ STAGES.splice(0,5,'Talked to a rep','Need understood','Options shown','Quotation given','Booked');
+ const car={browse:['Just enquiring, need not found',0,'need'],stock:['Long waiting period for the variant',1,null],design:['Not convinced by the car shown',2,'pitch'],making:['On-road price too high',3,'objection'],budget:['Over budget, EMI not worked out',3,'budget'],competitor:['Comparing with another brand',3,'objection'],family:['Needs family approval',3,'close'],exchange:['Exchange value too low',3,'objection']};
  Object.entries(car).forEach(([k,v])=>{REASONS[k]=Object.assign(REASONS[k]||{hi:'',en:''},{label:v[0],stage:v[1],skill:v[2]})});
- Object.assign(COACH,{need:'Ask who will drive it, the daily running and the family size in the first 2 minutes, before walking to any car.',budget:'Ask the budget and down payment before quoting. Top reps ask it within the first 3 minutes.',pitch:'Offer a test drive to every serious customer, and show the three features that match what they told you.',objection:'When the customer pushes on price, write one on-road quote with the exchange and every offer netted off, before giving any discount.',close:'End every visit with a next step: a booking, a home test drive, or a saved WhatsApp number.'})}
+ Object.assign(COACH,{need:'Ask who will drive it, the daily running and the family size in the first 2 minutes, before walking to any car.',budget:'Ask the budget and down payment before quoting. Top reps ask it within the first 3 minutes.',pitch:'Show the model they came for, then one more that fits what they said, beyond the XUV 7XO and Scorpio. Lead with performance and safety; Mahindra buyers care less about mileage.',objection:'When the customer pushes on price, write one on-road quotation with the exchange and every offer netted off, and hand it over before they leave.',close:'Nobody leaves without a written on-road quotation and a date for the next call.'})}
 
 REASONS.other={label:'No clear reason',stage:3,skill:null,hi:'',en:''};
 ZD.customReasons.forEach(r=>{REASONS[r.code]={label:r.label,stage:r.stage,skill:null,hi:r.hi,en:r.en}});
@@ -115,7 +115,51 @@ function delta(cur,prev,opt){opt=opt||{};let diff,txt;if(!hasBase())return '';
 /* ---------- State ---------- */
 const RANGES={all:{days:Math.max(ZD.spanDays||1,1),lo:0,hi:Math.max(ZD.spanDays||1,1)-1,plo:-1,phi:-1},today:{days:1,lo:0,hi:0,plo:7,phi:7},yesterday:{days:1,lo:1,hi:1,plo:8,phi:8},'7':{days:7,lo:0,hi:6,plo:7,phi:13},'30':{days:30,lo:0,hi:29,plo:30,phi:59}};
 const S={from:'team',rcf:{},rcfFor:null,period:'30',tab:'drop',showAll:{},cf:{},page:0,sort:'date',ctype:'persona',drawer:null,drawerAt:null};
-const CF_KEYS=['rep','outcome','persona','product','reason','stage','comp','kw'];
+const CF_KEYS=['rep','outcome','persona','product','reason','stage','comp','kw','quote','intent','mgroup','prio','fuel','avail','decision'];
+/* ---------- Floor view (car pilot): what the dealer said matters. Quotation given is the real step, the test drive is a side fact;
+   best sellers (XUV 7XO, Scorpio) vs the other models the dealer wants to move; how decided the customer is; availability. ---------- */
+const FLOOR=CAR&&!!ZD.has.floor;
+const MORE=(b,a)=>FLOOR?(b.n>a.n||(b.n===a.n&&b.v>a.v)):(b.v>a.v||(b.v===a.v&&b.n>a.n));
+const MG={best:'Best sellers (XUV 7XO, Scorpio)',other:'Other Mahindra models',ev:'Electric',none:'Model not decided'};
+const DEC={decided:'Decided on one model',choosing:'Choosing between 2 or 3',exploring:'Still exploring'};
+const QT={yes:'Quotation given',promised:'Promised, not given',no:'No quotation'};
+const mg=c=>c.mgroup||'none';
+const share=(n,d)=>d?Math.round(n/d*100)+'%':'-';
+function floorKpis(L){const n=L.length,hi=L.filter(c=>c.intent==='high').length,q=L.filter(c=>c.quote==='yes').length,pr=L.filter(c=>c.quote==='promised').length,b=L.filter(c=>c.outcome==='sold').length;
+ return `${kpi({label:'Customers',tag:'Input',val:n,sub:`${mins(L.reduce((a,c)=>a+c.dur,0))} with customers`,delta:'',go:'#conversations'})}
+  ${kpi({label:'High-intent customers',tag:'AI reading',val:hi,sub:`${share(hi,n)} of customers`,delta:'',filter:{intent:'high'}})}
+  ${kpi({label:'Quotations given',tag:'Key step',val:q,sub:`${share(q,n)} of customers${pr?` · ${pr} promised, not given`:''} · ${b} booked`,delta:'',filter:{quote:'yes'}})}`}
+function floorLede(L){const n=L.length;if(!n)return '';const q=L.filter(c=>c.quote==='yes').length,b=L.filter(c=>c.outcome==='sold').length,
+ hiNo=L.filter(c=>c.intent==='high'&&c.quote!=='yes'&&c.outcome!=='sold').length,best=L.filter(c=>c.mgroup==='best').length,alt=L.filter(c=>c.mgroup==='best'&&c.models.length>1).length;
+ return `<b>${q} of ${plural(n,'customer')} left with a quotation</b>, ${b} booked.${hiNo?` <b>${plural(hiNo,'high-intent customer')}</b> left without one: the actions below start there.`:''}${best?` ${best} came for the XUV 7XO or Scorpio; another model was shown to ${alt} of them.`:''}`}
+function floorCards(L){if(!FLOOR||!L.length)return '';const n=L.length,cnt=f=>L.filter(f).length,af=o=>`data-filter='${JSON.stringify(o)}'`;
+ const mix=ZC.barList(['best','other','ev','none'].map(k=>({k,v:cnt(c=>mg(c)===k)})).filter(x=>x.v).map(x=>({label:MG[x.k],value:x.v,text:`${x.v} · ${share(x.v,n)}`,attr:af({mgroup:x.k}),tip:`${MG[x.k]}|${plural(x.v,'customer')}`})),{max:n});
+ const best=L.filter(c=>c.mgroup==='best'),alt=best.filter(c=>c.models.length>1).length;
+ const pairs={};L.forEach(c=>{const m=[...new Set(c.models)].slice(0,3);for(let i=0;i<m.length;i++)for(let j=i+1;j<m.length;j++){const k=[m[i],m[j]].sort().join(' vs ');pairs[k]=(pairs[k]||0)+1}});
+ const topPairs=Object.entries(pairs).sort((a,b)=>b[1]-a[1]).slice(0,3);
+ const prio={};L.forEach(c=>c.prio.forEach(p=>prio[p]=(prio[p]||0)+1));
+ const care=ZC.barList(Object.entries(prio).sort((a,b)=>b[1]-a[1]).slice(0,7).map(([k,v])=>({label:k,value:v,text:`${v} · ${share(v,n)}`,attr:af({prio:k}),tip:`${k}|Raised by ${plural(v,'customer')}`})),{max:n,empty:'Nothing captured yet.'});
+ const fuel={};L.forEach(c=>(c.fuel.length?c.fuel:['Not said']).forEach(f=>fuel[f]=(fuel[f]||0)+1));
+ const col={};L.forEach(c=>c.colour.forEach(x=>col[x]=(col[x]||0)+1));
+ const av=L.filter(c=>c.avail),avB=av.filter(c=>c.outcome==='sold').length,td=L.filter(c=>c.td==='yes'),tdQ=td.filter(c=>c.quote==='yes').length;
+ const facts=`<div class="ffacts">
+   <div><span class="mono">Fuel asked for</span><div class="chips">${Object.entries(fuel).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<button class="chip" ${k==='Not said'?'':af({fuel:k})}>${esc(k)} <small class="num">${v}</small></button>`).join('')}</div></div>
+   <div><span class="mono">Colours asked for</span><div class="chips">${Object.keys(col).length?Object.entries(col).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`<button class="chip">${esc(k.replace(/^./,x=>x.toUpperCase()))} <small class="num">${v}</small></button>`).join(''):'<span class="hint">None said aloud yet.</span>'}</div></div>
+   <div><span class="mono">Availability came up</span><p><b class="num">${av.length}</b> of ${plural(n,'customer')}${av.length?` · ${avB} of them booked`:''}${av.length?` <button class="link" ${af({avail:'yes'})}>See them${ic('right',13)}</button>`:''}</p></div>
+   <div><span class="mono">Test drive</span><p>Taken in <b class="num">${td.length}</b> of ${n}${td.length?`; a quotation followed in ${tdQ}`:''}. The quotation is the step that moves the sale.</p></div></div>`;
+ return `<div class="cgrid3">
+  ${ZC.ccard(best.length?`${share(best.length,n)} came for the best sellers`:'Model mix',best.length?`another model shown to ${alt} of ${best.length}`:'Tap to filter',mix+(topPairs.length?`<div class="cc-h" style="margin-top:10px"><h3>Compared most</h3></div>${topPairs.map(([k,v])=>`<p class="hint" style="margin:2px 0"><b style="color:var(--ink)">${esc(k)}</b> · ${v}</p>`).join('')}`:''))}
+  ${ZC.ccard('What customers care about','Raised by the customer · tap to filter',care)}
+  ${ZC.ccard('On the floor','Fuel, colour, availability, test drive',facts)}
+ </div>`}
+function floorActions(L){const acts=[],af=o=>o;
+ const noQ=L.filter(c=>c.outcome!=='sold'&&c.quote!=='yes'&&c.intent!=='low').sort((a,b)=>(a.intent==='high'?0:1)-(b.intent==='high'?0:1));
+ if(noQ.length){const hi=noQ.filter(c=>c.intent==='high').length,pr=noQ.filter(c=>c.quote==='promised').length;acts.push({impact:sumv(noQ),n:noQ.length,title:`Send the quotation to ${plural(noQ.length,'customer')} who left without one`,body:`${hi} ${hi===1?'was':'were'} high intent${pr?`, ${pr} ${pr===1?'was':'were'} promised one`:''}. A written on-road quotation is the step that moves a Mahindra sale.`,btn:'See them',filter:{quote:'no'}})}
+ const one=L.filter(c=>c.mgroup==='best'&&c.models.length<2&&c.outcome!=='sold');
+ if(one.length)acts.push({impact:sumv(one),n:one.length,title:`Show a second model to ${plural(one.length,'customer')} who saw only the XUV 7XO or Scorpio`,body:'The showroom wants to move its other models. These customers saw only a best seller and have not booked.',btn:'See them',filter:{mgroup:'best'}});
+ const av=L.filter(c=>c.avail&&c.outcome!=='sold');
+ if(av.length)acts.push({impact:sumv(av),n:av.length,title:`Give a delivery date to ${plural(av.length,'customer')} who asked about availability`,body:'Availability decides the sale. Call back with a firm date or an in-stock alternative.',btn:'See them',filter:{avail:'yes'}});
+ return acts}
 /* TL = real test calls recorded on random days. SNAP = one day shown as a single snapshot (the pilot).
    Both are FLAT: no time controls, no trends, no comparisons. */
 const TL=!!ZD.timeless,SNAP=!!ZD.snapshot,FLAT=TL||SNAP,SP=(v,o)=>FLAT?'':ZC.spark(v,o);
@@ -139,8 +183,9 @@ function stats(list){const n=list.length,sold=list.filter(c=>c.outcome==='sold')
 function repRows(list){const store=stats(list);
  return REPS.map(r=>{const L=list.filter(c=>c.rep===r.id),s=stats(L);
    let weak=null,gap=0;SKILLS.forEach(k=>{const g=s.skill[k.id]-store.skill[k.id];if(weak===null||g<gap){weak=k.id;gap=g}});
-   const status=s.score>=store.score+6?['good','Top performer']:s.score<=store.score-6?['bad','Needs coaching']:['neutral','On track'];
-   return {rep:r,s,L,weak,gap,status}}).sort((a,b)=>b.s.score-a.s.score)}
+   const thin=SNAP&&s.n<3;
+   const status=thin?['neutral',s.n?`Only ${plural(s.n,'conversation')}, too few to rate`:'No conversations yet']:s.score>=store.score+6?['good','Top performer']:s.score<=store.score-6?['bad','Needs coaching']:['neutral','On track'];
+   return {rep:r,s,L,weak,gap,status,thin}}).sort((a,b)=>(a.thin-b.thin)||b.s.score-a.s.score||b.s.n-a.s.n)}
 
 /* ---------- Shell ---------- */
 const NAV=[['home','Overview','home'],['insights','Insights','insights'],['team','Team','team'],['coaching','Coaching','coach'],['conversations','Conversations','conv'],['followups','Follow-ups','calls']];
@@ -172,6 +217,7 @@ function computeActions(L){
  const oos=L.filter(c=>!c.inStock&&!/not decided|not recorded|not captured/i.test(PRODUCTS[c.product].label)),byP=groupBy(oos,c=>c.product);let top=null;Object.entries(byP).forEach(([k,v])=>{if(!top||v.length>top.v.length)top={k,v}});
  if(top)acts.push(CAR?{impact:sumv(top.v),n:top.v.length,title:`Cut the wait on the ${PRODUCTS[top.k].label}`,body:`${plural(top.v.length,'customer')} wanted it and we could not give a quick delivery date.`,btn:'Demand',go:'#insights',tab:'want'}:
   {impact:sumv(top.v),n:top.v.length,title:`Restock ${lc(PRODUCTS[top.k].label)}`,body:`${plural(top.v.length,'customer')} asked and we had none.${/lightweight/i.test(PRODUCTS[top.k].label)?' Most wanted under 10 grams.':''}`,btn:'Demand',go:'#insights',tab:'want'});
+ if(FLOOR)return floorActions(L).concat(acts.filter(a=>a.go!=='#insights')).slice(0,3);
  return acts.sort((a,b)=>b.impact-a.impact||b.n-a.n).slice(0,3)}
 function lede(s,p,big){
  if(!s.n)return `<b>No conversations recorded ${inTxt()}.</b> ${ZD.spanDays<3?'New recordings appear after the next data refresh.':'Switch to 7 or 30 days to see the picture.'}`;
@@ -203,7 +249,7 @@ const valSrc=c=>!ZD.has.valueSrc?'':c.value?(VSRC[c.valueSrc]||''):'value not kn
 function valueNote(L){if(!ZD.has.valueSrc||!L.length)return '';const n=k=>L.filter(c=>c.value&&c.valueSrc===k).length,un=L.filter(c=>!c.value).length,parts=[];
  [['call','said in the call'],['recorded','recorded in the app'],['team','entered by team'],['budget','from the customer\'s budget'],['indicative','indicative by model']].forEach(([k,t])=>{if(n(k))parts.push(n(k)+' '+t)});
  if(un)parts.push(un+' value not known');
- return `<p class="hint valnote">Rupee figures: <b class="num">${inr(sumv(L))}</b> across ${L.length-un} of ${plural(L.length,'conversation')} · ${parts.join(' · ')}. Values marked ~ are the model's typical on-road price, not a quote.</p>`}
+ return `<p class="hint valnote">Rupee figures: <b class="num">${inr(sumv(L))}</b> across ${L.length-un} of ${plural(L.length,'conversation')} · ${parts.join(' · ')}. Values marked ~ are the model's typical ex-showroom price, not a quote.</p>`}
 function timelessPanel(s){const by=o=>cur().filter(c=>c.outcome===o),fo=o=>`data-filter='${JSON.stringify({outcome:o})}'`;
  return `<aside class="card hpanel" aria-label="Skills and results"><div class="cc-h"><h3>Average skill score</h3><span class="hint">${plural(s.n,'conversation')}</span></div>
   ${ZC.barList(SKILLS.map(k=>({label:k.label,value:s.skill[k.id],text:String(s.skill[k.id]),tip:`${k.label}|Average ${s.skill[k.id]} out of 100`})),{max:100})}
@@ -226,24 +272,24 @@ function pendingHtml(){const m=ZD.meta;if(!m||!SNAP)return '';const row=(x,t)=>`
 function kpi(o){return `<button class="card kpi" ${o.filter?`data-filter='${JSON.stringify(o.filter)}'`:`data-go="${o.go}"`}><div class="row"><span class="label">${o.label}</span><span class="tag">${o.tag}</span></div><div class="val num">${o.val}</div><div class="row"><span class="sub">${o.sub}</span>${o.delta}</div></button>`}
 function renderHome(){
  const L=cur(),P=prev(),s=stats(L),p=stats(P),acts=computeActions(L),rows=repRows(L);
- const big=leaks(L).reduce((a,b)=>b.v>a.v||(b.v===a.v&&b.n>a.n)?b:a);
+ const big=leaks(L).reduce((a,b)=>MORE(b,a)?b:a);
  const short={good:'Top',neutral:'On track',bad:'Coach'};
  return `<div class="homegrid"><section class="hero" data-tour="brief">
   <span class="mono">${ic('spark',14)} AI briefing · ${esc(ZD.store)} · ${SNAP?WDL[TODAY.getDay()]+' '+fdate(TODAY):periodTxt()+(rangeDays()===1?' · '+fdate(dayDate()):'')} ${ZD.isSample?'<span class="sample">Sample data</span>':''}</span>
   <h1>${TL?'Conversation review':greet()}</h1>
-  <p class="lede">${lede(s,p,big)}</p>
+  <p class="lede">${FLOOR&&s.n?floorLede(L):lede(s,p,big)}</p>
   </section>${FLAT?timelessPanel(s):homePanel(s)}</div>
   <div class="waveband" data-wave-anchor aria-hidden="true"><span class="wavehint">Live voice waves · hover or click</span></div>
  <section class="kpis" data-tour="kpis">
-  ${kpi({label:Wd.conv,tag:'Output',val:pct(s.conv),sub:`${s.sold} of ${s.n} customers`,delta:delta(s.conv,p.conv,{pts:true}),go:'#insights'})}
+  ${FLOOR?floorKpis(L):`${kpi({label:Wd.conv,tag:'Output',val:pct(s.conv),sub:`${s.sold} of ${s.n} customers`,delta:delta(s.conv,p.conv,{pts:true}),go:'#insights'})}
   ${kpi({label:Wd.closed,tag:'Output',val:inr(s.soldValue),sub:Wd.tagged,delta:delta(s.soldValue,p.soldValue),filter:{outcome:'sold'}})}
-  ${kpi({label:'Conversations recorded',tag:'Input',val:s.n,sub:SNAP?`${mins(L.reduce((a,c)=>a+c.dur,0))} with customers`:`${(s.n/rangeDays()/REPS.length).toFixed(1)} per rep per day`,delta:delta(s.n,p.n),go:'#team'})}
- </section>${valueNote(L)}
-  <div class="homegrid2"><section class="card" data-tour="actions"><div class="card-h"><h2>${TL?'Start with these three':SNAP?'Do these next':'Today, do these three'}</h2><span class="hint">Ranked by money at stake</span></div>
-  <div class="acts">${acts.length?'':'<p class="hint" style="margin:0">No actions yet. They appear once a few conversations are in.</p>'}${acts.map((a,i)=>`<div class="act"><span class="n">${i+1}</span><div><h3>${a.title}</h3><p>${a.body}</p></div><div class="r">${a.impact?`<span class="pill gold num">${inr(a.impact)}</span>`:''}<button class="btn ${i===0?'primary':''} sm" data-go="${a.go}" ${a.tab?`data-tab="${a.tab}"`:''}>${a.btn}${ic('right',14)}</button></div></div>`).join('')}</div></section>
+  ${kpi({label:'Conversations recorded',tag:'Input',val:s.n,sub:SNAP?`${mins(L.reduce((a,c)=>a+c.dur,0))} with customers`:`${(s.n/rangeDays()/REPS.length).toFixed(1)} per rep per day`,delta:delta(s.n,p.n),go:'#team'})}`}
+ </section>${valueNote(L)}${floorCards(L)}
+  <div class="homegrid2"><section class="card" data-tour="actions"><div class="card-h"><h2>${TL?'Start with these three':SNAP?'Do these next':'Today, do these three'}</h2><span class="hint">${FLOOR?'Ranked by customers':'Ranked by money at stake'}</span></div>
+  <div class="acts">${acts.length?'':'<p class="hint" style="margin:0">No actions yet. They appear once a few conversations are in.</p>'}${acts.map((a,i)=>`<div class="act"><span class="n">${i+1}</span><div><h3>${a.title}</h3><p>${a.body}</p></div><div class="r">${a.impact?`<span class="pill gold num">${inr(a.impact)}</span>`:''}<button class="btn ${i===0?'primary':''} sm" ${a.filter?`data-filter='${JSON.stringify(a.filter)}'`:`data-go="${a.go}"`} ${a.tab?`data-tab="${a.tab}"`:''}>${a.btn}${ic('right',14)}</button></div></div>`).join('')}</div></section>
  <section class="card" data-tour="pulse"><div class="card-h"><h2>Team at a glance</h2><button class="link" data-go="#team">Full team${ic('right',14)}</button></div>
-  <div class="pulse">${rows.map(r=>`<button class="pchip" data-go="#rep-${r.rep.id}">${ring(r.s.score,54)}<b>${r.rep.first}</b><span class="pill ${r.status[0]}">${short[r.status[0]]}</span></button>`).join('')}</div>
-  <p class="hint" style="margin:10px 0 0">Ring shows conversation score out of 100. ${Wd.Store} average ${s.score}. Tap a rep to coach.</p>${featuredHtml()}</section></div>${dayCards(L)}`}
+  <div class="pulse">${rows.map(r=>`<button class="pchip" data-go="#rep-${r.rep.id}">${ring(r.s.score,54)}<b>${r.rep.first}</b><span class="pill ${r.status[0]}">${r.thin?plural(r.s.n,'chat'):short[r.status[0]]}</span></button>`).join('')}</div>
+  <p class="hint" style="margin:10px 0 0">Ring shows conversation score out of 100. ${Wd.Store} average ${s.score}.${rows.some(r=>r.thin)?' Reps with fewer than 3 conversations are not rated yet.':' Tap a rep to coach.'}</p>${featuredHtml()}</section></div>${dayCards(L)}`}
 function featuredHtml(){const f=(ZD.featured||[]).map(r=>CONVS.find(c=>c.ref===r)).filter(Boolean);if(!f.length)return '';
  return `<div class="card-h" style="margin:14px 0 8px"><h2>Start here</h2><span class="hint">Real test conversations</span></div><div class="featured">${f.map(c=>`<button class="feat" data-conv="${c.id}">${ring(c.score,40)}<span style="min-width:0"><b>${esc(PRODUCTS[c.product].label)}</b><span class="m">${esc(REP[c.rep].first)} · ${c.dur} min · ${esc(clipTxt((c.sum&&c.sum.happened)||'',90))}</span></span></button>`).join('')}</div>`}
 const clipTxt=(s,n)=>s.length>n?s.slice(0,n-1).trimEnd()+'…':s;
@@ -252,7 +298,7 @@ const clipTxt=(s,n)=>s.length>n?s.slice(0,n-1).trimEnd()+'…':s;
 function insightData(L,P){
  const notSold=L.filter(c=>c.outcome!=='sold');
  const reasons=Object.entries(groupBy(notSold,c=>c.reason)).map(([k,v])=>{const byRep=groupBy(v,c=>c.rep);const worst=Object.entries(byRep).sort((a,b)=>b[1].length-a[1].length)[0];
-   return {k,n:v.length,v:sumv(v),share:v.length/notSold.length,prevN:P.filter(c=>c.outcome!=='sold'&&c.reason===k).length,worst:worst?[worst[0],worst[1].length]:null}}).sort((a,b)=>b.v-a.v);
+   return {k,n:v.length,v:sumv(v),share:v.length/notSold.length,prevN:P.filter(c=>c.outcome!=='sold'&&c.reason===k).length,worst:worst?[worst[0],worst[1].length]:null}}).sort((a,b)=>FLOOR?b.n-a.n||b.v-a.v:b.v-a.v);
  const products=Object.entries(groupBy(L,c=>c.product)).map(([k,v])=>{const oos=v.filter(c=>!c.inStock);return {k,n:v.length,sold:v.filter(c=>c.outcome==='sold').length,oos:oos.length,oosV:sumv(oos)}}).sort((a,b)=>b.n-a.n);
  const overall=stats(L).conv;
  const comps=Object.entries(groupBy(L,c=>c.competitor)).map(([k,v])=>({k,n:v.length,conv:v.filter(c=>c.outcome==='sold').length/v.length,risk:sumv(v.filter(c=>c.outcome!=='sold')),prevN:P.filter(c=>c.competitor===k).length})).sort((a,b)=>b.n-a.n);
@@ -261,7 +307,7 @@ function insightData(L,P){
  const kwc={},kwp={};L.forEach(c=>c.kw.forEach(k=>kwc[k]=(kwc[k]||0)+1));P.forEach(c=>c.kw.forEach(k=>kwp[k]=(kwp[k]||0)+1));
  const kws=Object.keys(kwc).map(k=>({k,n:kwc[k],p:kwp[k]||0})).sort((a,b)=>b.n-a.n);
  return {reasons,products,overall,comps,pers,kws}}
-function funnel(L){const n=L.length,lk=leaks(L),big=lk.reduce((a,b)=>b.v>a.v||(b.v===a.v&&b.n>a.n)?b:a);let h='<div class="fun">';
+function funnel(L){const n=L.length,lk=leaks(L),big=lk.reduce((a,b)=>MORE(b,a)?b:a);let h='<div class="fun">';
  for(let k=0;k<5;k++){const cnt=L.filter(c=>c.stage>=k).length;
   h+=`<div class="fstep ${k===4?'sold':''}"><span>${STAGES[k]}</span><span class="fbar"><i style="width:${n?cnt/n*100:0}%"></i></span><b class="num" style="text-align:right">${cnt}</b></div>`;
   if(k<4){const l=lk[k];h+=`<div class="leak ${l.k===big.k?'big':''}"><button data-filter='{"stage":"${k}"}'>${ic('down',13)}${l.n} left · ${inr(l.v)}${l.k===big.k?' · biggest leak':''}</button></div>`}}
@@ -270,16 +316,24 @@ function renderInsights(){
  const L=cur(),P=prev(),D=insightData(L,P);
  const tabs=[['drop',Wd.noBuy],['want','What they want'],['comp','Competition'],['types','Customer types']].concat(CAR?[['after','After the booking']]:[]);
  let lead='',body='';
- if(S.tab==='drop'){const r0=D.reasons[0],big=leaks(L).reduce((a,b)=>b.v>a.v||(b.v===a.v&&b.n>a.n)?b:a);
-  lead=`Most customers leave <b>${AFTER[big.k]}</b>. The costliest reason is <b>${lc(REASONS[r0.k].label)}</b>, ${inr(r0.v)} across ${plural(r0.n,'customer')}. ${BEST[r0.k].real||ZD.isSample?`${REP[BEST[r0.k].rep].first} has an answer that works.`:''}`;
+ if(S.tab==='drop'){const r0=D.reasons[0],big=leaks(L).reduce((a,b)=>MORE(b,a)?b:a);
+  lead=`Most customers leave <b>${AFTER[big.k]}</b>. The ${FLOOR?'most common':'costliest'} reason is <b>${lc(REASONS[r0.k].label)}</b>, ${r0.v?inr(r0.v)+' across ':''}${plural(r0.n,'customer')}. ${BEST[r0.k].real||ZD.isSample?`${REP[BEST[r0.k].rep].first} has an answer that works.`:''}`;
   body=`<div class="ins2"><div><div class="card-h"><h2>Where ${Wd.sales} leak</h2><span class="hint">Tap a red line to see those customers</span></div>${funnel(L)}</div>
-  <div><div class="card-h" style="margin:0 0 4px"><h2>Reasons, by money lost</h2></div>`+
+  <div><div class="card-h" style="margin:0 0 4px"><h2>${FLOOR?'Reasons, by customers':'Reasons, by money lost'}</h2></div>`+
   showAll('drop',D.reasons,3,(r,i)=>{const R0=REASONS[r.k],b=BEST[r.k],pb=PLAYBOOK[r.k],own=b.real||ZD.isSample,tryTxt=own?`${REP[b.rep].first}'s answer: "${b.en}"`:pb?`"${pb.en}"`:'';return `<details class="why" ${i===0?'open':''}><summary>
    <span><span class="t">${R0.label}</span><br><span class="m num">${plural(r.n,'customer')}${r.worst?` · most with ${repLink(r.worst[0],REP[r.worst[0]].first)}`:''}</span></span>
    <span style="display:flex;align-items:center;gap:12px"><span style="text-align:right"><b class="num">${inr(r.v)}</b><br>${delta(r.n,r.prevN,{lowerBetter:true})}</span><span class="chev">${ic('chev')}</span></span></summary>
    <div class="body">${R0.hi||R0.en?`<div class="quote bad">${Q(R0.hi||R0.en,R0.en||R0.hi)}<div class="by">Customers say</div></div>`:''}
    ${own?`<div class="quote">${Q(b.hi,b.en)}<div class="by">What works · ${repLink(b.rep,REP[b.rep].name)}</div></div>`:pb?`<div class="quote">${Q(pb.hi,pb.en)}<div class="by">Suggested line · Zocus playbook</div></div><p class="hint" style="margin:6px 0">No answer recorded so far scored well enough to show as an example, so this is a playbook line, not your team's words.</p>`:`<p class="hint" style="margin:6px 0">No resolved answer recorded yet for this objection.</p>`}
    <div class="btnrow">${tryTxt?`<button class="btn primary sm" data-act="copy" data-text="${esc(`Team briefing: when a customer ${R0.en?`says "${R0.en}"`:`raises "${lc(R0.label)}"`}, try ${tryTxt}`)}">${ic('copy',14)}Copy for team briefing</button>`:''}<button class="btn sm" data-filter='{"reason":"${r.k}"}'>See ${plural(r.n,'conversation')}</button></div></div></details>`})+'</div></div>';
+ }else if(S.tab==='want'&&FLOOR){const n=L.length,by={};L.forEach(c=>{const ms=c.models.length?c.models:['Model not decided'];ms.forEach((m,i)=>{const r=by[m]||(by[m]={m,n:0,main:0,q:0,b:0,av:0,v:0});r.n++;if(i===0){r.main++;r.v+=c.value}if(c.quote==='yes')r.q++;if(c.outcome==='sold'&&i===0)r.b++;if(c.avail)r.av++})});
+  const rows=Object.values(by).sort((a,b)=>b.n-a.n),top=rows.find(r=>r.m!=='Model not decided');
+  lead=top?`<b>${esc(top.m)}</b> came up most, in ${plural(top.n,'conversation')}. ${L.filter(c=>c.models.length>=2).length} customers compared two or more models.`:'No model named yet.';
+  const prio={};L.forEach(c=>c.prio.forEach(p=>prio[p]=(prio[p]||0)+1));
+  body=`<div class="tblwrap"><table class="tbl"><thead><tr><th>Model</th><th class="r">Considered</th><th class="r">First choice</th><th class="r">Quotation</th><th class="r">Booked</th><th class="r">Availability asked</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${esc(r.m)}</b></td><td class="r num">${r.n}</td><td class="r num">${r.main}</td><td class="r num">${r.q}</td><td class="r num">${r.b}</td><td class="r num">${r.av||'-'}</td></tr>`).join('')}</tbody></table></div>
+  <p class="hint" style="margin:8px 0 0">A customer comparing two models is counted under both. First choice is the model talked about most.</p>
+  <div class="card-h" style="margin:26px 0 10px"><h2>What customers care about</h2><span class="hint">Tap to see them</span></div>
+  <div class="chips">${Object.entries(prio).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<button class="chip" data-filter='${JSON.stringify({prio:k})}'>${esc(k)} <small class="num">${v} · ${share(v,n)}</small></button>`).join('')||'<span class="hint">Nothing captured yet.</span>'}</div>`;
  }else if(S.tab==='want'){const sp=[...D.products].sort((a,b)=>b.oosV-a.oosV)[0];
   const topAsk=[...D.products].filter(x=>!/not decided|not recorded|not captured/i.test(PRODUCTS[x.k].label)).sort((x,y)=>y.n-x.n)[0];
   lead=!ZD.has.stock?(topAsk?`Customers asked for <b>${esc(PRODUCTS[topAsk.k].label)}</b> most: ${plural(topAsk.n,'conversation')}.`:'No requests this period.'):sp&&sp.oos?`<b>${PRODUCTS[sp.k].label}</b> is the stock gap: ${plural(sp.oos,'customer')} ${CAR?'wanted a variant we could not deliver soon':'asked when we had none'}, ${inr(sp.oosV)} of interest.${ZD.isSample?' "Lightweight" is a word customers keep using.':''}`:'No stock gaps this period.';
@@ -298,6 +352,12 @@ function renderInsights(){
  }else if(S.tab==='after'){
   lead='What happens after a booking (loan, insurance, extended warranty, accessories, service package, exchange) is <b>to be updated</b>.';
   body=`<div class="tbu"><b>To be updated</b><p class="hint">This section will show the add-ons on booked cars: loan, insurance, extended warranty, accessories, service package and exchange. It is not part of the pilot yet.</p></div>`;
+ }else if(FLOOR&&S.tab==='types'){const n=L.length,g=Object.entries(groupBy(L,c=>c.decision||'exploring')).map(([k,v])=>({k,n:v.length,q:v.filter(c=>c.quote==='yes').length,b:v.filter(c=>c.outcome==='sold').length,hi:v.filter(c=>c.intent==='high').length})).sort((a,b)=>b.n-a.n);
+  const d=g.find(x=>x.k==='decided');
+  lead=`Customers arrive with a model in mind: <b>${d?d.n:0} of ${n}</b> had decided on one, ${(g.find(x=>x.k==='choosing')||{n:0}).n} were choosing between two or three.`;
+  body=`<div class="tblwrap"><table class="tbl"><thead><tr><th>How decided</th><th>Share</th><th class="r">High intent</th><th class="r">Quotation</th><th class="r">Booked</th></tr></thead><tbody>${g.map(x=>`<tr class="click" data-filter='${JSON.stringify({decision:x.k})}'><td><b>${DEC[x.k]||x.k}</b></td><td style="min-width:130px"><div style="display:flex;align-items:center;gap:8px"><span class="bar" style="flex:1"><i style="width:${x.n/n*100}%;background:var(--ink)"></i></span><span class="num">${share(x.n,n)}</span></div></td><td class="r num">${x.hi}</td><td class="r num">${x.q}</td><td class="r num">${x.b}</td></tr>`).join('')}</tbody></table></div>
+  <div class="card-h" style="margin:26px 0 10px"><h2>Why they came</h2></div>
+  <div class="chips">${Object.entries(groupBy(L,c=>c.persona)).sort((a,b)=>b[1].length-a[1].length).map(([k,v])=>`<button class="chip" data-filter='${JSON.stringify({persona:k})}'>${esc(PER[k].label)} <small class="num">${v.length}</small></button>`).join('')}</div>`;
  }else{const pl=[...D.pers].sort((a,b)=>a.conv-b.conv)[0];
   lead=`<b>${PER[pl.k].label}</b> customers convert least, at ${pct(pl.conv)}.${pl.best?` ${pl.best.r.first} closes ${pct(pl.best.conv)} of them: send these walk-ins to ${pl.best.r.first}.`:''}`;
   body=`<div class="tblwrap"><table class="tbl"><thead><tr><th>Came in for</th><th>Share</th><th class="r">Conversion</th><th class="r">${Wd.avgSale}</th><th>Best rep</th></tr></thead><tbody>${D.pers.map(p=>`<tr class="click" data-filter='{"persona":"${p.k}"}'><td><b>${PER[p.k].label}</b></td><td style="min-width:130px"><div style="display:flex;align-items:center;gap:8px"><span class="bar" style="flex:1"><i style="width:${p.share*100}%;background:var(--ink)"></i></span><span class="num">${pct(p.share)}</span></div></td><td class="r num">${pct(p.conv)}</td><td class="r num">${p.ticket?inr(p.ticket):'-'}</td><td>${p.best?`${repLink(p.best.r.id,p.best.r.first)} <span class="hint num">${pct(p.best.conv)}</span>`:'-'}</td></tr>`).join('')}</tbody></table></div>`;
@@ -317,28 +377,28 @@ const wk=(W,f)=>W.map(x=>x.s.n>=2?f(x.s):null);
 const dotOf=k=>`<i class="sdot ${k}"></i>`;
 function renderTeam(){const L=cur(),P=prev(),rows=repRows(L),store=stats(L),p=stats(P),W=weekly(CONVS);
  const cls=(v,st)=>v>=st+5?'g':v<=st-5?'b':'w';
- const top=rows[0],low=rows[rows.length-1],need=rows.filter(r=>r.status[0]==='bad');
- const lead=(rows.length?`${Wd.Store} score is <b>${store.score}</b>${p.n?`, ${store.score>=p.score?'up':'down'} from ${p.score}`:''}. <b>${esc(top.rep.first)}</b> leads at ${top.s.score}.${need.length?` ${plural(need.length,'rep')} need${need.length===1?'s':''} coaching, furthest behind is <b>${esc(low.rep.first)}</b> on ${SK[low.weak].label.toLowerCase()} (${low.s.skill[low.weak]} vs ${store.skill[low.weak]}).`:''}`:'No recordings in this period.')+untagNote(L);
+ const rated=rows.filter(r=>!r.thin),top=rated[0]||rows[0],low=rated[rated.length-1]||rows[rows.length-1],need=rated.filter(r=>r.status[0]==='bad');
+ const lead=(rows.length?`${Wd.Store} score is <b>${store.score}</b>${p.n?`, ${store.score>=p.score?'up':'down'} from ${p.score}`:''}. ${rated.length?`<b>${esc(top.rep.first)}</b> leads at ${top.s.score}.`:`No rep has 3 conversations yet, so reps are not ranked.`}${need.length?` ${plural(need.length,'rep')} need${need.length===1?'s':''} coaching, furthest behind is <b>${esc(low.rep.first)}</b> on ${SK[low.weak].label.toLowerCase()} (${low.s.skill[low.weak]} vs ${store.skill[low.weak]}).`:''}`:'No recordings in this period.')+untagNote(L);
  const tiles=[
   ZC.tile({label:'Conversation score',value:store.score,spark:SP(wk(W,x=>x.score)),sub:delta(store.score,p.score)+VS()}),
   ZC.tile({label:Wd.conv,value:pct(store.conv),spark:SP(wk(W,x=>x.conv*100)),sub:delta(store.conv,p.conv,{pts:true})+VS()}),
   ZC.tile({label:'Conversations recorded',value:store.n,spark:SP(wk(W,x=>x.n)),sub:delta(store.n,p.n)+VS()}),
   ZC.tile({label:Wd.closed,value:inr(store.soldValue),spark:SP(wk(W,x=>x.soldValue)),sub:delta(store.soldValue,p.soldValue)+VS()})].join('');
  const trend=ZC.lineChart({labels:W.map(x=>x.label),series:[{name:Wd.Store+' score',values:wk(W,x=>x.score)}],aria:'Store conversation score by week for the last 8 weeks'});
- const sc=ZC.scatter({points:rows.filter(r=>r.s.n).map(r=>({x:r.s.score,y:Math.round(r.s.conv*100),size:r.s.n,label:r.rep.first,href:'#rep-'+r.rep.id,tip:`${r.rep.name}|Score ${r.s.score}|Conversion ${pct(r.s.conv)}|${plural(r.s.n,'conversation')}`})),xLabel:'Conversation score',yLabel:'Conversion %',ySuffix:'%',refX:store.score,refY:Math.round(store.conv*100),refLabel:Wd.store+' avg',aria:'Each rep plotted by conversation score and conversion'});
- const grid=ZC.heatGrid({cols:SKILLS.map(k=>SHORT[k.id]),rows:rows.map(r=>({label:r.rep.first,attr:`data-go="#rep-${r.rep.id}"`,cells:SKILLS.map(k=>({text:r.s.skill[k.id],cls:cls(r.s.skill[k.id],store.skill[k.id]),tip:`${r.rep.name}|${k.label}: ${r.s.skill[k.id]}|${Wd.Store} ${store.skill[k.id]}`}))})).concat([{label:Wd.Store,foot:true,cells:SKILLS.map(k=>({text:store.skill[k.id],cls:'n'}))}])});
- const hi=rows.filter(r=>r.s.score>=store.score&&r.s.conv<store.conv).sort((a,b)=>a.s.conv-b.s.conv)[0];
+ const sc=ZC.scatter({points:rated.filter(r=>r.s.n).map(r=>({x:r.s.score,y:Math.round(r.s.conv*100),size:r.s.n,label:r.rep.first,href:'#rep-'+r.rep.id,tip:`${r.rep.name}|Score ${r.s.score}|Conversion ${pct(r.s.conv)}|${plural(r.s.n,'conversation')}`})),xLabel:'Conversation score',yLabel:'Conversion %',ySuffix:'%',refX:store.score,refY:Math.round(store.conv*100),refLabel:Wd.store+' avg',aria:'Each rep plotted by conversation score and conversion'});
+ const grid=ZC.heatGrid({cols:SKILLS.map(k=>SHORT[k.id]),rows:rated.map(r=>({label:r.rep.first,attr:`data-go="#rep-${r.rep.id}"`,cells:SKILLS.map(k=>({text:r.s.skill[k.id],cls:cls(r.s.skill[k.id],store.skill[k.id]),tip:`${r.rep.name}|${k.label}: ${r.s.skill[k.id]}|${Wd.Store} ${store.skill[k.id]}`}))})).concat([{label:Wd.Store,foot:true,cells:SKILLS.map(k=>({text:store.skill[k.id],cls:'n'}))}])});
+ const hi=rated.filter(r=>r.s.score>=store.score&&r.s.conv<store.conv).sort((a,b)=>a.s.conv-b.s.conv)[0];
  return phead('Team',`${plural(REPS.length,'rep')} ${inTxt()}. Tap a row to open it.`)+
  `<div class="lead"><span class="orb" aria-hidden="true"></span><p style="margin:0">${lead}</p></div>
  <div class="ktiles">${tiles}</div>
  <div class="cgrid3">
   ${FLAT?'':ZC.ccard('Score trend',Wd.Store+', 8 weeks',trend)}
-  ${ZC.ccard(hi?`${esc(hi.rep.first)} scores well but closes less`:'Score vs conversion','Dot size = conversations',sc)}
-  ${ZC.ccard('Skills by rep','Green above '+Wd.store+', red below',grid)}
+  ${rated.length>=2?ZC.ccard(hi?`${esc(hi.rep.first)} scores well but closes less`:'Score vs conversion','Dot size = conversations',sc):''}
+  ${rated.length?ZC.ccard('Skills by rep','Green above '+Wd.store+', red below',grid):''}
  </div>
- <section class="card"><div class="card-h"><h2>Reps</h2><span class="hint">Ranked by conversation score</span></div>
+ <section class="card"><div class="card-h"><h2>Reps</h2><span class="hint">${rated.length?'Ranked by conversation score':'Ranked once a rep has 3 conversations'}</span></div>
  <div class="xr-h trow"><span>#</span><span>Rep</span><span class="r">Score</span><span class="r">Conv.</span><span class="r">Recorded</span><span>${FLAT?'':'8-week score'}</span><span></span></div>
- ${rows.map((r,i)=>{const RW=weekly(CONVS.filter(c=>c.rep===r.rep.id));return `<details class="xrow"><summary class="trow"><span class="num rk">${i+1}</span><span class="nm"><b>${esc(r.rep.name)}</b><span class="st">${dotOf(r.status[0])}${r.status[1]}</span></span><span class="r num"><b>${r.s.score}</b></span><span class="r num">${pct(r.s.conv)}</span><span class="r num">${r.s.n}</span><span>${SP(wk(RW,x=>x.score),{w:96,h:24})}</span>${ic('chev',16)}</summary>
+ ${rows.map((r,i)=>{const RW=weekly(CONVS.filter(c=>c.rep===r.rep.id));return `<details class="xrow"><summary class="trow"><span class="num rk">${r.thin?'–':i+1}</span><span class="nm"><b>${esc(r.rep.name)}</b><span class="st">${dotOf(r.status[0])}${r.status[1]}</span></span><span class="r num"><b>${r.s.score}</b></span><span class="r num">${pct(r.s.conv)}</span><span class="r num">${r.s.n}</span><span>${SP(wk(RW,x=>x.score),{w:96,h:24})}</span>${ic('chev',16)}</summary>
   <div class="xr-b"><div class="skills5">${SKILLS.map(k=>`<div class="skill"><div class="s2"><b style="font-weight:500">${SHORT[k.id]}</b><span class="num"><b style="color:var(--ink)">${r.s.skill[k.id]}</b> / ${store.skill[k.id]}</span></div><div class="bar"><i style="width:${r.s.skill[k.id]}%;background:${scoreCol(r.s.skill[k.id])}"></i><span class="tick" style="left:${store.skill[k.id]}%"></span></div></div>`).join('')}</div>
   <div class="xr-f"><span class="hint">Weakest vs ${Wd.store}: <b style="color:var(--ink)">${SK[r.weak].label}</b> (${r.gap>0?'+':''}${r.gap}). ${inr(r.s.soldValue)} closed from ${plural(r.s.sold,Wd.sale)}.</span><div class="btnrow"><button class="btn primary sm" data-go="#rep-${r.rep.id}/coaching">Coaching plan${ic('right',14)}</button><button class="btn sm" data-go="#rep-${r.rep.id}">Profile</button><button class="btn sm" data-go="#rep-${r.rep.id}/conversations">Conversations</button></div></div></div></details>`}).join('')}
  </section>`}
@@ -370,7 +430,7 @@ function renderRep(id){
  const body=tab==='coaching'?C.renderPlan(id):tab==='conversations'?repConvs(id,row):repOverview(id,row,store,rows);
  return `<div class="rnav"><button class="link back" data-go="#${from[0]}">${ic('left',15)}${from[1]}</button><span style="flex:1"></span>
   <div class="rsw"><button class="iconbtn sm" data-go="#rep-${pv}${sfx}" aria-label="Previous rep" title="Previous rep">${ic('left',15)}</button><select data-repsel aria-label="Switch rep">${rows.map((r,x)=>`<option value="${r.rep.id}" ${r.rep.id===id?'selected':''}>${x+1}. ${esc(r.rep.name)}</option>`).join('')}</select><button class="iconbtn sm" data-go="#rep-${nx}${sfx}" aria-label="Next rep" title="Next rep">${ic('right',15)}</button></div></div>
- <div class="rephead"><span class="av">${esc(rep.ini)}</span><div class="grow"><h1>${esc(rep.name)}</h1><p>${rep.tenure?esc(rep.tenure)+' · ':''}rank ${i+1} of ${rows.length} · <span class="pill ${row.status[0]}">${row.status[1]}</span>${pl?` · Readiness <b class="num">${pl.readiness}</b>`:''}${stt[1]&&stt[1]!=='On track'?` · <span class="pill ${stt[0]}">${stt[1]}</span>`:''}</p></div>
+ <div class="rephead"><span class="av">${esc(rep.ini)}</span><div class="grow"><h1>${esc(rep.name)}</h1><p>${rep.tenure?esc(rep.tenure)+' · ':''}${row.thin?'':`rank ${i+1} of ${rows.length} · `}<span class="pill ${row.status[0]}">${row.status[1]}</span>${pl&&!row.thin?` · Readiness <b class="num">${pl.readiness}</b>`:''}${stt[1]&&stt[1]!=='On track'?` · <span class="pill ${stt[0]}">${stt[1]}</span>`:''}</p></div>
   <button class="btn primary" data-act="copy" data-text="${esc(C.noteFor(id))}">${ic('copy',15)}Copy 1:1 note</button></div>
  <div class="lead"><span class="orb" aria-hidden="true"></span><p style="margin:0">${story}</p></div>
  <div class="tabs rtabs" role="tablist">${tabs.map(t=>`<button role="tab" aria-selected="${tab===t[0]}" data-go="#rep-${id}${t[0]==='overview'?'':'/'+t[0]}">${t[1]}</button>`).join('')}</div>
@@ -431,10 +491,10 @@ function repConvs(id,row){const f=S.rcf||{};
 
 /* ---------- Conversations ---------- */
 function convRow(c,own){const p=PRODUCTS[c.product];
- return `<button class="crow dense" data-conv="${c.id}">${ring(c.score,30)}<strong>${esc(c.customer)}</strong><small>${esc(p.label)} · ${esc(PER[c.persona].label)}${own?'':' · '+c.dur+' min'}</small><span class="c-rep">${own?c.dur+' min':repLink(c.rep,REP[c.rep].name)}</span><span class="c-val num">${valTxt(c)}</span><span>${outcomePill(c)}</span><span class="d num">${when(c)}</span></button>`}
-function cfLabel(k,v){return {rep:()=>'Rep: '+REP[v].first,outcome:()=>'Result: '+({sold:Wd.sold,followup:'Will return',lost:Wd.lost}[v]),persona:()=>PER[v].label,product:()=>PRODUCTS[v].label,reason:()=>REASONS[v].label,stage:()=>'Left after: '+STAGES[v],comp:()=>'Mentioned '+COMP[v].label,kw:()=>'Said "'+v+'"',day:()=>'On '+fdate(new Date(TODAY.getTime()-v*DAY)),hour:()=>'At '+((+v%12)||12)+(+v<12?' am':' pm')}[k]()}
+ return `<button class="crow dense" data-conv="${c.id}">${ring(c.score,30)}<strong>${esc(c.customer)}</strong><small>${FLOOR?esc((c.models.length?c.models.join(' vs '):p.label)+' · '+(QT[c.quote]||'')):esc(p.label)+' · '+esc(PER[c.persona].label)}${own?'':' · '+c.dur+' min'}</small><span class="c-rep">${own?c.dur+' min':repLink(c.rep,REP[c.rep].name)}</span><span class="c-val num">${valTxt(c)}</span><span>${outcomePill(c)}</span><span class="d num">${when(c)}</span></button>`}
+function cfLabel(k,v){return {rep:()=>'Rep: '+REP[v].first,outcome:()=>'Result: '+({sold:Wd.sold,followup:'Will return',lost:Wd.lost}[v]),persona:()=>PER[v].label,product:()=>PRODUCTS[v].label,reason:()=>REASONS[v].label,stage:()=>'Left after: '+STAGES[v],comp:()=>'Mentioned '+COMP[v].label,kw:()=>'Said "'+v+'"',quote:()=>({yes:'Quotation given',no:'Left without a quotation',promised:'Quotation promised'})[v],intent:()=>'Intent: '+v,mgroup:()=>MG[v],prio:()=>'Cares about '+lc(v),fuel:()=>'Fuel: '+v,avail:()=>'Asked about availability',decision:()=>DEC[v]||v,day:()=>'On '+fdate(new Date(TODAY.getTime()-v*DAY)),hour:()=>'At '+((+v%12)||12)+(+v<12?' am':' pm')}[k]()}
 function filtered(skipDay){const f=S.cf,q=(f.q||'').toLowerCase().trim();
- return cur().filter(c=>(skipDay||((f.day===undefined||c.d===+f.day)&&(f.hour===undefined||c.at.getHours()===+f.hour)))&&(!f.rep||c.rep===f.rep)&&(!f.outcome||c.outcome===f.outcome)&&(!f.persona||c.persona===f.persona)&&(!f.product||c.product===f.product)&&(!f.reason||c.reason===f.reason)&&(f.stage===undefined||f.stage===''||(c.stage===+f.stage&&c.outcome!=='sold'))&&(!f.comp||c.competitor===f.comp)&&(!f.kw||c.kw.includes(f.kw))&&
+ return cur().filter(c=>(skipDay||((f.day===undefined||c.d===+f.day)&&(f.hour===undefined||c.at.getHours()===+f.hour)))&&(!f.rep||c.rep===f.rep)&&(!f.outcome||c.outcome===f.outcome)&&(!f.persona||c.persona===f.persona)&&(!f.product||c.product===f.product)&&(!f.reason||c.reason===f.reason)&&(f.stage===undefined||f.stage===''||(c.stage===+f.stage&&c.outcome!=='sold'))&&(!f.comp||c.competitor===f.comp)&&(!f.kw||c.kw.includes(f.kw))&&(!f.quote||(f.quote==='no'?c.quote!=='yes':c.quote===f.quote))&&(!f.intent||c.intent===f.intent)&&(!f.mgroup||mg(c)===f.mgroup)&&(!f.prio||c.prio.includes(f.prio))&&(!f.fuel||c.fuel.includes(f.fuel))&&(!f.avail||c.avail)&&(!f.decision||c.decision===f.decision)&&
   (!q||String(c.ref).toLowerCase().includes(q)||refNo(c)===q.replace(/^#/,'')||c.customer.toLowerCase().includes(q)||REP[c.rep].name.toLowerCase().includes(q)||PRODUCTS[c.product].label.toLowerCase().includes(q)||(c.phone||'').replace(/\s/g,'').includes(q.replace(/\s/g,''))))}
 const PAGE=50;
 function sortConvs(list){const k=S.sort;return k==='value'?[...list].sort((a,b)=>b.value-a.value):k==='score'?[...list].sort((a,b)=>a.score-b.score):k==='scorehi'?[...list].sort((a,b)=>b.score-a.score):list}
@@ -457,13 +517,13 @@ function convAnalytics(list){
   ${ZC.ccard(n?`Median score ${med}`:'Scores',n?`${plural(low,'conversation')} under 55`:'',hist,'a3')}
  </div>`}
 function renderConversations(){const list=sortConvs(filtered()),tot=cur().length;
- const active=['day','hour','persona','product','reason','stage','comp','kw'].filter(k=>S.cf[k]!==undefined&&S.cf[k]!=='');
+ const active=['day','hour','persona','product','reason','stage','comp','kw','intent','mgroup','prio','fuel','avail','decision'].filter(k=>S.cf[k]!==undefined&&S.cf[k]!=='');
  const sel=(k,opts,ph)=>`<select id="f-${k}" data-cf="${k}" aria-label="${ph}"><option value="">${ph}</option>${opts.map(o=>`<option value="${o[0]}" ${S.cf[k]===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select>`;
  const pages=Math.max(1,Math.ceil(list.length/PAGE));S.page=clamp(S.page,0,pages-1);const from=S.page*PAGE,shown=list.slice(from,from+PAGE);
  return phead('Conversations',`${list.length} of ${tot} conversations ${inTxt()}. Charts and list follow the same filters.`)+
  `<details class="xband" data-xk="conv-analytics" ${ZC.isOpen('conv-analytics',true)?'open':''}><summary><span class="mono">Analytics</span><span class="x-s">${list.length?`${pct(list.filter(c=>c.outcome==='sold').length/list.length)} ${Wd.bought} · ${inr(sumv(list))} discussed`:''}</span>${ic('chev',16)}</summary>${convAnalytics(list)}</details>
  ${S.cf.rep&&REP[S.cf.rep]?(()=>{const r=REP[S.cf.rep],rs=stats(cur().filter(c=>c.rep===r.id)),st=stats(cur());return `<div class="card cstrip">${ring(rs.score,40)}<div class="grow"><b>${esc(r.name)}</b><span class="hint num">Score ${rs.score} (${Wd.store} ${st.score}) · closes ${pct(rs.conv)} (${Wd.store} ${pct(st.conv)}) · ${plural(rs.n,'conversation')}</span></div><button class="btn sm" data-go="#rep-${r.id}">Open profile${ic('right',14)}</button><button class="btn sm" data-go="#rep-${r.id}/coaching">Coaching plan</button></div>`})():''}
- <section class="card clistc"><div class="filters stick"><input id="f-q" data-cf="q" type="search" placeholder="Customer, phone, rep, product or number" value="${esc(S.cf.q||'')}">${sel('rep',REPS.map(r=>[r.id,r.name]),'All reps')}${sel('outcome',[['sold',Wd.sold],['followup','Will return'],['lost',Wd.lost]],'All results')}<select data-sort aria-label="Sort by">${[['date','Newest first'],['value','Highest value'],['score','Lowest score'],['scorehi','Highest score']].map(o=>`<option value="${o[0]}" ${S.sort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>
+ <section class="card clistc"><div class="filters stick"><input id="f-q" data-cf="q" type="search" placeholder="Customer, phone, rep, product or number" value="${esc(S.cf.q||'')}">${sel('rep',REPS.map(r=>[r.id,r.name]),'All reps')}${sel('outcome',[['sold',Wd.sold],['followup','Will return'],['lost',Wd.lost]],'All results')}${FLOOR?sel('quote',[['yes','Quotation given'],['no','No quotation'],['promised','Promised only']],'Any quotation'):''}<select data-sort aria-label="Sort by">${[['date','Newest first'],['value','Highest value'],['score','Lowest score'],['scorehi','Highest score']].map(o=>`<option value="${o[0]}" ${S.sort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>
  ${active.length?`<div class="activechips" style="margin-top:12px">${active.map(k=>`<button class="achip" data-act="unfilter" data-k="${k}">${esc(cfLabel(k,S.cf[k]))}${ic('x',14)}</button>`).join('')}<button class="link" data-act="clearf">Clear all</button></div>`:''}
  <div class="clist" style="margin-top:8px">${list.length?shown.map(c=>convRow(c)).join(''):`<div style="padding:32px 8px;text-align:center"><b>No conversations match these filters</b><p class="hint">${FLAT?'Remove a filter to see more.':'Try the 30-day range or remove a filter.'}</p><button class="btn sm" data-act="clearf">Clear filters</button></div>`}</div>
  ${list.length>PAGE?`<div class="pager"><span class="hint num">${from+1} to ${Math.min(from+PAGE,list.length)} of ${list.length}</span><div class="btnrow"><button class="btn sm" data-act="page" data-v="-1" ${S.page===0?'disabled':''}>${ic('left',14)}Previous</button><button class="btn sm" data-act="page" data-v="1" ${S.page>=pages-1?'disabled':''}>Next${ic('right',14)}</button></div></div>`:''}</section>`}
@@ -519,7 +579,7 @@ function drawDrawer(){const c=CONV[S.drawer];if(!c)return;const rep=REP[c.rep],s
  document.getElementById('drawerRoot').innerHTML=`<div class="drawer-scrim" data-act="close"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="Conversation with ${esc(c.customer)}"><span class="grab" aria-hidden="true"></span>
  <div class="dhead">${ring(c.score,46)}<div style="flex:1;min-width:0"><h2>${esc(c.customer)} ${outcomePill(c)}</h2><p>${SNAP?'Rep: ':'Recorded by '}${repLink(rep.id,rep.name)} · ${TL?'':'#'+refNo(c)+' · '}${when(c)} · ${c.dur} min${c.talkRep!=null?` · rep voice ${c.talkRep}% of words`:''}${c.phone?' · '+c.phone:''}${ZD.has.valueSrc?' · '+(c.value?valTxt(c)+' ('+valSrc(c)+')':'value not known'):''}</p></div><button class="iconbtn" data-act="close" aria-label="Close">${ic('x')}</button></div>
  <div class="dbody">
-  <section class="card"><span class="eyebrow">In 30 seconds</span><dl class="sumgrid" style="margin:10px 0 0"><dt>Wanted</dt><dd>${esc(sm.wanted)}</dd><dt>What happened</dt><dd>${esc(sm.happened)}</dd><dt>${c.outcome==='sold'?'Why it worked':'Why not closed'}</dt><dd>${esc(sm.why)}</dd><dt>Next step</dt><dd><b>${esc(sm.next)}</b></dd></dl></section>
+  <section class="card"><span class="eyebrow">In 30 seconds</span><dl class="sumgrid" style="margin:10px 0 0"><dt>Wanted</dt><dd>${esc(sm.wanted)}</dd><dt>What happened</dt><dd>${esc(sm.happened)}</dd><dt>${c.outcome==='sold'?'Why it worked':'Why not closed'}</dt><dd>${esc(sm.why)}</dd>${FLOOR?`<dt>On the floor</dt><dd>${esc([c.models.length?c.models.join(' vs '):'No model named',c.fuel.join('/'),c.colour.length?c.colour.join(', '):'',QT[c.quote]||'',c.td==='yes'?'test drive taken':c.td==='offered'?'test drive talked about':'no test drive',c.avail?'asked about availability':'',c.intent?c.intent+' intent':''].filter(Boolean).join(' · '))}${c.prio.length?`<br><span class="hint">Cares about: ${esc(c.prio.join(', '))}</span>`:''}${c.availQ?`<br><span class="hint">"${esc(clipTxt(c.availQ,140))}"</span>`:''}</dd>`:''}<dt>Next step</dt><dd><b>${esc(sm.next)}</b></dd></dl></section>
   ${aiCard(c)}
   ${checksCard(c)}
   ${transcriptCard(c)}

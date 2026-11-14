@@ -107,6 +107,26 @@ function carReason(t) {
 }
 const TEST_DRIVE_RE = /\b(took|taken|had|did|done|after|finished|completed|back from|went for|gone for)\b[^.?!]{0,40}test[- ]?(drive|ride)|test[- ]?(drive|ride)[^.?!]{0,25}\b(done|taken|completed|felt|went)\b|test[- ]?drove/i;
 const CHK_CAR = { D1: 'Asked what the car is for', D2: 'Confirmed the model or body type', D3: 'Asked the budget', D4: 'Confirmed variant, fuel and features wanted', P1: 'Gave a correct fact about the car', P2: 'Addressed the customer\'s priority', P3: 'Explained the value', O1: 'Acknowledged the objection', O2: 'Explored the objection', O3: 'Answered the objection', C1: 'Handled the comparison with another brand', SOP1: 'Stayed respectful', SOP2: 'Used the showroom offer', N1: 'Agreed a next step and contact' };
+/* ---------- What the floor said matters (14 Nov): models compared, fuel, colour, quotation given, availability, what the customer cares about ---------- */
+const COLOURS = ['everest white', 'galaxy grey', 'stealth black', 'napoli black', 'deep forest', 'tango red', 'desert fury', 'dazzling silver', 'red rage', 'nebula blue', 'battleship grey', 'white', 'black', 'grey', 'gray', 'silver', 'red', 'blue', 'green', 'brown', 'beige', 'bronze', 'orange', 'yellow', 'maroon', 'safed', 'kaala', 'kali', 'laal'];
+const COLOUR_NAME = { gray: 'grey', safed: 'white', kaala: 'black', kali: 'black', laal: 'red' };
+const COLOUR_RE = new RegExp('\\b(' + COLOURS.join('|') + ')\\b(?=\\s+(colou?r|shade|one|wala|wali|mein|car|thar|scorpio|xuv|is|chahiye|in|option))|\\b(colou?r|shade|rang)\\b[^.?!]{0,30}\\b(' + COLOURS.join('|') + ')\\b', 'gi');
+const PRIORITY = [
+  ['Performance', /\b(power|powerful|pick-?up|torque|performance|engine|bhp|4x4|four[- ]wheel|off[- ]?road|highway|speed|turbo|diesel engine)\b/i],
+  ['Safety', /\b(safety|safe|airbags?|ncap|adas|star rating|5[- ]star|five[- ]star)\b/i],
+  ['Features', /\b(features?|sunroof|touch ?screen|infotainment|camera|360|music|speakers?|ventilated|connected|alexa)\b/i],
+  ['Space', /\b(space|spacious|seater|third row|boot|legroom|family of)\b/i],
+  ['Comfort', /\b(comfort|comfortable|suspension|ride quality|smooth|seats? (are|is))\b/i],
+  ['Mileage', /\b(mileage|average|fuel efficien\w*|km ?per ?(l|litre)|kmpl|running cost)\b/i],
+  ['Price and offers', /\b(price|discount|offers?|emi|budget|expensive|cheap|costly|on[- ]?road)\b/i],
+  ['Availability', /\b(waiting|wait period|available|availability|in stock|stock|delivery)\b/i],
+  ['Resale', /\b(resale)\b/i],
+  ['Service', /\b(service|maintenance|warranty|service centre)\b/i]];
+const AVAIL_RE = /waiting (period|time|list|chal|hai|of \d|for (the )?(car|delivery|stock))|wait (of|for) (about |around )?\d+ (days?|weeks?|months?)|\bin stock\b|out of stock|stock (mein|me|nahi|hai)|not available|availability|delivery (date|time|by|in)|kab (tak )?(milegi|milega|delivery)|(\d+|two|three|four|six) (weeks?|months?) (wait|delivery)/i;
+const QUOTE_GIVEN_RE = /(here is|here's|this is|giving you|i(?:'ve| have) (?:made|prepared|written)|let me write|written)[^.?!]{0,40}(quotation|quote|on[- ]?road)|quotation (de |bana|ready|is ready)|on[- ]?road (price |)(comes|is|will be|hoga|padega)/i;
+const QUOTE_PROMISE_RE = /(send|share|whatsapp|mail|give|provide)[^.?!]{0,40}(quotation|quote|price|on[- ]?road)|(quotation|price)[^.?!]{0,20}(bhej|send)/i;
+const fuelOf = (text, modelObjs) => { const f = []; if (/\bdiesel\b/i.test(text)) f.push('Diesel'); if (/\bpetrol\b/i.test(text)) f.push('Petrol'); if (/\b(electric|ev|battery|charging|charger)\b/i.test(text) || modelObjs.some(m => m.ev)) f.push('Electric'); return f; };
+const modelGroup = m => !m ? '' : m.ev ? 'ev' : m.bestSeller ? 'best' : 'other';
 
 async function runExport(o) {
 if (o.org != null) { const h = findOrg(o.org); if (h.length !== 1) { console.log(`${o.storeName || o.org}: skipped, ${h.length ? 'more than one company matches' : 'no company matches'} "${o.org}" (known: ${orgs.map(x => x.name).join(' | ')})`); return; } org = h[0]; tz = org.timezone || 'Asia/Kolkata'; }
@@ -142,7 +162,7 @@ const CHK = { D1: 'need', D2: 'need', D4: 'need', D3: 'budget', P1: 'pitch', P2:
 const SOP = { discovery: 'need', product_knowledge: 'pitch', objection_handling: 'objection', competitor_handling: 'objection' };
 const reasonCode = t => { const s = (t || '').toLowerCase(); if (!s) return ''; if (/family|approval|discuss|husband|wife|mother|parents/.test(s)) return 'family'; if (/competitor|another|other jeweller|elsewhere/.test(s)) return 'competitor'; if (/budget|price|cost|making|charge|discount|expensive/.test(s)) return 'budget'; if (/design|style|pattern/.test(s)) return 'design'; if (/stock|unavailable|size/.test(s)) return 'stock'; if (/browsing|just looking/.test(s)) return 'browse'; return clip(t, 60); };
 
-const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'customer_quote_en', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_quote_en', 'objection_reply', 'objection_reply_en', 'objection_at_sec', 'followup_due', 'followup_done', 'rep_tenure', 'store_name', 'owner_name', 'zocus_url', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'value_source'];
+const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'customer_quote_en', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_quote_en', 'objection_reply', 'objection_reply_en', 'objection_at_sec', 'followup_due', 'followup_done', 'rep_tenure', 'store_name', 'owner_name', 'zocus_url', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'value_source', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision'];
 const DERIVED = {}; const mark = (col, how) => { (DERIVED[col] ||= { how, n: 0 }).n++; };
 const exported = new Set(), unscored = []; let fixtureN = 0, heldN = 0, partialN = 0;
 const skip = { range: 0, noOutcome: 0, noScore: 0, dropped: 0 }, src = { checks: 0, 'analysis review': 0 }, srcN = {}, calls = [];
@@ -225,11 +245,27 @@ for (const r of rows) {
     const segs = Array.isArray(r.segments) ? r.segments : [], id = ob.evidence?.[0]?.segmentId, i = segs.findIndex(s => s.id === id);
     if (i >= 0) { at = Math.round(segs[i].startMs / 1000); const nx = segs.slice(i + 1).find(s => s.speaker !== segs[i].speaker); if (nx) { reply = clip(nx.text, 300); mark('objection_reply', 'next speaker\'s line in the transcript after the objection'); } mark('objection_at_sec', 'start of the objection segment in the transcript'); }
   }
+    // ---- floor details (car stores): what the dealer said matters ----
+  const custText = (turns.some(t => t.who === 'Customer') ? turns.filter(t => t.who === 'Customer').map(t => t.text).join(' . ') : fullText);
+  const asList = v => Array.isArray(v) ? v : String(v || '').split(/\s*[|,\/]\s*|\s+vs\s+/i).filter(Boolean);
+  const noteModels = note.models ? asList(note.models).map(x => carModels(x)[0]?.m || { label: x.trim() }) : null;
+  const considered = isCar ? (noteModels || [...(noteModel ? [noteModel] : []), ...models.map(x => x.m)].filter((m, i, a) => a.findIndex(y => y.label === m.label) === i)) : [];
+  const fuel = isCar ? (note.fuel ? asList(note.fuel) : fuelOf(fullText + ' ' + sumText, considered)) : [];
+  const colours = isCar ? (note.colour ? asList(note.colour) : [...new Set([...fullText.matchAll(COLOUR_RE)].map(m => (m[1] || m[4] || '').toLowerCase()).filter(Boolean).map(c => COLOUR_NAME[c] || c))]) : [];
+  const promisesTxt = (res.commitments || []).map(c => c.text || '').join(' . ');
+  const quote = !isCar ? '' : note.quote ? (/^(y|yes|given|true)/i.test(String(note.quote)) ? 'yes' : /promis/i.test(String(note.quote)) ? 'promised' : 'no')
+    : (outcome === 'sold' || vsrc === 'call' || !!priceLine || QUOTE_GIVEN_RE.test(fullText)) ? 'yes' : (QUOTE_PROMISE_RE.test(promisesTxt) || QUOTE_PROMISE_RE.test(fullText)) ? 'promised' : 'no';
+  const testDrive = !isCar ? '' : note.test_drive != null ? (/^(y|yes|true)/i.test(String(note.test_drive)) ? 'yes' : 'no') : TEST_DRIVE_RE.test(fullText + ' . ' + sumText) ? 'yes' : /test[- ]?(drive|ride)/i.test(fullText) ? 'offered' : 'no';
+  const availLine = isCar ? (sayTurns.flatMap(t => String(t.text || '').split(/(?<=[.?!।])\s+/)).find(s => AVAIL_RE.test(s)) || '') : '';
+  const priorities = isCar ? (note.priorities ? asList(note.priorities) : PRIORITY.filter(([, re]) => re.test(custText)).map(([k]) => k)) : [];
+  const intent = isCar ? (note.intent || rr.intent || '') : '';
+  const decision = !isCar ? '' : considered.length === 1 ? 'decided' : considered.length >= 2 && considered.length <= 3 ? 'choosing' : 'exploring';
+  if (isCar) mark('floor details', 'models compared, fuel, colour, quotation given, test drive, availability and what the customer cares about are read from the transcript (team notes override); intent is the AI\'s own reading');
   const priceTalk = /price|budget|making|charge|discount|negotiat/i.test(lossText + (ob?.theme || ''));
   const stageMap = isCar
-    ? [['price_quoted', () => outcome === 'sold' || !!priceLine || vsrc === 'call' || priceTalk || /on[- ]?road|ex[- ]?showroom|quotation/i.test(fullText)], ['product_shown', () => TEST_DRIVE_RE.test(fullText + ' . ' + sumText)], ['need_understood', () => !!fld(res, 'purpose') || !!fld(res, 'profile')]]
+    ? [['price_quoted', () => quote === 'yes'], ['product_shown', () => considered.length > 0 || testDrive === 'yes'], ['need_understood', () => !!fld(res, 'purpose') || !!fld(res, 'profile')]]
     : [['price_quoted', () => outcome === 'sold' || priceTalk], ['product_shown', () => !!fld(res, 'preference')], ['need_understood', () => !!fld(res, 'purpose')]];
-  const stageReached = outcome === 'sold' ? '' : (stageMap.find(([, f]) => f())?.[0] || 'talked'); if (stageReached) mark('stage_reached', isCar ? 'estimated from the conversation (purpose captured, test drive taken, price discussed)' : 'estimated from what was captured (purpose, preference, price talk)');
+  const stageReached = outcome === 'sold' ? '' : (stageMap.find(([, f]) => f())?.[0] || 'talked'); if (stageReached) mark('stage_reached', isCar ? 'estimated from the conversation (purpose captured, a model shown, quotation given)' : 'estimated from what was captured (purpose, preference, price talk)');
   const due = r.task_due || r.fu_wake, dur0 = r.ended_at ? Math.max(1, Math.round((new Date(r.ended_at) - new Date(r.captured_at)) / 60000)) : '';
   const dmin = Math.max(+dur0 || 0, Math.round(durSec / 60), Math.round((r.media_ms || 0) / 60000)) || dur0;
   const occasionOf = cat => { const a = (cat?.attributes || []).find(x => x.dimension === 'occasion' && x.canonicalId); return a ? a.canonicalId.split('.').pop().replace(/_/g, ' ').replace(/^./, ch => ch.toUpperCase()) : ''; };
@@ -251,7 +287,7 @@ for (const r of rows) {
   if (!custName && o.notes) custName = 'Customer ' + (dayIds.indexOf(r.id) + 1);
   const product = isCar ? (mainModel?.label || 'Model not decided') : (fld(res, 'preference') || 'Not captured');
   const weak = []; if (+dmin && +dmin < 3) weak.push('under 3 minutes'); if (r.quality && r.quality !== 'complete') weak.push('recording marked ' + r.quality); if (res.relevance?.status && res.relevance.status !== 'relevant') weak.push('AI: not a sales conversation'); if (rr.outcomeReason === 'truncated') weak.push('ends mid-conversation'); if ((r.roles?.speakers || []).length && !wCust) weak.push('no customer voice found');
-  calls.push({ id: r.id, at: fmt(r.captured_at).slice(11), min: dmin, rep: repName, customer: custName, model: product, value, source: vsrc, outcome, said: vsrc === 'call' ? clip(rr.value?.evidence?.at(-1)?.quote || priceLine?.text || '', 120) : '', weak });
+  calls.push({ id: r.id, at: fmt(r.captured_at).slice(11), min: dmin, rep: repName, customer: custName, model: product, value, source: vsrc, outcome, models: considered.map(m => m.label).join(' vs '), fuel: fuel.join('/'), quote, td: testDrive, avail: availLine ? clip(availLine, 100) : '', said: vsrc === 'call' ? clip(rr.value?.evidence?.at(-1)?.quote || priceLine?.text || '', 120) : '', weak });
 
   exported.add(r.id); fixtureN += r.ai_provider === 'fictional_fixture' ? 1 : 0; heldN += r.ai_held ? 1 : 0; partialN += r.quality && r.quality !== 'complete' ? 1 : 0;
   const rec = {
@@ -270,6 +306,8 @@ for (const r of rows) {
     followup_due: due && outcome !== 'sold' ? fmt(due, false) : '', followup_done: due && outcome !== 'sold' ? (r.task_done ? 'yes' : 'no') : '',
     store_name: o.storeName || (r.store && r.store !== 'Main' ? r.store : org.name), owner_name: owner,
     ai_checks: aiChecks, transcript: pub ? '' : transcript, vertical: o.vertical || (org.vertical === 'jewellery' && !o.ids ? 'jewellery' : org.vertical || ''),
+    models_considered: considered.map(m => m.label).join('|'), model_group: modelGroup(mainModel), fuel: fuel.join('|'), colour: colours.join('|'), quote_given: quote, test_drive: testDrive,
+    availability: isCar ? (availLine ? 'yes' : 'no') : '', availability_quote: clip(availLine, 200), priorities: priorities.join('|'), intent, decision,
     quality: r.quality && r.quality !== 'complete' ? r.quality : '', ai_model: r.ai_model || '', talk_rep_pct: wRep + wCust ? Math.round(100 * wRep / (wRep + wCust)) : '', segments_n: turns.length || '',
   };
   if (rec.keywords) mark('keywords', 'objection themes used as keywords');

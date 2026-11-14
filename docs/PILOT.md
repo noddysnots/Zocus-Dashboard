@@ -8,7 +8,21 @@ Decided with the team on 13 Nov. This replaces the earlier plan (one login per r
 - **Car wording.** Booked / Will return / Did not book, test drive, on-road price, showroom. "After the booking" (add-ons) says "To be updated".
 - **The dealer gets a locked link**: `https://<site>/?dealer`.
 
-## The stores in the dropdown
+## What the floor told us (14 Nov, Abhishek)
+
+- XUV 7XO and Scorpio are about 70% of sales, mostly diesel. The dealer wants to move the other models.
+- Customers arrive with a model and colour in mind and choose between 2, at most 3. They may upgrade, never downgrade. Availability decides.
+- Mahindra buyers care about performance, not mileage.
+- Giving a quotation is the big step; a test drive does not move the needle much.
+- 8 reps for regular customers, 2 for EV; the EV rep shows the EV first.
+
+So the Overview leads with customers, high-intent customers and **quotations given**; the funnel is Talked, Need understood, Options shown, **Quotation given**, Booked; and there are cards for the model mix (best sellers vs other models vs EV), models compared, what customers care about, fuel, colour, availability and test drives. The first action is always "send the quotation to customers who left without one". Reps with fewer than 3 conversations are not ranked or rated. Add fuel, colour and "quotation given?" to the WhatsApp line when they are not said aloud.
+
+## Who sees what
+
+The site opens on the pilot store only (no switcher, demos or upload). The full app with demos and test stores is at `/?all`.
+
+## The stores in the dropdown (/?all)
 
 | Group | What it is |
 |---|---|

@@ -132,7 +132,9 @@ function build(text,name){
       aiPromises:get(r,'ai_commitments').split('|').map(t=>t.trim()).filter(Boolean),aiNext:get(r,'ai_next_action'),
       aiNotes:get(r,'ai_notes').split('|').map(t=>t.trim()).filter(Boolean),
       aiChecks:get(r,'ai_checks').split(' | ').map(t=>{const m=t.trim().match(/^(MET|NOT_MET):\s*(.*?)\s*\((\w+)\)\.?\s*(.*)$/);return m?{ok:m[1]==='MET',label:m[2],id:m[3],why:m[4]}:null}).filter(Boolean),
-      valueSrc:get(r,'value_source').toLowerCase(),transcript:get(r,'transcript'),talkRep:get(r,'talk_rep_pct')===''?null:num(get(r,'talk_rep_pct')),
+      valueSrc:get(r,'value_source').toLowerCase(),
+      models:get(r,'models_considered').split('|').map(s=>s.trim()).filter(Boolean),mgroup:get(r,'model_group').toLowerCase(),fuel:get(r,'fuel').split('|').map(s=>s.trim()).filter(Boolean),colour:get(r,'colour').split('|').map(s=>s.trim()).filter(Boolean),
+      quote:get(r,'quote_given').toLowerCase(),td:get(r,'test_drive').toLowerCase(),avail:get(r,'availability').toLowerCase()==='yes',availQ:get(r,'availability_quote'),prio:get(r,'priorities').split('|').map(s=>s.trim()).filter(Boolean),intent:get(r,'intent').toLowerCase(),decision:get(r,'decision').toLowerCase(),transcript:get(r,'transcript'),talkRep:get(r,'talk_rep_pct')===''?null:num(get(r,'talk_rep_pct')),
       turns:(()=>{const t=get(r,'transcript');if(!/^\[\d+:\d\d\] /.test(t))return null;return t.split('\n').map(l=>{const m=l.match(/^\[(\d+):(\d\d)\] ([^:]{0,40}): ([\s\S]*)$/);return m?{t:+m[1]*60+ +m[2],who:m[3],text:m[4]}:null}).filter(Boolean)})()}});
   if(noReason)warnings.push(noReason+' not-sold conversation'+(noReason>1?'s have':' has')+' no reason. They are grouped as "No clear reason".');
   REPS.sort((a,b)=>CONVS.filter(c=>c.rep===b.id).length-CONVS.filter(c=>c.rep===a.id).length||a.name.localeCompare(b.name));
@@ -142,7 +144,7 @@ function build(text,name){
   const ns=rr.filter(r=>!/^(sold|yes|won)$/i.test(get(r,'outcome'))),nsFilled=c=>ns.length?ns.filter(r=>get(r,c)!=='').length/ns.length>=.3:false;
   const has={stock:filled('in_stock'),competitor:filled('competitor'),offer:filled('competitor_offer'),reason:nsFilled('reason'),stage:nsFilled('stage_reached'),
     followups:filled('followup_due'),replies:filled('objection_reply'),types:filled('customer_type'),
-    ai:CONVS.some(c=>c.aiCoach.length||c.aiPromises.length||c.aiNext||c.aiNotes.length),checks:CONVS.some(c=>c.aiChecks.length),valueSrc:'value_source' in idx,transcript:CONVS.some(c=>c.transcript)};
+    ai:CONVS.some(c=>c.aiCoach.length||c.aiPromises.length||c.aiNext||c.aiNotes.length),checks:CONVS.some(c=>c.aiChecks.length),valueSrc:'value_source' in idx,floor:'quote_given' in idx,transcript:CONVS.some(c=>c.transcript)};
   return {ok:true,name,warnings,
     ds:{has,vertical:(get(first,'vertical')||'').toLowerCase(),today,store:get(first,'store_name')||'Your store',owner:get(first,'owner_name')||'',REPS,PRODUCTS,PERSONAS,COMPS,CONVS,customReasons,hasObjection,rawText:text,file:name}}}
 
@@ -213,8 +215,9 @@ async function loadStores(){
     await Promise.all((j.stores||[]).map(async st=>{try{const file=st.file||'data/cases/'+st.id+'.csv',c=await fetch(file,{cache:'no-store'});if(!c.ok)return;const text=await c.text();if(/^\s*<(!doctype|html)/i.test(text))return;let meta=null;try{const m=await fetch(file.replace(/\.csv$/,'.meta.json'),{cache:'no-store'});if(m.ok)meta=await m.json()}catch(e){}out.push({id:st.id,name:st.name,vertical:st.vertical||'',featured:(st.featured||[]).map(n=>'ZC-'+n),text,meta,isDefault:!!st.default,timeless:!!st.timeless,snapshot:!!st.snapshot,empty:parseCSV(text).length<2,group:st.group||(st.timeless?'test':'pilot')})}catch(e){}}));
     const order=(j.stores||[]).map(x=>x.id);return out.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id))}catch(e){return []}}
 function setStore(id){setChoice(id);try{sessionStorage.setItem('zocus-skip-splash','1')}catch(e){}location.reload()}
-/* A dealer link (…/?dealer) opens the pilot store only: no store switcher, no demo stores, no upload. It hides, it does not secure. */
-const LOCKED=(()=>{try{return new URLSearchParams(location.search).has('dealer')}catch(e){return false}})();
+/* For the pilot the site opens on the pilot store only (also …/?dealer); …/?all shows every store, demos and upload.
+   Locked mode: no store switcher, no demo stores, no upload. It hides, it does not secure. */
+const LOCKED=(()=>{try{const q=new URLSearchParams(location.search);return q.has('dealer')||!q.has('all')}catch(e){return false}})();
 const dayName=s=>{const d=parseDate(s);return d?['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()]+' '+d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]:''};
 const clock=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})\s*$/);if(!m)return '';const h=+m[1];return (h%12||12)+':'+m[2]+(h<12?' am':' pm')};
 /* A one-day store with nothing ready yet: say so, instead of falling back to the sample store. app.js is not started. */
