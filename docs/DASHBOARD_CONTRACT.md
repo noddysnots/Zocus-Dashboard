@@ -57,8 +57,7 @@ Everything below differs from the pre-pilot dashboard. Each is limited to one-da
 |---|---|---|
 | A conversation after the booking (delivery, accessories, a dispute) is left out of the sales numbers, is not scored, has no value | Sales counts show only sales conversations; the other is shown separately | pilot |
 | No real score means a dash, never a made-up number | "Score not available yet" | pilot |
-| A customer who already chose a model is not marked on "understand the need" and "ask the budget" | Skill bars show a dash for those; the score uses the other checks | pilot |
-| Test-drive check is shown but not scored (the dealer says it matters little) | 9 of 10 checks count (7 for finalising customers) | pilot |
+| **Scores are the backend's own** (changed 14 Nov, 7 pm): the mean of all the checks the backend marked, done 100, partly 50, missed 0, the test drive and the need and budget of a finalising customer included | The team sees the same numbers (best today 50); a note on the Overview says the scorer is strict | pilot |
 | Reps with fewer than 3 conversations are not ranked or rated | "1 chat", no Top/Coach label | pilot |
 | A single-rep store coaches on the rep's lowest skill, not always the first one | Coaching action names the real weakest step | pilot |
 | Value: team number, recorded amount, price said in the call, customer budget, indicative by model (3 models or fewer compared), else "–" | Source is shown next to each value | car stores |
@@ -76,3 +75,5 @@ Everything below differs from the pre-pilot dashboard. Each is limited to one-da
 3. `node tools/check-csv.mjs data/cases/pilot.csv` (the audit runs it): the dashboard's own parser accepts the file.
 
 To change the contract on purpose: edit this file and `tests/contract.json` in the same commit and say why.
+
+Price tables in the conversation panel show the exact rupee figure (for example ₹1,07,500), not a rounded lakh, so each figure can be checked against the transcript.

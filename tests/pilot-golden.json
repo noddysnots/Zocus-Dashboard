@@ -48,7 +48,7 @@
   },
   "calls": {
     "261": {
-      "rep_name": "Jitenbhai",
+      "rep_name": "Jatin",
       "product": "Scorpio N",
       "models_considered": "Scorpio N|XUV 7XO",
       "fuel": "Petrol|Diesel",
@@ -78,7 +78,7 @@
       "visit": "repeat"
     },
     "264": {
-      "rep_name": "Jitenbhai",
+      "rep_name": "Jatin",
       "product": "Scorpio N",
       "models_considered": "Scorpio N",
       "value_inr": "",
@@ -133,7 +133,8 @@
       "stage": "exploring",
       "kind": "",
       "scored": "yes",
-      "customer_name": "Customer 8"
+      "customer_name": "Customer 8",
+      "rep_name": "Jatin"
     },
     "276": {
       "_why": "Short walk-around of an older and the new model; no need, budget or follow-up. The model is never named, so there is no value. The wireless charger is not an EV-charging priority. Staff talk at the end is not part of the conversation.",
@@ -162,7 +163,8 @@
       "kind": "",
       "scored": "yes",
       "priorities": "Space|Comfort|Price and offers",
-      "customer_name": "Customer 10"
+      "customer_name": "Customer 10",
+      "rep_name": "Jatin"
     },
     "274": {
       "_why": "Top 9e in Ruby Velvet, price negotiation (2 lakh scheme, 30.50 target), colour not in stock, customer may go to Ahmedabad. The rep says his own name (Joshi) at 24:08. On-road 31.89 lakh was the figure given as final. The AI's 30 lakh value came from the customer's own words, so the value is set in the notes.",

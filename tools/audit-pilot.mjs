@@ -58,7 +58,7 @@ if (!noDb) {
   } catch (e) { warn('database', 'could not read the database, so rows were not compared with it: ' + e.message.split('\n')[0]); }
 }
 const local = d => { const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(d)).map(x => [x.type, x.value])); return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}`; };
-const RUB_COUNT = ['need', 'budget', 'options', 'value_proof', 'price_offers', 'concerns', 'decision_timing', 'ask', 'next_step'], PTS = { done: 100, partly: 50, missed: 0 }, MK = { done: 'MET', partly: 'PARTLY', missed: 'NOT_MET' };
+const RUB_COUNT = ['need', 'budget', 'options', 'experience', 'value_proof', 'price_offers', 'concerns', 'decision_timing', 'ask', 'next_step'], PTS = { done: 100, partly: 50, missed: 0 }, MK = { done: 'MET', partly: 'PARTLY', missed: 'NOT_MET' };
 const parts = t => { const o = {}, ms = [...String(t || '').matchAll(/(Customer need|What happened|Outcome|Why|Next step):\s*/g)]; ms.forEach((mm, i) => { o[mm[1]] = String(t).slice(mm.index + mm[0].length, i + 1 < ms.length ? ms[i + 1].index : undefined).trim(); }); return o; };
 
 for (const r of rows) {
@@ -82,7 +82,7 @@ for (const r of rows) {
       bad.length ? fail(id, 'summary parts differ from the database: ' + bad.join(', ')) : ok(id, 'the five summary parts match the database word for word');
       const sc = d.scoring;
       if (r.scored === 'yes' && sc?.eligibility?.eligible && Array.isArray(sc.checks)) {
-        const na = r.stage === 'finalising' ? ['need', 'budget'] : [], mism = [];
+        const na = [], mism = [];
         for (const c of sc.checks.filter(c => PTS[c.mark] != null)) { const want = na.includes(c.id) ? 'NA' : MK[c.mark], m = r.ai_checks.match(new RegExp('(MET|PARTLY|NOT_MET|NA): [^|]*?\\(' + c.id + '\\)')); if (!m || m[1] !== want) mism.push(`${c.id}: file ${m ? m[1] : 'missing'}, database ${want}`); }
         mism.length ? fail(id, 'rubric marks differ: ' + mism.join('; ')) : ok(id, `all ${sc.checks.length} rubric marks match the database`);
         const cnt = sc.checks.filter(c => RUB_COUNT.includes(c.id) && !na.includes(c.id) && PTS[c.mark] != null), want = cnt.length ? Math.round(cnt.reduce((a, c) => a + PTS[c.mark], 0) / cnt.length) : null;

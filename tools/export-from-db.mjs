@@ -113,7 +113,7 @@ const TEST_DRIVE_RE = /\b(took|taken|had|did|done|after|finished|completed|back 
 const CHK_CAR = { D1: 'Asked what the car is for', D2: 'Confirmed the model or body type', D3: 'Asked the budget', D4: 'Confirmed variant, fuel and features wanted', P1: 'Gave a correct fact about the car', P2: 'Addressed the customer\'s priority', P3: 'Explained the value', O1: 'Acknowledged the objection', O2: 'Explored the objection', O3: 'Answered the objection', C1: 'Handled the comparison with another brand', SOP1: 'Stayed respectful', SOP2: 'Used the showroom offer', N1: 'Agreed a next step and contact' };
 /* ---------- automotive rubric (points-score-v3): 10 checks, each done / partly / missed ---------- */
 const RUB_POINTS = { done: 100, partly: 50, missed: 0 };
-const RUB_SKILL = { need: 'need', budget: 'budget', options: 'pitch', value_proof: 'pitch', price_offers: 'objection', concerns: 'objection', decision_timing: 'close', ask: 'close', next_step: 'close' }; // 'experience' (test drive) is shown but not scored: the dealer says it matters little
+const RUB_SKILL = { need: 'need', budget: 'budget', options: 'pitch', value_proof: 'pitch', price_offers: 'objection', concerns: 'objection', decision_timing: 'close', ask: 'close', next_step: 'close', experience: 'pitch' }; // all 10 checks count, exactly as the backend scores them (the test drive included), so the numbers match what the team sees in the backend
 const RUB_LABEL = { need: 'Understood what the customer wants', budget: 'Asked the budget', decision_timing: 'Found out when and how they decide', options: 'Showed the right options', experience: 'Offered a test drive or showroom visit', value_proof: 'Explained why this car is worth it', price_offers: 'Gave a clear price and offers', concerns: 'Answered the customer\'s concerns', ask: 'Asked for the booking', next_step: 'Agreed a next step with a date' };
 const RUB_ORDER = ['need', 'budget', 'options', 'experience', 'value_proof', 'price_offers', 'concerns', 'decision_timing', 'ask', 'next_step'];
 const toks = s => new Set(String(s || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/).filter(w => w.length > 3));
@@ -217,7 +217,7 @@ for (const r of rows) {
   const suggested = /(taking|take|collect\w*) delivery|delivery today|before delivery|pre-?delivery|hand ?over/i.test(sumAll) && /accessor|insurance|payment|coating|RTO/i.test(sumAll) ? 'after_booking' : /quot|on-?road|ex-?showroom|discount|financ|loan|variant|booking|price|stock|delivery/i.test(sumAll) ? 'finalising' : 'exploring';
   const jStage = note.stage || (note.kind === 'delivery' ? 'after_booking' : suggested), stageSrc = note.stage || note.kind ? 'team' : 'suggested';
   const isDelivery = jStage === 'after_booking'; // after the sale (delivery, accessories, payment, a dispute): not a sales pitch, so no sales score, quotation or value
-  const NA_IDS = jStage === 'finalising' ? ['need', 'budget'] : []; // a customer who has already chosen a model is not marked on discovering the need or the budget
+  const NA_IDS = []; // every check the backend marked counts; a customer who has already chosen a model is still marked on need and budget, as in the backend (changed 14 Nov, 7 pm)
   const res = r.result || {}, oc = r.outcome || {}, rr = res.revenueRecovery || {}, sc = r.scoring;
   const stage = oc.stage, tag = r.sale_tag;
   let outcome = stage === 'won' || tag === 'yes' ? 'sold' : stage === 'follow_up' ? 'followup' : stage === 'lost' || tag === 'no' ? 'lost' : null;
