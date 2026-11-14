@@ -136,7 +136,7 @@ function build(text,name){
       aiChecks:get(r,'ai_checks').split(' | ').map(t=>{const m=t.trim().match(/^(MET|PARTLY|NOT_MET|NA):\s*(.*?)\s*\((\w+)\)\.?\s*([\s\S]*)$/);if(!m)return null;const qi=m[4].indexOf('\u275D'),why=qi>=0?m[4].slice(0,qi).trim():m[4],quote=qi>=0?m[4].slice(qi+1).replace(/\u275E\s*$/,'').trim():'';return {ok:m[1]==='MET',mark:m[1]==='MET'?'done':m[1]==='PARTLY'?'partly':m[1]==='NA'?'na':'missed',label:m[2],id:m[3],why,quote}}).filter(Boolean),
       endAt:parseDate(get(r,'ended_at')),analysedAt:parseDate(get(r,'analysed_at')),
       sumNeed:get(r,'sum_need'),sumHappened:get(r,'sum_happened'),sumOutcome:get(r,'sum_outcome'),sumWhy:get(r,'sum_why'),sumNext:get(r,'sum_next'),
-      promises:jsonOf(get(r,'promises_json')),concerns:jsonOf(get(r,'concerns_json')),prices:jsonOf(get(r,'prices_json')),trEn:jsonOf(get(r,'tr_en'),{}),
+      promises:jsonOf(get(r,'promises_json')),concerns:jsonOf(get(r,'concerns_json')),prices:jsonOf(get(r,'prices_json')),trEn:jsonOf(get(r,'tr_en'),{}),visit:get(r,'visit').toLowerCase(),visitHistory:get(r,'visit_history'),arrived:get(r,'arrived'),needForm:get(r,'need_form'),stock:jsonOf(get(r,'stock_json'),null),objections:jsonOf(get(r,'objections_json')),crm:jsonOf(get(r,'crm_json'),{}),
       flags:get(r,'flags').split('|').map(s=>s.trim()).filter(Boolean),remarks:get(r,'remarks'),
       fBudget:get(r,'f_budget'),fPref:get(r,'f_preference'),fTiming:get(r,'f_timing'),fComp:get(r,'f_competitor'),
       valueSrc:get(r,'value_source').toLowerCase(),
@@ -170,8 +170,8 @@ function modal(title,body){const root=document.getElementById('modalRoot');
   const b=root.querySelector('button');if(b)b.focus()}
 function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function menuHtml(){const ds=window.ZD;
-  if(ds.focus)return '<div class="dm-info"><b>'+esc(ds.store)+'</b><span>'+(ds.CONVS?ds.CONVS.length:0)+' conversations</span></div>'+storeOptions().map(o=>'<button data-zact="store" data-id="'+esc(o.id)+'"'+(o.id===ds.storeId?' aria-current="true"':'')+'><span class="dm-dot"></span>'+esc(o.label)+'</button>').join('')+(ds.rawText?'<button data-zact="export">Export current data (CSV)</button>':'')+(ds.empty?'':'<button data-zact="tour">Show me around</button>');
-  if(ds.locked)return '<div class="dm-info"><b>'+esc(ds.store)+'</b><span>'+(ds.CONVS?ds.CONVS.length:0)+' conversations</span></div>'+(ds.rawText?'<button data-zact="export">Export current data (CSV)</button>':'')+(ds.empty?'':'<button data-zact="tour">Show me around</button>');
+  if(ds.focus)return '<div class="dm-info"><b>'+esc(ds.store)+'</b><span>'+(ds.CONVS?ds.CONVS.length:0)+' conversations</span></div>'+storeOptions().map(o=>'<button data-zact="store" data-id="'+esc(o.id)+'"'+(o.id===ds.storeId?' aria-current="true"':'')+'><span class="dm-dot"></span>'+esc(o.label)+'</button>').join('')+(ds.snapshot&&!ds.empty?'<button data-zact="report">Day report (PDF)</button><button data-zact="crm">CRM sheet (CSV)</button>':'')+(ds.rawText?'<button data-zact="export">Export current data (CSV)</button>':'')+(ds.empty?'':'<button data-zact="tour">Show me around</button>');
+  if(ds.locked)return '<div class="dm-info"><b>'+esc(ds.store)+'</b><span>'+(ds.CONVS?ds.CONVS.length:0)+' conversations</span></div>'+(ds.snapshot&&!ds.empty?'<button data-zact="report">Day report (PDF)</button><button data-zact="crm">CRM sheet (CSV)</button>':'')+(ds.rawText?'<button data-zact="export">Export current data (CSV)</button>':'')+(ds.empty?'':'<button data-zact="tour">Show me around</button>');
   const info=ds.isSample?'Showing sample data (fictional store)':esc(ds.file)+' · '+ds.CONVS.length+' conversations';
   const so=storeOptions(),storeList=ds.stores&&ds.stores.length?[...GROUPS,['upload','Your upload']].map(([g,l])=>{const a=so.filter(x=>x.group===g);return a.length?'<div class="dm-sec">'+esc(l)+'</div>'+a.map(o=>'<button data-zact="store" data-id="'+esc(o.id)+'"'+(o.id===ds.storeId?' aria-current="true"':'')+'><span class="dm-dot"></span>'+esc(o.label)+'</button>').join(''):''}).join('')+'<div class="dm-sec">Data</div>':'';
   return '<div class="dm-info"><b>'+(ds.isSample?'Data':esc(ds.store))+'</b><span>'+info+'</span></div>'+storeList+
@@ -200,6 +200,8 @@ document.addEventListener('click',async e=>{
   else if(a==='tour'){toggleMenu(false);const h=document.querySelector('[data-act="tour"]');if(h)h.click()}
   else if(a==='mclose'){document.getElementById('modalRoot').innerHTML=''}
   else if(a==='upload'){document.getElementById('zfile').click()}
+  else if(a==='report'){toggleMenu(false);location.hash='#report'}
+  else if(a==='crm'){toggleMenu(false);try{const r=await fetch('data/cases/'+window.ZD.storeId+'-crm.csv',{cache:'no-store'});if(!r.ok)throw 0;download('zocus-crm-sheet.csv',await r.text())}catch(err){toast('The CRM sheet is not ready yet.')}}
   else if(a==='export'){download((window.ZD.isSample?'zocus-sample':'zocus-data')+'.csv',window.ZD.rawText);toggleMenu(false)}
   else if(a==='template'){toggleMenu(false);try{const r=await fetch(TEMPLATE_URL);download('zocus-template.csv',await r.text())}catch(err){toast('Could not load the template.')}}
   else if(a==='reset'){await kvDel('csv');setChoice('sample');try{sessionStorage.setItem('zocus-skip-splash','1')}catch(e){}location.reload()}

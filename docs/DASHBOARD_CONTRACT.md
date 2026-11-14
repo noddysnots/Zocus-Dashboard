@@ -33,6 +33,20 @@ Also inside the original blocks: the open promises are the entries of "Do these 
 
 **Removed on purpose** (they made the Overview busy): three journey cards, a day-note box, a large "After the sale" card, a separate "Promises to keep" card. Their detail lives in the conversation panel, the Follow-ups page and the "After the booking" tab.
 
+## 2b. Depth added on 14 Nov (afternoon), inside existing pages
+
+The floor asked for more detail per conversation because volumes are low. Nothing was added to the Overview. Each item below appears only when it has content, starts with one plain sentence and keeps the detail folded.
+
+| Where | What |
+|---|---|
+| Conversation panel | "This visit" (first or repeat, what happened before, wait time, need-analyzer answers), "Stock match" (wanted, in hand, what else was offered), "Objections and answers" (replaces "Customer concerns" and "In their words" when written by hand), "Follow-ups" (was "Promised") |
+| Follow-ups page | Follow-ups written by hand from the recording; our own suggestions carry a "Suggested" pill and are not counted in the menu badge |
+| Coaching page | One card, "Objections today and how they were answered", per rep, with a suggested line |
+| Insights | One tab, last in the row: "Demand vs stock" |
+| Data menu | "Day report (PDF)": one long page built from the same panel sections, printed by the browser. "CRM sheet (CSV)": one row per visit, with blank columns for the dealer |
+
+A booked customer with open follow-ups shows "Booked · follow-up open" in the panel and the day report.
+
 ## 3. Rules that change a number
 
 Everything below differs from the pre-pilot dashboard. Each is limited to one-day pilot stores (`snapshot`) or to car stores unless stated; the standard stores keep the original rule.
@@ -50,6 +64,7 @@ Everything below differs from the pre-pilot dashboard. Each is limited to one-da
 | Budget is read only from the customer's own lines, not from range-in-km talk | | car stores |
 | "Quotation given" needs an on-road or ex-showroom figure from the rep or a quotation written for the customer; a spoken range ("15 to 17 lakh") is not a quotation | Overcounting removed | car stores |
 | An all-electric shortlist is fuel "Electric" (the rep listing petrol, diesel and CNG as other versions does not count) | | car stores |
+| A staff tag in the app decides the result ("yes" = Booked, "no" = Did not book) unless the notes override it; #262 is Booked from its tag, #261 is Will return by the user's choice | Booking conversion 1 of 4, Bookings won ₹11.2L | pilot |
 | Customers are named only from the team's notes ("Customer at 11:54 am" otherwise); message drafts do not greet by a name the team never gave | | pilot |
 
 ## 4. What is checked before a push

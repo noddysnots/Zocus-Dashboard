@@ -106,6 +106,17 @@ for (const r of rows) {
     else typeof p.p === 'number' ? fail(id, `price "${p.m}" ${p.p} is not on the transcript line at ${ln.at} (if it is said in number words, check it by hand and list it in prices_checked_by_hand)`) : warn(id, `price "${p.m}" (${p.p}): figure not found as digits on the line at ${ln.at}; check by hand`);
   }
 
+  let pr = []; try { pr = JSON.parse(r.promises_json || '[]'); } catch { fail(id, 'promises_json is not valid JSON'); }
+  /* hand-written depth (stock, objections, follow-ups): every time given must be the start of a real transcript line; suggestions must be marked */
+  const J = (col, dflt) => { try { return JSON.parse(r[col] || dflt); } catch { fail(id, col + ' is not valid JSON'); return JSON.parse(dflt); } };
+  const obj = J('objections_json', '[]'), stk = J('stock_json', '{}'), hand = pr.filter(x => x.hand);
+  const timed = [...obj.map(o => ['objection "' + o.t + '"', o.at]), ...hand.filter(f => !f.s).map(f => ['follow-up "' + f.t + '"', f.at]), ...(stk.at ? [['stock note', stk.at]] : [])];
+  const badT = timed.filter(([, at]) => !at || !starts.has(at));
+  if (timed.length) badT.length ? fail(id, 'no transcript line starts at the time given for: ' + badT.map(([n2, at]) => n2 + ' (' + (at || 'no time') + ')').join('; ')) : ok(id, `${timed.length} objections, follow-ups and stock notes each sit on a real transcript line`);
+  const badV = obj.filter(o => !['answered', 'partly', 'open'].includes(o.v)); if (badV.length) fail(id, 'objection verdict must be answered, partly or open: ' + badV.map(o => o.t).join('; '));
+  if (r.stock_json && !['yes', 'no', 'unknown'].includes(stk.inhand)) fail(id, 'stock.inhand must be yes, no or unknown');
+  if (r.visit && !['first', 'repeat'].includes(r.visit)) fail(id, 'visit must be first or repeat');
+  if (r.visit === 'repeat' && !r.visit_history) fail(id, 'a repeat visit needs a history line saying how we know');
   /* names: where does each name in the notes appear in the audio, and who says it */
   for (const [role, nm] of [['rep', note.rep], ['customer', note.customer]]) {
     if (!nm) continue; const tok = String(nm).trim(); if (tok.length < 3) continue;
@@ -113,7 +124,6 @@ for (const r of rows) {
     hits.length ? warn(id, `the ${role} name "${nm}" is also spoken in the audio: ${hits.map(h => h.at + ' ' + h.who).join(', ')}. Confirm who it belongs to`) : ok(id, `the ${role} name "${nm}" is a floor nickname (not in the audio)`);
   }
   /* drafts: no greeting by a name the team did not give */
-  let pr = []; try { pr = JSON.parse(r.promises_json || '[]'); } catch { fail(id, 'promises_json is not valid JSON'); }
   const greet = pr.filter(p => /^\s*(?:[Nn]amaste|[Nn]amaskar|[Hh]ello|[Hh]i|[Hh]ey|[Dd]ear)[\s,]+(?!(?:Sir|Madam|Sahab|Saheb|Ji|I|We|Please|Thank|Thanks|Your|The)\b)[A-Z][a-z]+/.test(p.d || '') && !note.customer);
   greet.length ? fail(id, 'a message draft greets the customer by a name the team never gave: "' + greet[0].d.slice(0, 40) + '"') : ok(id, 'message drafts do not greet by an unconfirmed name');
   /* the customer is never named from the audio */

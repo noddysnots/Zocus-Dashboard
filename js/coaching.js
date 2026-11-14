@@ -5,7 +5,7 @@
    Assign / reviewed / drill progress is kept in this browser (localStorage) until the backend has coaching_assignments. */
 window.ZocusCoach=function(X){
 'use strict';
-const {W,CAR,PLAYBOOK,FLAT,SNAP,inTxt,baseTxt,S,REPS,REP,SKILLS,REASONS,COACH,CONVS,BEST,ZD,esc,ic,ring,inr,plural,fdate,sumv,cur,prev,stats,repRows,periodTxt,phead,render,toast,Q,scoreCol,groupBy}=X;
+const {objCard,W,CAR,PLAYBOOK,FLAT,SNAP,inTxt,baseTxt,S,REPS,REP,SKILLS,REASONS,COACH,CONVS,BEST,ZD,esc,ic,ring,inr,plural,fdate,sumv,cur,prev,stats,repRows,periodTxt,phead,render,toast,Q,scoreCol,groupBy}=X;
 const LS='zocus-coach-v1';
 let st={assign:{},drills:{},base:{}};
 try{const r=JSON.parse(localStorage.getItem(LS)||'null');if(r&&typeof r==='object')st=Object.assign(st,r)}catch(e){}
@@ -105,12 +105,13 @@ function renderHub(){
   const money=ZC.barList(bySkill.filter(x=>x.v).map(x=>({label:x.k.label,value:x.v,text:inr(x.v),on:hubSkill===x.k.id,attr:`data-act="coach-skill" data-key="${x.k.id}" aria-pressed="${hubSkill===x.k.id}"`,tip:`${x.k.label}|${plural(x.n,'customer')} left at this step|${inr(x.v)} not closed`})),{empty:'No lost '+W.sales+' tied to a skill in this period.'});
   const ready=ZC.barList([...all].filter(p=>!p.row.thin).sort((a,b)=>b.readiness-a.readiness).map(p=>({label:p.rep.first,value:p.readiness,text:String(p.readiness),attr:`data-go="#coach-${p.rep.id}"`,tip:`${p.rep.name}|Readiness ${p.readiness}|Score ${p.s.score} · ${p.done} of ${p.drills.length} drills`})),{max:100,ref:avgR});
   const grid=ZC.heatGrid({cols:SKILLS.map(k=>SHORT[k.id]),rows:[...all].sort((a,b)=>b.s.score-a.s.score).map(p=>({label:p.rep.first,attr:`data-go="#coach-${p.rep.id}"`,cells:SKILLS.map(k=>{const g=p.s.skill[k.id]-store.skill[k.id];return {text:(g>0?'+':'')+g,cls:g>=5?'g':g<=-5?'b':'n',tip:`${p.rep.name}|${k.label}: ${p.s.skill[k.id]}|${W.Store} ${store.skill[k.id]}`}})}))});
-  const floorMiss=(()=>{if(!SNAP)return '';const m={};L.forEach(c=>(c.aiChecks||[]).filter(x=>x.id!=='experience'&&x.mark!=='na'&&(x.mark?x.mark!=='done':!x.ok)).forEach(x=>{const r=m[x.label]||(m[x.label]={n:0,miss:0,ex:c,why:x.why});r.n++;if(x.mark==='missed'||x.ok===false)r.miss++}));const scored=L.filter(c=>c.aiChecks&&c.aiChecks.length).length,top=Object.entries(m).sort((a,b)=>(b[1].miss*2+b[1].n)-(a[1].miss*2+a[1].n)).slice(0,5);
+  const floorMiss=(()=>{if(!SNAP)return '';const m={};L.forEach(c=>(c.aiChecks||[]).filter(x=>x.id!=='experience'&&x.mark!=='na'&&(x.mark?x.mark!=='done':!x.ok)).forEach(x=>{const r=m[x.label]||(m[x.label]={n:0,miss:0,ex:c,why:x.why});r.n++;if(x.mark?x.mark==='missed':x.ok===false)r.miss++}));const scored=L.filter(c=>c.aiChecks&&c.aiChecks.length).length,top=Object.entries(m).sort((a,b)=>(b[1].miss*2+b[1].n)-(a[1].miss*2+a[1].n)).slice(0,5);
     if(!top.length)return '';return `<section class="card"><div class="card-h"><h2>What the floor missed today</h2><span class="hint">across ${plural(scored,'scored conversation')} · missed first, then partly done</span></div>${top.map(([t,v])=>`<div class="chk"><span class="pill ${v.miss?'bad':'warn'} num">${v.miss?v.miss+' missed':v.n+' partly'}</span><div>${esc(t)}${v.why?`<small>${esc(v.why)}</small>`:''}<div style="margin-top:6px">${see(v.ex)}</div></div></div>`).join('')}</section>`})();
   return phead('Coaching',`A plan for every rep, built from the skills they score low on and how your best reps answer the same customers. Based on ${baseTxt()}.`)+
   `<div class="lead"><span class="orb" aria-hidden="true"></span><p style="margin:0">${lead}</p></div>
   ${ZD.hasObjection||CAR?'':`<p class="hint" style="margin:-8px 0 0">This file has no objection columns, so suggested answers are Zocus's built-in examples, not your best reps' words. Add <b>objection</b>, <b>objection_resolved</b> and <b>objection_reply</b> to personalise them.</p>`}
   ${floorMiss}
+  ${objCard?objCard():''}
   <div class="ktiles">${tiles}</div>
   <div class="cgrid3">
     ${ZC.ccard(topSkill?`Most money is lost at ${esc(topSkill.k.label.toLowerCase())}`:'Where the money leaks','Tap a skill to filter reps',money)}

@@ -117,3 +117,10 @@ Transcript speaker labels: `Rep`, `Customer`, `Customer's companion`, `Backgroun
 | `kind`, `result_label` | `delivery` marks an after-booking conversation (not scored); the label replaces the result pill |
 | `payment_status` | free text, shown on after-booking conversations |
 `ai_checks` may also carry `NA: label (id). reason` for checks that are not counted at this stage. The meta file may carry `dayNote`.
+
+## Pilot depth columns (optional, 14 Nov 2026)
+`visit` (first / repeat), `visit_history` (text), `arrived` (HH:MM counter punch-in), `need_form` (text), `stock_json` (`{want, have, inhand, alt, at}`), `objections_json` (list of `{t, at, q, a, v, tip}`; `v` = answered / partly / open), `crm_json` (`{variant, payment, delivery_wanted, exchange, registration}`). In `promises_json`, `hand: 1` marks a follow-up written by hand and `s: 1` a suggestion.
+
+## CRM sheet
+`data/cases/pilot-crm.csv` and the blank `data/crm-template.csv` are written by `tools/make-crm.mjs`. Columns ending "(dealer)" are for the dealer to fill.
+

@@ -5,7 +5,7 @@
     "jewel"
   ],
   "prices_checked_by_hand": {
-    "_note": "Prices said in Hindi or Gujarati number words, where the audit cannot find digits. Each was read against the recording by hand on 14 Nov 2026: 261 0:49 'seventeen-fifty on road'; 262 4:13 '4 to 5 thousand more'; 264 2:50 'tees hazar' (30,000), 1:15 'gyarah sau' (1,100), 4:14 'das hazar paanch sau' (10,500), 10:25 'paanch sau' (500) and 'paintees sau' (3,500).",
+    "_note": "Prices said in Hindi or Gujarati number words, where the audit cannot find digits. Each was read against the recording by hand on 14 Nov 2026: 261 0:49 'seventeen-fifty on road'; 262 4:13 '4 to 5 thousand more'; 264 2:50 'tees hazar' (30,000), 1:15 'gyarah sau' (1,100), 4:14 'das hazar paanch sau' (10,500), 10:25 'paanch sau' (500) and 'paintees sau' (3,500). 272 4:04 'around 20,000' and 4:11 '40-42,000' read by hand.",
     "261": [
       "0:49"
     ],
@@ -21,7 +21,7 @@
   },
   "calls": {
     "261": {
-      "rep_name": "Speed Racer",
+      "rep_name": "Jitenbhai",
       "product": "Scorpio N",
       "models_considered": "Scorpio N|XUV 7XO",
       "fuel": "Petrol|Diesel",
@@ -47,10 +47,11 @@
       "stage": "finalising",
       "kind": "",
       "scored": "yes",
-      "priorities": "Price and offers|Loan and finance"
+      "priorities": "Price and offers|Loan and finance",
+      "visit": "repeat"
     },
     "264": {
-      "rep_name": "Speed Racer",
+      "rep_name": "Jitenbhai",
       "product": "Scorpio N",
       "models_considered": "Scorpio N",
       "value_inr": "",
@@ -77,6 +78,21 @@
       "scored": "yes",
       "priorities": "Range and charging|Service|Features|Price and offers",
       "customer_name": "Customer 5"
+    },
+    "272": {
+      "_why": "Repeat visit to settle price and delivery of a red 3XO. Quotations were sent on WhatsApp, so no car price is said aloud; the value is the model's indicative band. 'Petrol diesel' at 0:04 is a stray opening word, not the customer's choice.",
+      "rep_name": "Lead rep",
+      "product": "XUV 3XO",
+      "models_considered": "XUV 3XO",
+      "fuel": "",
+      "colour": "Red",
+      "value_source": "indicative",
+      "quote_given": "yes",
+      "stage": "finalising",
+      "kind": "",
+      "scored": "yes",
+      "customer_name": "Customer 6",
+      "visit": "repeat"
     }
   }
 }

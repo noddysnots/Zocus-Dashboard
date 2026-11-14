@@ -827,7 +827,8 @@ html.emptyday .seg,html.emptyday #rangeSel,html.emptyday [data-act="palopen"],ht
 
 .cdot.na{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line)}
 .stg{font-size:12px}.stg-exploring{background:rgba(34,184,207,.16)}.stg-finalising{background:rgba(217,162,27,.2)}.stg-after_booking{background:rgba(123,97,255,.18)}
-.pchip b{max-width:130px;text-align:center;line-height:1.25;overflow-wrap:anywhere}
+.pchip{min-width:88px}
+.pchip b{max-width:130px;text-align:center;line-height:1.25;overflow-wrap:break-word}
 .floornote{margin:8px 0 0;font-size:13px;line-height:1.45;color:var(--muted)}
 .alertline{display:flex;align-items:center;gap:10px;width:100%;margin:0 0 14px;padding:10px 14px;border-radius:14px;border:1px solid rgba(123,97,255,.3);background:rgba(123,97,255,.07);color:inherit;font:inherit;font-size:14px;text-align:left;cursor:pointer}
 .alertline:hover{background:rgba(123,97,255,.12)}
@@ -841,3 +842,25 @@ html.emptyday .seg,html.emptyday #rangeSel,html.emptyday [data-act="palopen"],ht
 .pill.after{background:rgba(123,97,255,.14);color:#5a43d6}
 @media(max-width:640px){.alertline{flex-wrap:wrap}.alertline .atxt{flex-basis:100%;white-space:normal}}
 @media(max-width:640px){.tlb span{display:none}}
+.objx{border-top:1px solid var(--line);padding:9px 0}.objx:first-of-type{margin-top:8px}
+.objx summary{display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none;flex-wrap:wrap}.objx summary::-webkit-details-marker{display:none}
+.objx summary b{flex:1;min-width:140px;font-weight:600}
+.objb{padding:8px 0 2px}.objb p{margin:6px 0 0;font-size:14px;line-height:1.45}.objb .hint{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.objtip{padding:8px 10px;border-radius:10px;background:var(--gold-soft)}
+.objrep{margin-top:14px}
+.stocktbl td{vertical-align:top;font-size:13.5px;min-width:150px}
+.rpt{max-width:980px;margin:0 auto}
+.rpthead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:6px 0 18px}.rpthead h1{margin:4px 0 2px}
+.rptconv{margin-top:26px;padding-top:18px;border-top:2px solid var(--line)}
+.rptconv .dhead{position:static;padding:8px 0 12px;background:none;border:0}
+.rptconv .dbody{padding:0;overflow:visible;display:flex;flex-direction:column;gap:12px}
+@media print{
+ @page{margin:12mm}
+ body{background:#fff!important}
+ #waves,.top,.bnav,.waveband,.noprint,.livebar,.btnrow,.link,#toastRoot{display:none!important}
+ .page{padding:0!important;max-width:none!important}
+ .card{box-shadow:none!important;break-inside:avoid;background:#fff!important}
+ .rptconv{break-before:page;border-top:0;margin-top:0}
+ .tlb,.pill,.chip2,.bar i,.objtip{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+

@@ -127,6 +127,19 @@ Abhishek, 11:48 am: today's traffic is mostly model finalisation, accessory sele
 - **after_booking**: accessories, payment, delivery or a dispute; not scored, left out of the sales numbers, shown under "After the sale" and in the "After the booking" tab (accessories and add-ons with prices, payment status, open issues). `payment` in the notes shows the payment status.
 The team's one-line note about the day goes in the notes file as `"daynote"` and is shown on the Overview.
 
+### Going deeper per conversation (14 Nov, afternoon)
+Volumes are low, so each conversation carries more, all written by hand into `data/pilot-notes.json` at the refresh and checked by the audit (every time given must be the start of a real transcript line):
+- `visit` and `history`: first or repeat visit and what we know of earlier visits (from the floor, or from the recording).
+- `stock`: what the customer wanted, what is in hand (`inhand`: yes, no, unknown), what else the rep offered. This is the dealer's main aim: sell what is in stock, move waiting customers to another colour or a higher model.
+- `objections`: the customer's line, the rep's answer, a verdict and a suggested line (marked "Zocus playbook").
+- `followups`: what was promised, by when, with a message; `s: 1` marks our own suggestion.
+- `arrived` (counter punch-in, gives the wait time) and `need_form` (Mahindra's need-analyzer answers): empty until the dealer shares them. Do not fill Mahindra's form.
+- `crm`: variant, payment, delivery wanted, exchange, registration.
+
+**CRM sheet.** `node tools/make-crm.mjs` (run by the refresh) writes `data/cases/pilot-crm.csv`: one row per visit, our columns filled, ten columns left for the dealer (customer name, mobile, enquiry or SalesGenie ID, need-analyzer answers, punch-in time, booking amount, booking date, promised delivery, SalesGenie follow-up result, final outcome). `data/crm-template.csv` is the same sheet empty. Mobile numbers spoken in a recording are never copied into it. Download: Data menu, "CRM sheet (CSV)".
+
+**Day report.** Data menu, "Day report (PDF)": the day's numbers, one table of all conversations, then every conversation in full. "Save as PDF" uses the browser's print.
+
 ### Names
 Customers are shown as "Customer at 11:54 am" and are never named from the recording; message drafts do not greet by a name the team has not given. Reps are the floor nicknames and names the team gives. A name that is also **spoken in the audio** is flagged by the audit: for #266 the rep is Hardik (the team's word), while the recording also has the name Hardik said at 15:11 (the rep quoting a customer's reference: "Hardik bhai, it runs 500 plus"), at 23:18 (a customer's reply, "Hardik Joshi") and at 23:20 (the rep: "Hardik bhai, right?"). Whose name that is cannot be told from the audio. Please confirm with Abhishek; it is one line in `data/pilot-notes.json` to change.
 
