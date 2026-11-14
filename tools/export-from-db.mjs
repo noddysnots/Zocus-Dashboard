@@ -187,12 +187,13 @@ const CHK = { D1: 'need', D2: 'need', D4: 'need', D3: 'budget', P1: 'pitch', P2:
 const SOP = { discovery: 'need', product_knowledge: 'pitch', objection_handling: 'objection', competitor_handling: 'objection' };
 const reasonCode = t => { const s = (t || '').toLowerCase(); if (!s) return ''; if (/family|approval|discuss|husband|wife|mother|parents/.test(s)) return 'family'; if (/competitor|another|other jeweller|elsewhere/.test(s)) return 'competitor'; if (/budget|price|cost|making|charge|discount|expensive/.test(s)) return 'budget'; if (/design|style|pattern/.test(s)) return 'design'; if (/stock|unavailable|size/.test(s)) return 'stock'; if (/browsing|just looking/.test(s)) return 'browse'; return clip(t, 60); };
 
-const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'customer_quote_en', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_quote_en', 'objection_reply', 'objection_reply_en', 'objection_at_sec', 'followup_due', 'followup_done', 'rep_tenure', 'store_name', 'owner_name', 'zocus_url', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'value_source', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision', 'ended_at', 'analysed_at', 'scored', 'sum_need', 'sum_happened', 'sum_outcome', 'sum_why', 'sum_next', 'promises_json', 'concerns_json', 'flags', 'remarks', 'prices_json', 'f_budget', 'f_preference', 'f_timing', 'f_competitor', 'tr_en', 'kind', 'result_label'];
+const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'customer_quote_en', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_quote_en', 'objection_reply', 'objection_reply_en', 'objection_at_sec', 'followup_due', 'followup_done', 'rep_tenure', 'store_name', 'owner_name', 'zocus_url', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'value_source', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision', 'ended_at', 'analysed_at', 'scored', 'sum_need', 'sum_happened', 'sum_outcome', 'sum_why', 'sum_next', 'promises_json', 'concerns_json', 'flags', 'remarks', 'prices_json', 'f_budget', 'f_preference', 'f_timing', 'f_competitor', 'tr_en', 'kind', 'result_label', 'stage', 'stage_src', 'payment_status'];
 const DERIVED = {}; const mark = (col, how) => { (DERIVED[col] ||= { how, n: 0 }).n++; };
 const exported = new Set(), unscored = []; let fixtureN = 0, heldN = 0, partialN = 0;
 const skip = { range: 0, noOutcome: 0, noScore: 0, dropped: 0 }, src = { checks: 0, 'analysis review': 0 }, srcN = {}, calls = [];
 const isCar = o.vertical === 'car';
 /* team notes for a pilot day: rep, customer, segment, model, value, drop (see data/pilot-notes.json) */
+const DAYNOTE = (() => { if (!o.notes) return ''; try { return JSON.parse(fs.readFileSync(path.resolve(root, o.notes), 'utf8')).daynote || ''; } catch { return ''; } })();
 const NOTES = (() => { if (!o.notes) return {}; try { return JSON.parse(fs.readFileSync(path.resolve(root, o.notes), 'utf8')).calls || {}; } catch (e) { console.error('Could not read the notes file ' + o.notes + ': ' + e.message); return {}; } })();
 const from = val('--date') || o.date || val('--from'), to = val('--date') || o.date || val('--to');
 let lastDay = rows.length ? fmt(rows.at(-1).captured_at, false) : null;
@@ -205,7 +206,11 @@ for (const r of rows) {
   if ((from && day < from) || (to && day > to) || (dayN && day < dayN)) { skip.range++; continue; }
   const note = NOTES[String(r.id)] || {};
   if (note.drop) { skip.dropped++; continue; }
-  const isDelivery = note.kind === 'delivery'; // a conversation after the sale (delivery, accessories, a dispute): not a sales pitch, so no sales score, quotation or value
+  const sumAll = String(r.summary || r.result?.summary || '');
+  const suggested = /(taking|take|collect\w*) delivery|delivery today|before delivery|pre-?delivery|hand ?over/i.test(sumAll) && /accessor|insurance|payment|coating|RTO/i.test(sumAll) ? 'after_booking' : /quot|on-?road|ex-?showroom|discount|financ|loan|variant|booking|price|stock|delivery/i.test(sumAll) ? 'finalising' : 'exploring';
+  const jStage = note.stage || (note.kind === 'delivery' ? 'after_booking' : suggested), stageSrc = note.stage || note.kind ? 'team' : 'suggested';
+  const isDelivery = jStage === 'after_booking'; // after the sale (delivery, accessories, payment, a dispute): not a sales pitch, so no sales score, quotation or value
+  const NA_IDS = jStage === 'finalising' ? ['need', 'budget'] : []; // a customer who has already chosen a model is not marked on discovering the need or the budget
   const res = r.result || {}, oc = r.outcome || {}, rr = res.revenueRecovery || {}, sc = r.scoring;
   const stage = oc.stage, tag = r.sale_tag;
   let outcome = stage === 'won' || tag === 'yes' ? 'sold' : stage === 'follow_up' ? 'followup' : stage === 'lost' || tag === 'no' ? 'lost' : null;
@@ -220,7 +225,7 @@ for (const r of rows) {
   if (sc?.eligibility?.eligible && Array.isArray(sc.checks) && sc.checks.length) {
     rubric = sc.checks.filter(c => c.id in RUB_POINTS || c.mark in RUB_POINTS).filter(c => RUB_POINTS[c.mark] != null);
     const acc = {}; let sum = 0, cnt = 0;
-    for (const c of rubric) { const k = RUB_SKILL[c.id]; if (!k) continue; (acc[k] ||= []).push(RUB_POINTS[c.mark]); sum += RUB_POINTS[c.mark]; cnt++; }
+    for (const c of rubric) { const k = RUB_SKILL[c.id]; if (!k || NA_IDS.includes(c.id)) continue; (acc[k] ||= []).push(RUB_POINTS[c.mark]); sum += RUB_POINTS[c.mark]; cnt++; }
     for (const k in acc) tally[k] = Math.round(acc[k].reduce((a, b) => a + b, 0) / acc[k].length);
     if (cnt) { source = 'rubric'; var rubricScore = Math.round(sum / cnt); }
   }
@@ -234,7 +239,7 @@ for (const r of rows) {
   let sk = {}, overall = '';
   if (scored) {
     sk = source === 'rubric' ? { ...tally } : Object.fromEntries(Object.entries(tally).map(([k, [a, b]]) => [k, pct(a, b)]));
-    if (sk.budget == null) { sk.budget = budgetText ? 100 : 0; mark('score_budget', 'proxy: was a budget captured in the conversation (100) or not (0)'); }
+    if (sk.budget == null && !NA_IDS.includes('budget')) { sk.budget = budgetText ? 100 : 0; mark('score_budget', 'proxy: was a budget captured in the conversation (100) or not (0)'); }
     if (sk.close == null) { sk.close = outcome === 'sold' || hasNext ? 100 : 0; mark('score_close', 'proxy: sale closed or a next step / follow-up set (100), otherwise 0'); }
     const have = Object.values(sk).filter(v => v != null);
     overall = source === 'rubric' ? rubricScore : source === 'checks' ? pct(m, n) : Math.round(have.reduce((a, b) => a + b, 0) / have.length);
@@ -244,7 +249,7 @@ for (const r of rows) {
 
   // speaker turns. Label by the AI's role guess only: the account that recorded (rep_id) is NOT the person speaking, so never use its name here.
   const ROLE = { rep: 'Rep', customer: 'Customer', customer_companion: "Customer's companion", background: 'Background', other_staff: 'Other staff', assisting_staff: 'Other staff', unidentified: 'Other voice' };
-  const roleOf = Object.fromEntries((r.roles?.speakers || []).map(x => [x.label, ROLE[x.role] || 'Other voice']));
+  const roleOf = Object.fromEntries((r.roles?.speakers || []).map(x => [x.label, /^STORE_/.test(x.reason || '') && !['rep', 'customer', 'customer_companion', 'background'].includes(x.role) ? 'Store colleague' : ROLE[x.role] || 'Other voice']));
   const ts = ms => { const t = Math.floor(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
   const turns = []; for (const g of Array.isArray(r.segments) ? r.segments : []) { const who = roleOf[g.speaker] || g.speaker || ''; const last = turns.at(-1); if (last && last.who === who && last.text.length < 600) last.text += ' ' + (g.text || '').trim(); else turns.push({ who, at: g.startMs || 0, text: (g.text || '').trim() }); }
   const transcript = turns.length > 1 ? turns.map(t => `[${ts(t.at)}] ${t.who}: ${t.text.replace(/\s+/g, ' ')}`).join('\n') : (r.transcript || '').replace(/\s+/g, ' ').trim();
@@ -327,7 +332,7 @@ for (const r of rows) {
   const NOTE_SKIP = isCar ? /source coverage|not attributable|no matching|jewell?ery|catalogu?e|tanishq|\bgold\b/i : /source coverage|not attributable|no matching/i;
   const aiNotes = uniq((res.sop || []).filter(x => x.note && !NOTE_SKIP.test(x.note)).map(x => x.note));
   const CHK_LABEL = isCar ? CHK_CAR : { D1: 'Asked the occasion or purpose', D2: 'Confirmed the category or type', D3: 'Asked the budget', D4: 'Confirmed specifications', P1: 'Gave a correct product fact', P2: 'Addressed the customer\'s priority', P3: 'Explained the value', O1: 'Acknowledged the objection', O2: 'Explored the objection', O3: 'Answered the objection', C1: 'Handled the competitor comparison', SOP1: 'Stayed respectful', SOP2: 'Used the store offer or hook', N1: 'Agreed a next step and contact' };
-  const seenChk = new Set(), aiChecks = rubric ? RUB_ORDER.map(id => rubric.find(c => c.id === id)).filter(Boolean).map(c => `${({ done: 'MET', partly: 'PARTLY', missed: 'NOT_MET' })[c.mark]}: ${RUB_LABEL[c.id] || c.id} (${c.id}). ${clip(String(c.reason || '').replace(/\|/g, '/'), 220)}${c.evidence?.[0]?.quote ? ' ❝' + clip(String(c.evidence[0].quote).replace(/\|/g, '/'), 160) + '❞' : ''}`).join(' | ') : (sc?.observations || []).filter(x => ['MET', 'NOT_MET'].includes(x.state)).filter(x => { const k = x.checkId + x.state; if (seenChk.has(k)) return false; seenChk.add(k); return true; })
+  const seenChk = new Set(), aiChecks = rubric ? RUB_ORDER.map(id => rubric.find(c => c.id === id)).filter(Boolean).map(c => `${NA_IDS.includes(c.id) ? 'NA' : ({ done: 'MET', partly: 'PARTLY', missed: 'NOT_MET' })[c.mark]}: ${RUB_LABEL[c.id] || c.id} (${c.id}). ${clip(String(c.reason || '').replace(/\|/g, '/'), 220)}${c.evidence?.[0]?.quote ? ' ❝' + clip(String(c.evidence[0].quote).replace(/\|/g, '/'), 160) + '❞' : ''}`).join(' | ') : (sc?.observations || []).filter(x => ['MET', 'NOT_MET'].includes(x.state)).filter(x => { const k = x.checkId + x.state; if (seenChk.has(k)) return false; seenChk.add(k); return true; })
     .map(x => `${x.state}: ${CHK_LABEL[x.checkId] || x.checkId} (${x.checkId})${x.reason ? '. ' + clip(String(x.reason).replace(/\|/g, '/'), 180) : ''}`).join(' | ');
 
   // who: team notes win; then "Rep / Customer" typed in the app's customer box; the recording account is only a last resort
@@ -337,7 +342,7 @@ for (const r of rows) {
   if (!custName && o.notes) custName = 'Customer ' + (dayIds.indexOf(r.id) + 1);
   const product = isCar ? (mainModel?.label || 'Model not decided') : (fld(res, 'preference') || 'Not captured');
   const weak = []; if (+dmin && +dmin < 3) weak.push('under 3 minutes'); if (r.quality && r.quality !== 'complete') weak.push('recording marked ' + r.quality); if (res.relevance?.status && res.relevance.status !== 'relevant') weak.push('AI: not a sales conversation'); if (rr.outcomeReason === 'truncated') weak.push('ends mid-conversation'); if ((r.roles?.speakers || []).length && !wCust) weak.push('no customer voice found');
-  calls.push({ id: r.id, at: fmt(r.captured_at).slice(11), min: dmin, rep: repName, customer: custName, model: product, value, source: vsrc, outcome, scored: scored && !isDelivery, kind: isDelivery ? 'delivery' : '', prices: distinctPrices, models: considered.map(m => m.label).join(' vs '), fuel: fuel.join('/'), quote, td: testDrive, avail: availLine ? clip(availLine, 100) : '', said: vsrc === 'call' ? clip(rr.value?.evidence?.at(-1)?.quote || priceLine?.text || '', 120) : '', weak });
+  calls.push({ id: r.id, at: fmt(r.captured_at).slice(11), min: dmin, rep: repName, customer: custName, model: product, value, source: vsrc, outcome, scored: scored && !isDelivery, kind: isDelivery ? 'delivery' : '', stage: jStage, stageSrc, suggested, prices: distinctPrices, models: considered.map(m => m.label).join(' vs '), fuel: fuel.join('/'), quote, td: testDrive, avail: availLine ? clip(availLine, 100) : '', said: vsrc === 'call' ? clip(rr.value?.evidence?.at(-1)?.quote || priceLine?.text || '', 120) : '', weak });
 
   // ---- what the backend gave us beyond the summary line: five-part summary, promises with drafts, concerns, flags ----
   const sumParts = (() => { const t = String(r.summary || res.summary || ''), o2 = {}, ms = [...t.matchAll(/(Customer need|What happened|Outcome|Why|Next step):\s*/g)]; ms.forEach((mm, i) => { o2[mm[1]] = t.slice(mm.index + mm[0].length, i + 1 < ms.length ? ms[i + 1].index : undefined).trim(); }); if (!ms.length) o2['What happened'] = t.trim(); return o2; })();
@@ -372,7 +377,7 @@ for (const r of rows) {
     ended_at: r.ended_at ? fmt(r.ended_at) : '', analysed_at: r.analysed_at ? fmt(r.analysed_at) : '', sum_need: sumParts['Customer need'] || '', sum_happened: sumParts['What happened'] || '', sum_outcome: sumParts['Outcome'] || '', sum_why: sumParts['Why'] || '', sum_next: sumParts['Next step'] || '',
     promises_json: promises.length ? JSON.stringify(promises) : '', concerns_json: concerns.length ? JSON.stringify(concerns) : '', flags: [...new Set(flagsAI)].join('|'), remarks: note.remarks || '', prices_json: note.prices ? JSON.stringify(note.prices) : '',
     f_budget: fld(res, 'budget'), f_preference: fld(res, 'preference'), f_timing: fld(res, 'timing'), f_competitor: fld(res, 'competitor'), tr_en: note.tr_en ? JSON.stringify(note.tr_en) : '',
-    result_label: isDelivery ? (note.result_label || 'Delivery issue') : '',
+    result_label: isDelivery ? (note.result_label || 'After booking') : '', stage: jStage, stage_src: stageSrc, payment_status: note.payment || '',
     quality: r.quality && r.quality !== 'complete' ? r.quality : '', ai_model: r.ai_model || '', talk_rep_pct: wRep + wCust ? Math.round(100 * wRep / (wRep + wCust)) : '', segments_n: turns.length || '',
   };
   if (note.csv) Object.assign(rec, note.csv);
@@ -388,7 +393,7 @@ const dateKey = val('--date') || o.date || null, nowLocal = fmt(new Date());
 let history = []; try { const pm = JSON.parse(fs.readFileSync(metaPath, 'utf8')); if (pm.date === dateKey && Array.isArray(pm.history)) history = pm.history; } catch {}
 if (o.keepAll && dateKey && (!history.length || history.at(-1).shown !== out.length)) history.push({ at: nowLocal, shown: out.length });
 const repCount = o.notes ? calls.reduce((a, c) => { a[c.rep] = (a[c.rep] || 0) + 1; return a; }, {}) : scoped.reduce((a, x) => { a[x.rep || 'Unknown'] = (a[x.rep || 'Unknown'] || 0) + 1; return a; }, {});
-const meta = { store: o.storeName || org.name, exportedAt: new Date().toISOString(), exportedLocal: nowLocal, date: dateKey, recorded: scoped.length, shown: out.length,
+const meta = { dayNote: DAYNOTE, store: o.storeName || org.name, exportedAt: new Date().toISOString(), exportedLocal: nowLocal, date: dateKey, recorded: scoped.length, shown: out.length,
   analysing: kept.filter(x => !exported.has(x.id) && !unscored.includes(x.id) && x.analysis_state !== 'succeeded' && x.status !== 'reupload_required').map(pend),
   failed: kept.filter(x => x.status === 'reupload_required').map(pend),
   unscored: kept.filter(x => unscored.includes(x.id)).map(pend),

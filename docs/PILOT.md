@@ -114,3 +114,10 @@ A call is dropped only when the team says so (for example #263, a fragment, was 
 
 ### Conversations after the sale
 A delivery-day conversation (accessories, a dispute) is not a sales pitch. Mark it in `data/pilot-notes.json` with `"kind": "delivery"` (and `result_label`, for example "Delivery dispute"). It then stays out of every sales number, is not scored, has no value, and is shown in its own card "After the sale: needs attention", on the timeline in purple, in the conversation list and with its promises. First case: #264, 14 Nov.
+
+### Journey stage (14 Nov, from the floor)
+Abhishek, 11:48 am: today's traffic is mostly model finalisation, accessory selection and payment finalisation; a normal day is mostly early enquiries. Every conversation now carries a stage, set in the notes file (`"stage"`) or guessed from the AI summary (the refresh list says which, please confirm):
+- **exploring**: early enquiry; all nine scored checks count.
+- **finalising**: the customer has chosen a model and is settling variant, price, finance, stock; "understand the need" and "ask the budget" are shown as "Not counted" and are left out of the score.
+- **after_booking**: accessories, payment, delivery or a dispute; not scored, left out of the sales numbers, shown under "After the sale" and in the "After the booking" tab (accessories and add-ons with prices, payment status, open issues). `payment` in the notes shows the payment status.
+The team's one-line note about the day goes in the notes file as `"daynote"` and is shown on the Overview.

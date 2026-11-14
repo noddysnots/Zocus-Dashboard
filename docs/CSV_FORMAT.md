@@ -112,3 +112,8 @@ When `vertical` is `car` the dashboard uses showroom wording (Booked, test drive
 | `tr_en` | JSON map of transcript time (`m:ss`) to an English line |
 
 Transcript speaker labels: `Rep`, `Customer`, `Customer's companion`, `Background`, `Other voice`, `Other staff`. `Background` and `Other voice` are collapsed as side talk.
+
+| `stage`, `stage_src` | journey stage: `exploring`, `finalising` or `after_booking`; `team` or `suggested` |
+| `kind`, `result_label` | `delivery` marks an after-booking conversation (not scored); the label replaces the result pill |
+| `payment_status` | free text, shown on after-booking conversations |
+`ai_checks` may also carry `NA: label (id). reason` for checks that are not counted at this stage. The meta file may carry `dayNote`.

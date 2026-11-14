@@ -122,7 +122,7 @@ function build(text,name){
     const dur=num(get(r,'duration_min'));
     const due=parseDate(get(r,'followup_due'));
     return {id:i+1,ref:get(r,'conversation_id')||('row-'+(i+2)),rep:repMap[x.rep],at:x.at,d:Math.round((todayMid-new Date(x.at.getFullYear(),x.at.getMonth(),x.at.getDate()).getTime())/DAY),
-      persona:perMap[cl],product:prodMap[pl],inStock:!no(get(r,'in_stock')),skills:x.sk,score:x.score,scored:x.scored,kind:get(r,'kind').toLowerCase()==='delivery'?'delivery':'sale',resultLabel:get(r,'result_label'),competitor:comp,outcome:x.oc,reason,stage,value:x.value,
+      persona:perMap[cl],product:prodMap[pl],inStock:!no(get(r,'in_stock')),skills:x.sk,score:x.score,scored:x.scored,kind:get(r,'kind').toLowerCase()==='delivery'?'delivery':'sale',jstage:get(r,'stage').toLowerCase(),stageSrc:get(r,'stage_src'),payment:get(r,'payment_status'),resultLabel:get(r,'result_label'),competitor:comp,outcome:x.oc,reason,stage,value:x.value,
       dur:isNaN(dur)||dur<=0?15:Math.round(dur),customer:get(r,'customer_name')||'Customer',phone:get(r,'customer_phone')||null,
       kw:get(r,'keywords').split('|').map(s=>s.trim()).filter(Boolean),done:false,
       cq:get(r,'customer_quote'),cqEn:get(r,'customer_quote_en'),
@@ -133,7 +133,7 @@ function build(text,name){
       aiCoach:get(r,'ai_coaching').split('|').map(t=>t.trim()).filter(Boolean),aiQuote:get(r,'ai_coaching_quote'),
       aiPromises:get(r,'ai_commitments').split('|').map(t=>t.trim()).filter(Boolean),aiNext:get(r,'ai_next_action'),
       aiNotes:get(r,'ai_notes').split('|').map(t=>t.trim()).filter(Boolean),
-      aiChecks:get(r,'ai_checks').split(' | ').map(t=>{const m=t.trim().match(/^(MET|PARTLY|NOT_MET):\s*(.*?)\s*\((\w+)\)\.?\s*([\s\S]*)$/);if(!m)return null;const qi=m[4].indexOf('\u275D'),why=qi>=0?m[4].slice(0,qi).trim():m[4],quote=qi>=0?m[4].slice(qi+1).replace(/\u275E\s*$/,'').trim():'';return {ok:m[1]==='MET',mark:m[1]==='MET'?'done':m[1]==='PARTLY'?'partly':'missed',label:m[2],id:m[3],why,quote}}).filter(Boolean),
+      aiChecks:get(r,'ai_checks').split(' | ').map(t=>{const m=t.trim().match(/^(MET|PARTLY|NOT_MET|NA):\s*(.*?)\s*\((\w+)\)\.?\s*([\s\S]*)$/);if(!m)return null;const qi=m[4].indexOf('\u275D'),why=qi>=0?m[4].slice(0,qi).trim():m[4],quote=qi>=0?m[4].slice(qi+1).replace(/\u275E\s*$/,'').trim():'';return {ok:m[1]==='MET',mark:m[1]==='MET'?'done':m[1]==='PARTLY'?'partly':m[1]==='NA'?'na':'missed',label:m[2],id:m[3],why,quote}}).filter(Boolean),
       endAt:parseDate(get(r,'ended_at')),analysedAt:parseDate(get(r,'analysed_at')),
       sumNeed:get(r,'sum_need'),sumHappened:get(r,'sum_happened'),sumOutcome:get(r,'sum_outcome'),sumWhy:get(r,'sum_why'),sumNext:get(r,'sum_next'),
       promises:jsonOf(get(r,'promises_json')),concerns:jsonOf(get(r,'concerns_json')),prices:jsonOf(get(r,'prices_json')),trEn:jsonOf(get(r,'tr_en'),{}),

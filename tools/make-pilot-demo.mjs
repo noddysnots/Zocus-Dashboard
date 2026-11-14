@@ -132,10 +132,37 @@ sched.forEach(({ start, dur: dur0 }, i) => {
     f_budget: budgeted ? `About ${inr(budget)}` : '', f_preference: `${product}${colour ? ', ' + colour : ''}`, f_timing: avail ? 'Wants delivery soon' : '', f_competitor: comp ? comp[0] : '', tr_en: '',
   });
 });
-const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'value_source', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_reply', 'followup_due', 'followup_done', 'store_name', 'owner_name', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision', 'ended_at', 'analysed_at', 'scored', 'sum_need', 'sum_happened', 'sum_outcome', 'sum_why', 'sum_next', 'promises_json', 'concerns_json', 'flags', 'remarks', 'prices_json', 'f_budget', 'f_preference', 'f_timing', 'f_competitor', 'tr_en'];
+/* journey stages: some customers explore, most are finalising, and a few come back after booking (accessories, payment, delivery) */
+const PTS2 = { MET: 100, PARTLY: 50, NOT_MET: 0 };
+const afterIdx = new Set([Math.min(5, rows.length - 1), Math.min(11, rows.length - 1)]);
+rows.forEach((r, i) => {
+  r.stage_src = 'team'; r.kind = ''; r.result_label = ''; r.payment_status = '';
+  if (afterIdx.has(i)) {
+    const model = r.models_considered.split('|')[0] || 'XUV 7XO', dispute = i === Math.min(5, rows.length - 1);
+    Object.assign(r, { stage: 'after_booking', kind: 'delivery', result_label: dispute ? 'Delivery dispute' : 'After booking', outcome: 'followup', scored: 'no', score: '', score_need: '', score_budget: '', score_pitch: '', score_objection: '', score_close: '', ai_checks: '', value_inr: '', value_source: '', quote_given: '',
+      sum_need: `The customer is taking delivery of a ${model} today and is choosing accessories and finalising payment.`,
+      sum_happened: dispute ? 'The rep listed accessories and an insurance upgrade. The customer wanted the extended-warranty bundle in his booking deal swapped for accessories; the rep said the booking terms do not allow it.' : 'The rep went through the accessories list and the insurance upgrade; the customer chose the mats and the pedal covers and asked for the paperwork.',
+      sum_outcome: dispute ? 'Unresolved: the customer says he may cancel rather than lose the bundled amount.' : 'The customer agreed the accessories and will pay the balance at delivery.',
+      sum_why: dispute ? 'The bundled item was agreed at booking, but the customer cannot use it near his home.' : 'No issue.', sum_next: dispute ? 'A manager should speak to the customer before delivery.' : 'Fit the accessories before evening delivery.',
+      payment_status: dispute ? 'Balance being worked out; customer will pay in cash.' : 'Balance to be paid at delivery, by cheque.',
+      prices_json: JSON.stringify([{ m: '7D matting', p: 10500, b: 'accessory', at: '4:14' }, { m: 'Pedal cover', p: 500, b: 'accessory', at: '10:25' }, { m: 'Insurance upgrade, 1+2 to 3+3 years', p: 1100, b: 'extra on the quotation', at: '1:15' }, ...(dispute ? [{ m: 'Extended warranty bundle in the booking deal', p: 30000, b: 'agreed at booking', at: '2:50' }] : [])]),
+      concerns_json: dispute ? JSON.stringify([{ t: 'Customer wants the bundled amount cancelled or swapped', s: 'open', a: 'Rep refused, citing the booking terms' }]) : '', flags: dispute ? 'Customer mentioned possible cancellation; not an explicit lost sale.' : '', customer_type: 'Delivery today' });
+    return;
+  }
+  r.stage = r.models_considered && !/^(talked|need_understood)$/.test(r.stage_reached) ? 'finalising' : 'exploring';
+  if (r.stage === 'finalising' && r.ai_checks) {
+    const parts = r.ai_checks.split(' | '), rest = [];
+    const out = parts.map(p => (/\((need|budget)\)/.test(p) ? p.replace(/^(MET|PARTLY|NOT_MET):/, 'NA:') : p));
+    const pts = out.filter(p => !/^NA:/.test(p) && !/\(experience\)/.test(p)).map(p => PTS2[p.split(':')[0]]);
+    r.ai_checks = out.join(' | '); r.score = Math.round(pts.reduce((a, b) => a + b, 0) / pts.length); r.score_need = ''; r.score_budget = '';
+  }
+});
+const DAYNOTE = "From the floor (sample): customers are mostly finalising the model, choosing accessories and finalising payment today. On a normal day most are early enquiries.";
+const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'value_source', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_reply', 'followup_due', 'followup_done', 'store_name', 'owner_name', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision', 'ended_at', 'analysed_at', 'scored', 'sum_need', 'sum_happened', 'sum_outcome', 'sum_why', 'sum_next', 'promises_json', 'concerns_json', 'flags', 'remarks', 'prices_json', 'f_budget', 'f_preference', 'f_timing', 'f_competitor', 'tr_en', 'kind', 'result_label', 'stage', 'stage_src', 'payment_status'];
 const cell = v => { v = String(v ?? ''); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
 const upTo = hm => rows.filter(r => r.analysed_at.slice(11) <= hm).length;
 const meta = {
+  dayNote: DAYNOTE,
   store: STORE, exportedAt: `${DAY}T14:35:00.000Z`, exportedLocal: `${DAY} 20:05`, date: DAY, recorded: rows.length + 2, shown: rows.length,
   analysing: [{ id: 7101, at: `${DAY} 19:48`, rep: 'Sneha Patil', min: 14 }], failed: [], unscored: [],
   leftOut: [{ id: 7103, at: `${DAY} 12:40`, why: 'Recording cut short' }],
