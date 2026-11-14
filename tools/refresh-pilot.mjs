@@ -31,7 +31,7 @@ console.log(`Pilot: ${meta.store} · ${date || 'all dates'} · exported ${meta.e
 console.log(`Recorded ${meta.recorded} · shown ${meta.shown} · still being analysed ${meta.analysing.length} · not scorable ${meta.unscored.length} · failed uploads ${meta.failed.length} · left out by the team ${(meta.leftOut || []).length}`);
 if (calls.length) {
   console.log('\nConversations (use the # to tag a rep, customer, model, fuel, colour, quotation or value, or to drop a call):');
-  console.table(calls.map(c => ({ '#': c.id, time: t12(c.at), min: c.min, rep: c.rep, customer: c.customer, models: c.models || c.model, fuel: c.fuel || '-', quotation: c.quote, 'test drive': c.td, value: inr(c.value), 'value from': SRC[c.source] ?? c.source, result: ({ sold: 'booked', followup: 'will return', lost: 'did not book' })[c.outcome] })));
+  console.table(calls.map(c => ({ '#': c.id, time: t12(c.at), min: c.min, rep: c.rep, customer: c.customer, models: c.models || c.model, fuel: c.fuel || '-', quotation: c.quote, 'test drive': c.td, value: inr(c.value), 'value from': SRC[c.source] ?? c.source, result: c.kind === 'delivery' ? 'delivery issue (not scored)' : ({ sold: 'booked', followup: 'will return', lost: 'did not book' })[c.outcome] })));
   const said = calls.filter(c => c.said); if (said.length) { console.log('Prices read from the conversation (check these):'); said.forEach(c => console.log(`  #${c.id} ${inr(c.value)}: "${c.said}"`)); }
   const untag = calls.filter(c => c.rep === 'Rep not tagged').length; if (untag) console.log(`${untag} of ${calls.length} have no rep tagged yet.`);
   const noVal = calls.filter(c => c.value === '').length, ind = calls.filter(c => c.source === 'indicative').length;

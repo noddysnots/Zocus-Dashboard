@@ -122,7 +122,7 @@ function build(text,name){
     const dur=num(get(r,'duration_min'));
     const due=parseDate(get(r,'followup_due'));
     return {id:i+1,ref:get(r,'conversation_id')||('row-'+(i+2)),rep:repMap[x.rep],at:x.at,d:Math.round((todayMid-new Date(x.at.getFullYear(),x.at.getMonth(),x.at.getDate()).getTime())/DAY),
-      persona:perMap[cl],product:prodMap[pl],inStock:!no(get(r,'in_stock')),skills:x.sk,score:x.score,scored:x.scored,competitor:comp,outcome:x.oc,reason,stage,value:x.value,
+      persona:perMap[cl],product:prodMap[pl],inStock:!no(get(r,'in_stock')),skills:x.sk,score:x.score,scored:x.scored,kind:get(r,'kind').toLowerCase()==='delivery'?'delivery':'sale',resultLabel:get(r,'result_label'),competitor:comp,outcome:x.oc,reason,stage,value:x.value,
       dur:isNaN(dur)||dur<=0?15:Math.round(dur),customer:get(r,'customer_name')||'Customer',phone:get(r,'customer_phone')||null,
       kw:get(r,'keywords').split('|').map(s=>s.trim()).filter(Boolean),done:false,
       cq:get(r,'customer_quote'),cqEn:get(r,'customer_quote_en'),
@@ -151,7 +151,7 @@ function build(text,name){
   const ns=rr.filter(r=>!/^(sold|yes|won)$/i.test(get(r,'outcome'))),nsFilled=c=>ns.length?ns.filter(r=>get(r,c)!=='').length/ns.length>=.3:false;
   const has={stock:filled('in_stock'),competitor:filled('competitor'),offer:filled('competitor_offer'),reason:nsFilled('reason'),stage:nsFilled('stage_reached'),
     followups:filled('followup_due'),replies:filled('objection_reply'),types:filled('customer_type'),
-    ai:CONVS.some(c=>c.aiCoach.length||c.aiPromises.length||c.aiNext||c.aiNotes.length),checks:CONVS.some(c=>c.aiChecks.length),valueSrc:'value_source' in idx,floor:'quote_given' in idx,rubric:CONVS.some(c=>c.aiChecks.some(x=>x.mark==='partly')),times:'ended_at' in idx,promises:CONVS.some(c=>c.promises.length),transcript:CONVS.some(c=>c.transcript)};
+    ai:CONVS.some(c=>c.aiCoach.length||c.aiPromises.length||c.aiNext||c.aiNotes.length),checks:CONVS.some(c=>c.aiChecks.length),valueSrc:'value_source' in idx,floor:'quote_given' in idx,delivery:CONVS.some(c=>c.kind==='delivery'),rubric:CONVS.some(c=>c.aiChecks.some(x=>x.mark==='partly')),times:'ended_at' in idx,promises:CONVS.some(c=>c.promises.length),transcript:CONVS.some(c=>c.transcript)};
   return {ok:true,name,warnings,
     ds:{has,vertical:(get(first,'vertical')||'').toLowerCase(),today,store:get(first,'store_name')||'Your store',owner:get(first,'owner_name')||'',REPS,PRODUCTS,PERSONAS,COMPS,CONVS,customReasons,hasObjection,rawText:text,file:name}}}
 
