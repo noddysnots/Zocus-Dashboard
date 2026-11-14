@@ -59,7 +59,8 @@
         "customer_quote_en": "Is there any discount?",
         "objection_quote_en": "Is there any discount?",
         "objection_reply_en": "There is no discount on the Scorpio, and there is a waiting period on the car. When do you want it?",
-        "customer_type": "Choosing a manual Scorpio-N"
+        "customer_type": "Choosing a manual Scorpio-N",
+        "outcome": "followup"
       },
       "tr_en": {
         "0:10": "XUV 700 in petrol or diesel?",
