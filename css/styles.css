@@ -877,6 +877,8 @@ html.emptyday .seg,html.emptyday #rangeSel,html.emptyday [data-act="palopen"],ht
 .rpt-summary .tlcard{margin-bottom:6px}
 .rpt-summary .tlcard .lg{margin-top:4px;font-size:11px}
 .rpt-summary .stagebar{margin:2px 0 0}
+.rpt-summary .rpt-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 0;align-items:start}
+.rpt-summary .rpt-pair .card{margin:0}
 .rpt-summary .drop{margin:6px 0 0;font-size:13px;line-height:1.3;color:var(--ink)}
 .rpt-summary .imp,.rpt-summary .fulist{margin:0;padding-left:16px}
 .rpt-summary .imp li,.rpt-summary .fulist li{margin:2px 0;font-size:12.5px;line-height:1.3}
@@ -900,6 +902,9 @@ html.emptyday .seg,html.emptyday #rangeSel,html.emptyday [data-act="palopen"],ht
 .rpt-toc-list a:hover{text-decoration:underline}
 .rpt .tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .rpt .bl,.rpt .zc,.rpt svg{max-width:100%}
+@media(max-width:700px){
+ .rpt-summary .rpt-pair{grid-template-columns:minmax(0,1fr)}
+}
 @media(max-width:640px){
  .rpt-summary .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
  .rpthead{align-items:flex-start}
@@ -932,6 +937,8 @@ html.emptyday .seg,html.emptyday #rangeSel,html.emptyday [data-act="palopen"],ht
  .rpt-summary .tl{height:28px}
  .rpt-summary .tlax{font-size:9px}
  .rpt-summary .tlcard .lg{display:none}
+ .rpt-summary .rpt-pair{gap:6px;margin:4px 0 0}
+ .rpt-summary .rpt-pair .card{padding:6px 8px}
  .rpt-summary .fulist{columns:2;column-gap:10px}
  .rpt-summary .rpt-p2 .bl i{height:8px}
  .rpt-summary .rpthead .btnrow{display:none!important}

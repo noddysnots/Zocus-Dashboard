@@ -677,13 +677,16 @@ function renderReport(){const LD=[...allCur()].sort((a,b)=>a.at-b.at),L=cur(),D=
  const repTbl=rows.map(r=>{const best=r.L.filter(c=>c.scored!==false).reduce((m,c)=>Math.max(m,c.score||0),0);const qn=r.L.filter(c=>c.quote==='yes').length,wr=r.L.filter(c=>c.outcome==='followup').length;const res=r.s.sold?`${r.s.sold} booked`:(qn?`${qn} quoted`:(wr?`${wr} will return`:'–'));return `<tr${r.thin?' class="thin"':''}><td><b>${esc(r.rep.name)}</b>${r.thin?' <span class="hint">fewer than 3</span>':''}</td><td class="r num">${r.s.n}</td><td class="r num">${r.s.score}<span class="of100">/100</span></td><td class="r num">${best||'–'}</td><td>${esc(res)}</td></tr>`}).join('');
  const impacts=impactPoints(L,D,LD),P=openPromises(LD).filter(x=>!x.done);
  const night=P.length?P.map(x=>`<li${x.p.crit?' class="crit"':''}>${x.p.crit?'<span class="pill crit">Critical</span> ':''}<b>#${refNo(x.c)}</b> · ${esc(clipTxt(x.p.t,72))} <span class="hint">${esc(rname(REP[x.c.rep]))}</span></li>`).join(''):'<li class="hint">No open follow-ups.</li>';
+ const by=o=>L.filter(c=>c.outcome===o);
+ const resultSplit=ZC.splitBar([{name:Wd.sold,n:by('sold').length,color:ZC.OUTCOME.sold,sub:inr(sumv(by('sold')))},{name:'Will return',n:by('followup').length,color:ZC.OUTCOME.followup,sub:inr(sumv(by('followup')))},{name:Wd.lost,n:by('lost').length,color:ZC.OUTCOME.lost,sub:inr(sumv(by('lost')))}]);
  const asOf=reportAsOf(m);
  return `<div class="rpt rpt-summary"><div class="rpt-page rpt-p1 page-break-after">${reportHead('Day report',`${WDL[TODAY.getDay()]} ${fdate(TODAY)}${asOf}`)}
   <section class="kpis rpt-keep">${kpi({label:Wd.conv,tag:'Output',val:s.n?pct(s.conv):'–',sub:`${s.sold} of ${s.n} customers`,delta:'',go:'#insights'})}${kpi({label:Wd.closed,tag:'Output',val:s.soldValue?inr(s.soldValue):'–',sub:s.soldValue?Wd.tagged:'None booked yet',delta:'',filter:{outcome:'sold'}})}${kpi({label:'Conversations',tag:'Input',val:s.n,sub:D.length?`plus ${D.length} after booking`:'sales only',delta:'',go:'#team'})}${kpi({label:'Time with customers',tag:'Input',val:mins(tot),sub:`across ${plural(s.n,'conversation')}`,delta:'',go:'#conversations'})}</section>
   <section class="card rpt-keep funnelc"><div class="card-h"><h2>Funnel</h2><span class="hint">Each step as a share of the one before</span></div>${ZC.barList(funnelItems,{max:Math.max(...steps.map(x=>x.n),1)})}<p class="drop">${esc(funnelDrop(steps))}</p></section>
-  ${dayTimeline(LD)}${stageBar(LD)}</div>
+  ${dayTimeline(LD)}${stageBar(LD)}
+  <div class="rpt-pair rpt-keep"><section class="card rpt-keep"><div class="card-h"><h2>Results today</h2><span class="hint">Booked · will return · lost</span></div>${resultSplit}</section>
+  <section class="card rpt-keep"><div class="card-h"><h2>Models talked about</h2><span class="hint">Conversations · quoted or not</span></div>${ZC.barList(modelItems)}</section></div></div>
  <div class="rpt-page rpt-p2"><div class="rpt-p2head noprint-hide"><h2 class="rpt-doc">Day report · page 2</h2><span class="hint">${fdate(TODAY)}${asOf}</span></div>
-  <section class="card rpt-keep"><div class="card-h"><h2>Models talked about</h2><span class="hint">Conversations · quoted or not</span></div>${ZC.barList(modelItems)}</section>
   <section class="card rpt-keep"><div class="card-h"><h2>Rep performance</h2><span class="hint">Same scores as the Team page · mark when under 3 conversations</span></div>
    <div class="tblwrap"><table class="tbl"><thead><tr><th>Rep</th><th class="r">Conversations</th><th class="r">Avg score</th><th class="r">Best</th><th>Results</th></tr></thead><tbody>${repTbl||'<tr><td colspan="5">–</td></tr>'}</tbody></table></div>
    ${ZC.barList(repItems,{max:100})}</section>
