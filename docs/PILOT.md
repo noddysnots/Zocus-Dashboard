@@ -111,3 +111,6 @@ The screen is built **conversation by conversation**, for the dealer's owner and
 3. You push; Vercel redeploys; reload.
 
 A call is dropped only when the team says so (for example #263, a fragment, was dropped on 14 Nov).
+
+### Conversations after the sale
+A delivery-day conversation (accessories, a dispute) is not a sales pitch. Mark it in `data/pilot-notes.json` with `"kind": "delivery"` (and `result_label`, for example "Delivery dispute"). It then stays out of every sales number, is not scored, has no value, and is shown in its own card "After the sale: needs attention", on the timeline in purple, in the conversation list and with its promises. First case: #264, 14 Nov.
