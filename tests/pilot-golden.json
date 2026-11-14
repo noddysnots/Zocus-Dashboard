@@ -5,7 +5,7 @@
     "jewel"
   ],
   "prices_checked_by_hand": {
-    "_note": "Prices said in Hindi or Gujarati number words, where the audit cannot find digits. Each was read against the recording by hand on 14 Nov 2026: 261 0:49 'seventeen-fifty on road'; 262 4:13 '4 to 5 thousand more'; 264 2:50 'tees hazar' (30,000), 1:15 'gyarah sau' (1,100), 4:14 'das hazar paanch sau' (10,500), 10:25 'paanch sau' (500) and 'paintees sau' (3,500). 272 4:04 'around 20,000' and 4:11 '40-42,000' read by hand.",
+    "_note": "Prices said in Hindi or Gujarati number words, where the audit cannot find digits. Each was read against the recording by hand on 14 Nov 2026: 261 0:49 'seventeen-fifty on road'; 262 4:13 '4 to 5 thousand more'; 264 2:50 'tees hazar' (30,000), 1:15 'gyarah sau' (1,100), 4:14 'das hazar paanch sau' (10,500), 10:25 'paanch sau' (500) and 'paintees sau' (3,500). 272 4:04 'around 20,000' and 4:11 '40-42,000' read by hand. 275: all four prices are digits on the line.",
     "261": [
       "0:49"
     ],
@@ -93,6 +93,20 @@
       "scored": "yes",
       "customer_name": "Customer 6",
       "visit": "repeat"
+    },
+    "275": {
+      "_why": "EV vs CNG enquiry for a 3XO. The EV was not at the showroom. Test drive: floor says it happened (note), the AI summary says none. Three models compared, so the value is the 3XO EV's typical price (indicative, marked ~), not a quote; the rep said about 15.5 lakh for the AX5.",
+      "product": "XUV 3XO EV",
+      "models_considered": "XUV 3XO EV|XUV 3XO CNG|Scorpio Classic",
+      "fuel": "Electric|CNG",
+      "value_inr": "1442500",
+      "value_source": "indicative",
+      "quote_given": "yes",
+      "test_drive": "yes",
+      "stage": "exploring",
+      "kind": "",
+      "scored": "yes",
+      "customer_name": "Customer 8"
     }
   }
 }
