@@ -86,14 +86,14 @@
     {
       "id": "xev9e",
       "label": "XEV 9e",
-      "aliases": ["xev 9e", "xev 9 e"],
+      "aliases": ["xev 9e", "xev 9 e"], "csAliases": ["9e", "9E"],
       "range": [2190000, 3050000],
       "ev": true
     },
     {
       "id": "xev9s",
       "label": "XEV 9S",
-      "aliases": ["xev 9s", "xev 9 s"],
+      "aliases": ["xev 9s", "xev 9 s"], "csAliases": ["9S"],
       "range": [1995000, 2945000],
       "ev": true
     }

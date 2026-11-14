@@ -40,12 +40,13 @@ const normTxt = (s, keepCase) => ' ' + (keepCase ? String(s || '') : String(s ||
 /* every model mentioned, most-mentioned first (ties: mentioned last). Longer names are matched and masked first, so "Thar Roxx" is not also counted as "Thar". */
 function carModels(text) {
   let low = normTxt(text), cs = normTxt(text, true); const hit = {};
-  const al = PL.models.flatMap(m => m.aliases.map(a => ({ m, a }))).sort((x, y) => y.a.length - x.a.length);
-  for (const { m, a } of al) {
-    const key = (m.caseSensitive ? a : a.toLowerCase()).replace(/[^A-Za-z0-9]+/g, ' ').trim().replace(/ /g, ' ?');
+  /* aliases match any case; csAliases (short forms such as "9e" or "9S") match only as written */
+  const al = PL.models.flatMap(m => [...m.aliases.map(a => ({ m, a, cs: !!m.caseSensitive })), ...(m.csAliases || []).map(a => ({ m, a, cs: true }))]).sort((x, y) => y.a.length - x.a.length);
+  for (const { m, a, cs: isCs } of al) {
+    const key = (isCs ? a : a.toLowerCase()).replace(/[^A-Za-z0-9]+/g, ' ').trim().replace(/ /g, ' ?');
     const re = new RegExp(' ' + key + '(?= )', 'g');
     const hitFn = (s, i) => { const h = hit[m.id] ||= { m, n: 0, last: 0 }; h.n++; h.last = Math.max(h.last, i); return ' ' + '#'.repeat(s.length - 1); };
-    if (m.caseSensitive) cs = cs.replace(re, hitFn); else low = low.replace(re, hitFn);
+    if (isCs) cs = cs.replace(re, hitFn); else low = low.replace(re, hitFn);
   }
   return Object.values(hit).sort((a, b) => b.n - a.n || b.last - a.last);
 }
@@ -66,13 +67,16 @@ function rupeeFigures(s) {
   return out;
 }
 const PRICE_RE = /on[- ]?road|ex[- ]?showroom|\bprice[ds]?\b|pricing|quotation|\bquote[ds]?\b|\bcosts?\b|kimat|keemat|\bdaam\b|kitne (ka|ki|mein)/i;
-const NOT_PRICE = /\bemi\b|down ?payment|discount|exchange|insurance|\bloan\b|per month|monthly|a month|accessor|booking amount|\btoken\b|cashback|\bbonus\b|waiver|warranty|budget|salary|resale|old car/i;
+const NOT_PRICE = /\bemi\b|down ?payment|discount|exchange|insurance|\bloan\b|per month|monthly|a month|accessor|booking amount|\btoken\b|cashback|\bbonus\b|waiver|warranty|budget|salary|resale|old car|\bbatter(y|ies)\b|\bcharger\b|replacement/i;
+/* a line about a battery, charger or replacement cost is never the price of the car (an EV battery replacement of about 10 lakh was once read as the car's value) */
+const NOT_CAR_PRICE = /\bbatter(y|ies)\b|\bcharger\b|replacement/i;
 const BUDGET_RE = /budget|afford|\bspend\b|price range|\brange\b/i;
+const NOT_BUDGET = /\bkm\b|kilomet|kilowatt|\bkwh\b|\bbatter(y|ies)\b|\bcharg/i;
 /* the last car-sized rupee figure said on a matching line of the conversation */
 function saidInCall(turns, re) {
   let f = null;
   for (const t of turns) for (const s of String(t.text || '').split(/(?<=[.?!।])\s+/)) {
-    if (!re.test(s) || (re === PRICE_RE && NOT_PRICE.test(s))) continue;
+    if (!re.test(s) || (re === PRICE_RE && NOT_PRICE.test(s)) || (re === BUDGET_RE && (NOT_BUDGET.test(s) || (t.who && !/^Customer/.test(t.who))))) continue;
     const v = rupeeFigures(s); if (v.length) f = { v: v.at(-1), who: t.who, text: s.trim().slice(0, 160) };
   }
   return f;
@@ -135,6 +139,7 @@ const COLOURS = ['everest white', 'galaxy grey', 'stealth black', 'napoli black'
 const COLOUR_NAME = { gray: 'grey', safed: 'white', kaala: 'black', kali: 'black', laal: 'red' };
 const COLOUR_RE = new RegExp('\\b(' + COLOURS.join('|') + ')\\b(?=\\s+(colou?r|shade|one|wala|wali|mein|car|thar|scorpio|xuv|is|chahiye|in|option))|\\b(colou?r|shade|rang)\\b[^.?!]{0,30}\\b(' + COLOURS.join('|') + ')\\b', 'gi');
 const PRIORITY = [
+  ['Range and charging', /\b(charg(?:e|es|ing|er|ers)|batter(?:y|ies)|kwh|kilowatt|km ?(?:per|on a|on one) charge)\b/i], // the bare word "range" counts only for an EV shortlist (see below): in a petrol or diesel call it means the price range
   ['Performance', /\b(power|powerful|pick-?up|torque|performance|engine|bhp|4x4|four[- ]wheel|off[- ]?road|highway|speed|turbo|diesel engine|suspension)\b/i],
   ['Safety', /\b(safety|safe|airbags?|ncap|adas|star rating|5[- ]star|five[- ]star)\b/i],
   ['Features', /\b(features?|sunroof|touch ?screen|infotainment|camera|360|music|speakers?|ventilated|connected|alexa)\b/i],
@@ -149,7 +154,7 @@ const PRIORITY = [
 const AVAIL_RE = /waiting (period|time|list|chal|hai|of \d|for (the )?(car|delivery|stock))|wait (of|for) (about |around )?\d+ (days?|weeks?|months?)|\bin stock\b|out of stock|stock (mein|me|nahi|hai)|not available|availability|delivery (date|time|by|in)|kab (tak )?(milegi|milega|delivery)|(\d+|two|three|four|six) (weeks?|months?) (wait|delivery)/i;
 const QUOTE_GIVEN_RE = /(here is|here's|this is|giving you|i(?:'ve| have) (?:made|prepared|written)|let me write|written)[^.?!]{0,40}(quotation|quote|on[- ]?road)|quotation (de |bana|ready|is ready)|on[- ]?road (price |)(comes|is|will be|hoga|padega)/i;
 const QUOTE_PROMISE_RE = /(send|share|whatsapp|mail|give|provide)[^.?!]{0,40}(quotation|quote|price|on[- ]?road)|(quotation|price)[^.?!]{0,20}(bhej|send)/i;
-const fuelOf = (text, modelObjs) => { const f = []; if (/\bdiesel\b/i.test(text)) f.push('Diesel'); if (/\bpetrol\b/i.test(text)) f.push('Petrol'); if (/\b(electric|ev|battery|charging|charger)\b/i.test(text) || modelObjs.some(m => m.ev)) f.push('Electric'); return f; };
+const fuelOf = (text, modelObjs) => { if (modelObjs.length && modelObjs.every(m => m.ev)) return ['Electric']; const f = []; if (/\bdiesel\b/i.test(text)) f.push('Diesel'); if (/\bpetrol\b/i.test(text)) f.push('Petrol'); if (/\b(electric|ev|battery|charging|charger)\b/i.test(text) || modelObjs.some(m => m.ev)) f.push('Electric'); return f; };
 const modelGroup = m => !m ? '' : m.ev ? 'ev' : m.bestSeller ? 'best' : 'other';
 
 async function runExport(o) {
@@ -261,6 +266,9 @@ for (const r of rows) {
   // car: which model was discussed (notes win, else the most-mentioned model in the transcript)
   const models = isCar ? carModels([fullText, sumText, fld(res, 'preference')].join(' . ')) : [];
   const asModel = x => { const mm = carModels(String(x))[0]?.m; return mm ? { ...mm, label: String(x).trim() } : { label: String(x).trim() }; };
+  const asList = v => Array.isArray(v) ? v : String(v || '').split(/\s*[|,\/]\s*|\s+vs\s+/i).filter(Boolean);
+  /* how many models the customer compared: indicative values are only for a customer who has narrowed it to 3 or fewer (the floor says customers choose between 2 or 3) */
+  const nCompared = !isCar ? 0 : note.models ? asList(note.models).length : new Set([...(note.model ? [String(note.model).trim()] : []), ...models.map(x => x.m.label)]).size;
   const noteModel = note.model ? asModel(note.model) : null;
   const mainModel = noteModel || models[0]?.m || null, alsoModels = models.map(x => x.m.label).filter(l => l !== mainModel?.label);
   if (isCar && mainModel && !noteModel) mark('product', 'car model read from the transcript: the most-mentioned model from data/price-list.json');
@@ -270,7 +278,9 @@ for (const r of rows) {
   setV(+note.value || 0, 'team');
   if (oc.amountMinor != null) setV(Number(oc.amountMinor) / 100, 'recorded');
   /* the AI's own value: basis says whether it is a price quoted in the conversation or the customer's budget */
-  if (rr.value?.amountMinor != null) setV(Number(rr.value.amountMinor) / 100, /budget/i.test(rr.value.basis || '') ? 'budget' : 'call');
+  const aiValBad = isCar && rr.value?.amountMinor != null && NOT_CAR_PRICE.test((rr.value.evidence || []).map(e => e?.quote || '').join(' '));
+  if (aiValBad) mark('value_inr: AI value ignored', 'the AI took the value from a line about a battery, charger or replacement cost, which is not the price of the car');
+  if (rr.value?.amountMinor != null && !aiValBad) setV(Number(rr.value.amountMinor) / 100, /budget/i.test(rr.value.basis || '') ? 'budget' : 'call');
   /* value: when several prices were quoted, take the AI's own value, else the price nearest the customer's budget (else the last one said) */
   const allPrices = isCar ? priceLines(sayTurns) : [];
   const distinctPrices = [...new Set(allPrices.map(p => p.v))];
@@ -280,7 +290,7 @@ for (const r of rows) {
   if (isCar) {
     if (priceLine) setV(priceLine.v, distinctPrices.length > 1 ? 'call' : 'call');
     setV(budgetMid(budgetText) || saidInCall(sayTurns, BUDGET_RE)?.v || 0, 'budget');
-    if (mainModel?.range) setV((mainModel.range[0] + mainModel.range[1]) / 2, 'indicative');
+    if (mainModel?.range && nCompared <= 3) setV((mainModel.range[0] + mainModel.range[1]) / 2, 'indicative');
   } else if (budgetText && money(budgetText)) setV(money(budgetText), 'budget');
   const VS_HOW = { call: 'price said in the conversation', budget: 'customer-stated budget, used where no price was said', indicative: 'no price said: midpoint of the model\'s indicative band in data/price-list.json', team: 'entered by the team in the notes file' };
   if (VS_HOW[vsrc]) mark('value_inr: ' + vsrc, VS_HOW[vsrc]);
@@ -301,18 +311,17 @@ for (const r of rows) {
   }
     // ---- floor details (car stores): what the dealer said matters ----
   const custText = (turns.some(t => t.who === 'Customer') ? turns.filter(t => t.who === 'Customer' || t.who === "Customer's companion").map(t => t.text).join(' . ') : fullText);
-  const asList = v => Array.isArray(v) ? v : String(v || '').split(/\s*[|,\/]\s*|\s+vs\s+/i).filter(Boolean);
   const noteModels = note.models ? asList(note.models).map(asModel) : null;
   const considered = isCar ? (noteModels || [...(noteModel ? [noteModel] : []), ...models.map(x => x.m)].filter((m, i, a) => a.findIndex(y => y.label === m.label) === i)) : [];
   const fuel = isCar ? (note.fuel ? asList(note.fuel) : fuelOf(fullText + ' ' + sumText, considered)) : [];
   const colours = isCar ? (note.colour ? asList(note.colour) : [...new Set([...fullText.matchAll(COLOUR_RE)].map(m => (m[1] || m[4] || '').toLowerCase()).filter(Boolean).map(c => COLOUR_NAME[c] || c))]) : [];
   const promisesTxt = (res.commitments || []).map(c => c.text || '').join(' . ');
   const quote = !isCar ? '' : note.quote ? (/^(y|yes|given|true)/i.test(String(note.quote)) ? 'yes' : /promis/i.test(String(note.quote)) ? 'promised' : 'no')
-    : (outcome === 'sold' || vsrc === 'call' || !!priceLine || QUOTE_GIVEN_RE.test(fullText) || sayTurns.some(t => (t.who === 'Rep' || !t.who) && /\b\d{1,2}[.,]?\d*\s*(lakh|lac)\b|\bon[- ]?road\b|\bex[- ]?showroom\b/i.test(t.text))) ? 'yes' : (QUOTE_PROMISE_RE.test(promisesTxt) || QUOTE_PROMISE_RE.test(fullText)) ? 'promised' : 'no';
+    : (outcome === 'sold' || vsrc === 'call' || !!priceLine || QUOTE_GIVEN_RE.test(fullText) || sayTurns.some(t => (t.who === 'Rep' || !t.who) && String(t.text || '').split(/(?<=[.?!।])\s+/).some(sn => /\bon[- ]?road\b|\bex[- ]?showroom\b/i.test(sn) && rupeeFigures(sn).length && !/\d\s*(?:-|to)\s*\d/.test(sn)))) ? 'yes' : (QUOTE_PROMISE_RE.test(promisesTxt) || QUOTE_PROMISE_RE.test(fullText)) ? 'promised' : 'no';
   const testDrive = !isCar ? '' : note.test_drive != null ? (/^(y|yes|true)/i.test(String(note.test_drive)) ? 'yes' : 'no') : TEST_DRIVE_RE.test(fullText + ' . ' + sumText) ? 'yes' : /test[- ]?(drive|ride)/i.test(fullText) ? 'offered' : 'no';
   const availAI = [...(res.objections || []).map(x => x.theme), rr.rootCause].filter(Boolean).find(s => /stock|delivery|waiting|availab/i.test(s)) || '';
   const availLine = isCar ? (availAI || sayTurns.flatMap(t => String(t.text || '').split(/(?<=[.?!।])\s+/)).find(s => AVAIL_RE.test(s)) || '') : '';
-  const priorities = isCar ? (note.priorities ? asList(note.priorities) : PRIORITY.filter(([, re]) => re.test(custText)).map(([k]) => k)) : [];
+  const priorities = isCar ? (note.priorities ? asList(note.priorities) : PRIORITY.filter(([k, re]) => re.test(custText) || (k === 'Range and charging' && considered.some(m => m.ev) && /\brange\b/i.test(custText))).map(([k]) => k)) : [];
   const intent = isCar ? (note.intent || rr.intent || '') : '';
   const decision = !isCar ? '' : considered.length === 1 ? 'decided' : considered.length >= 2 && considered.length <= 3 ? 'choosing' : 'exploring';
   if (isCar) mark('floor details', 'models compared, fuel, colour, quotation given, test drive, availability and what the customer cares about are read from the transcript (team notes override); intent is the AI\'s own reading');
@@ -329,7 +338,7 @@ for (const r of rows) {
   const aiPromises = uniq((res.commitments || []).map(c => c.text));
   const ra = rr.recommendedAction, aiNext = clip(typeof ra === 'string' ? ra : ra?.text || ra?.summary || ra?.description || '', 250);
   // the company is set up as jewellery in the backend, so for a car store drop the AI's remarks about the jewellery catalogue
-  const NOTE_SKIP = isCar ? /source coverage|not attributable|no matching|jewell?ery|catalogu?e|tanishq|\bgold\b/i : /source coverage|not attributable|no matching/i;
+  const NOTE_SKIP = isCar ? /source coverage|not attributable|no matching|jewell?ery|catalog(?:ue)?|tanishq|\bgold\b/i : /source coverage|not attributable|no matching/i;
   const aiNotes = uniq((res.sop || []).filter(x => x.note && !NOTE_SKIP.test(x.note)).map(x => x.note));
   const CHK_LABEL = isCar ? CHK_CAR : { D1: 'Asked the occasion or purpose', D2: 'Confirmed the category or type', D3: 'Asked the budget', D4: 'Confirmed specifications', P1: 'Gave a correct product fact', P2: 'Addressed the customer\'s priority', P3: 'Explained the value', O1: 'Acknowledged the objection', O2: 'Explored the objection', O3: 'Answered the objection', C1: 'Handled the competitor comparison', SOP1: 'Stayed respectful', SOP2: 'Used the store offer or hook', N1: 'Agreed a next step and contact' };
   const seenChk = new Set(), aiChecks = rubric ? RUB_ORDER.map(id => rubric.find(c => c.id === id)).filter(Boolean).map(c => `${NA_IDS.includes(c.id) ? 'NA' : ({ done: 'MET', partly: 'PARTLY', missed: 'NOT_MET' })[c.mark]}: ${RUB_LABEL[c.id] || c.id} (${c.id}). ${clip(String(c.reason || '').replace(/\|/g, '/'), 220)}${c.evidence?.[0]?.quote ? ' ❝' + clip(String(c.evidence[0].quote).replace(/\|/g, '/'), 160) + '❞' : ''}`).join(' | ') : (sc?.observations || []).filter(x => ['MET', 'NOT_MET'].includes(x.state)).filter(x => { const k = x.checkId + x.state; if (seenChk.has(k)) return false; seenChk.add(k); return true; })
@@ -347,14 +356,16 @@ for (const r of rows) {
   // ---- what the backend gave us beyond the summary line: five-part summary, promises with drafts, concerns, flags ----
   const sumParts = (() => { const t = String(r.summary || res.summary || ''), o2 = {}, ms = [...t.matchAll(/(Customer need|What happened|Outcome|Why|Next step):\s*/g)]; ms.forEach((mm, i) => { o2[mm[1]] = t.slice(mm.index + mm[0].length, i + 1 < ms.length ? ms[i + 1].index : undefined).trim(); }); if (!ms.length) o2['What happened'] = t.trim(); return o2; })();
   const fus = Array.isArray(res.followupOpportunities) ? res.followupOpportunities : [], usedF = new Set();
-  const promises = (res.actions || []).map(a => { let bi = -1, bs = 0.3; fus.forEach((f, i) => { if (usedF.has(i)) return; const s = jac(a.title, f.title); if (s > bs) { bs = s; bi = i; } }); if (bi >= 0) usedF.add(bi); const f = fus[bi]; return { t: a.title, d: f?.draft || a.draft || '', q: clipE(a.evidence?.[0]?.quote, 220), k: f?.timing?.kind || '', ph: f?.timing?.phrase || '' }; });
-  fus.forEach((f, i) => { if (!usedF.has(i)) promises.push({ t: f.title, d: f.draft || '', q: clip(f.evidence?.[0]?.quote, 160), k: f.timing?.kind || '', ph: f.timing?.phrase || '' }); });
+  const GREET = /^(\s*(?:[Nn]amaste|[Nn]amaskar|[Hh]ello|[Hh]i|[Hh]ey|[Dd]ear|[Gg]ood (?:morning|afternoon|evening)))[\s,]+((?!(?:sir|madam|sahab|saheb|ji)\b)[A-Z][a-z]+(?:\s+(?:bhai|ji|ben|sir|madam|sahab|saheb))?)\s*([,!.:])/;
+  const scrubDraft = d => { const t = String(d || ''); return note.customer ? t : t.replace(GREET, (m, g, nm, pn) => g + pn); };
+  const promises = (res.actions || []).map(a => { let bi = -1, bs = 0.3; fus.forEach((f, i) => { if (usedF.has(i)) return; const s = jac(a.title, f.title); if (s > bs) { bs = s; bi = i; } }); if (bi >= 0) usedF.add(bi); const f = fus[bi]; return { t: a.title, d: scrubDraft(f?.draft || a.draft || ''), q: clipE(a.evidence?.[0]?.quote, 220), k: f?.timing?.kind || '', ph: f?.timing?.phrase || '' }; });
+  fus.forEach((f, i) => { if (!usedF.has(i)) promises.push({ t: f.title, d: scrubDraft(f.draft || ''), q: clip(f.evidence?.[0]?.quote, 160), k: f.timing?.kind || '', ph: f.timing?.phrase || '' }); });
   if (!promises.length) (res.commitments || []).forEach(c => promises.push({ t: String(c.text || '').replace(/^Salesperson (said|will say) (he would |that |the )?/i, '').replace(/^./, ch => ch.toUpperCase()), d: '', q: clipE(c.evidence?.[0]?.quote, 220), k: '', ph: '', due: '', fromC: 1 }));
   const dueOf = txt => { const s = String(txt || ''); let mm; if (/by (the )?(evening|tonight)|by evening/i.test(s)) return 'by evening'; if ((mm = s.match(/within (about |around )?(an|one|1|two|2|\d+) (hour|hours|minutes?|mins?|days?)/i))) return 'within ' + (mm[1] ? 'about ' : '') + ({ an: 'an', one: 'an', 1: 'an' }[mm[2].toLowerCase()] || mm[2]) + ' ' + mm[3].replace(/^hours?$/i, mm[2].toLowerCase().match(/^(an|one|1)$/) ? 'hour' : 'hours'); return ''; };
   promises.forEach(p => { p.due = p.fromC ? dueOf(p.t) : dueOf(p.t + ' ' + (res.commitments || []).map(c => c.text).join(' ')); if (!p.due && /stock/i.test(p.k)) p.due = 'when stock is confirmed'; });
   const concerns = (sc?.concerns || []).map(c => ({ t: c.concern, s: c.status })).map(c => { const ob = (res.objections || []).map(x => ({ x, s: jac(c.t, x.theme) })).sort((a, b) => b.s - a.s)[0]; return { ...c, a: ob && ob.s > 0.3 ? clip(ob.x.resolution || '', 240) : '' }; });
   (res.objections || []).forEach(x => { if (!concerns.some(c => jac(c.t, x.theme) > 0.3)) concerns.push({ t: x.theme, s: x.resolution ? 'partly' : 'open', a: clip(x.resolution || '', 240) }); });
-  const flagsAI = (res.warnings || []).filter(w => !/jewell?ery|catalogu?e|tanishq/i.test(w)).map(w => /interrupt|someone else|other person/i.test(w) ? 'Phone calls or other conversations interrupted the recording' : /multi-person|several people|multiple people|excluded spans/i.test(w) ? 'Several people were speaking' : clip(w, 120));
+  const flagsAI = (res.warnings || []).filter(w => !/jewell?ery|catalog(?:ue)?|tanishq/i.test(w)).map(w => /interrupt|someone else|other person/i.test(w) ? 'Phone calls or other conversations interrupted the recording' : /multi-person|several people|multiple people|excluded spans/i.test(w) ? 'Several people were speaking' : clip(w, 120));
   exported.add(r.id); fixtureN += r.ai_provider === 'fictional_fixture' ? 1 : 0; heldN += r.ai_held ? 1 : 0; partialN += r.quality && r.quality !== 'complete' ? 1 : 0;
   const rec = {
     conversation_id: 'ZC-' + r.id, captured_at: fmt(r.captured_at), rep_name: repName, outcome, value_inr: value, value_source: vsrc, product,

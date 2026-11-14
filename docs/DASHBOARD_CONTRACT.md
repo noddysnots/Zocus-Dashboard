@@ -1,0 +1,61 @@
+# Dashboard contract
+
+The dealer, and any analytics team, expects the dashboard to stay put: the same pages, the same sections, the same words. Conversations change every day; the dashboard does not. This file says what is fixed, where new things may go, and which rules change a number.
+
+It is enforced by three checks you run before every push (see the end).
+
+## 1. What is fixed
+
+**The six pages and the menu**: Overview, Insights, Team, Coaching, Conversations, Follow-ups. No page is added, renamed or removed.
+
+**The standard stores** (the sample jewellery store, Mira, Horizon, and the real test stores Tanishq, TVS two-wheeler) look exactly as they did before the pilot work (recorded on commit `6e0f797`): same headings, same number cards, same figures. `tests/contract.json` holds the recorded menu, headings and number cards.
+
+**Accepted change, 14 Nov 2026:** stores whose vertical is `car` use car-dealer wording (Booking conversion, Bookings won, showroom, booked). This applies to the Mahindra test store and the pilot.
+
+## 2. The pilot Overview
+
+Original blocks, in the original order, with the original card style:
+
+1. Briefing with the "Average skill score" and "Results" panel
+2. Three number cards: **Booking conversion**, **Bookings won** (the revenue card), **Conversations recorded**. A dash, never a made-up figure, where there is nothing to show, with a line saying what is known ("None booked yet · ₹27.3L quoted so far")
+3. "Do these next" and "Team at a glance"
+4. Reps, Time with customers, Latest conversations
+
+**Three additions, each one line or one slim card, and nothing else may be added without changing this file:**
+
+| Slot | What | Shown when |
+|---|---|---|
+| Alert line (top) | "1 delivery-day conversation needs attention" with the AI outcome, opens the conversation | a conversation after the booking (a delivery, a dispute) exists |
+| Stage chips (under the number cards) | Exploring · Finalising · After booking, with counts; tap to filter | always on a one-day pilot |
+| The day so far (before Reps) | one slim timeline of the day | always on a one-day pilot |
+
+Also inside the original blocks: the open promises are the entries of "Do these next" (copy-message buttons in the same rows); the floor's note for the day is one muted sentence under the briefing; the after-booking conversation is a row in Latest conversations with a purple pill.
+
+**Removed on purpose** (they made the Overview busy): three journey cards, a day-note box, a large "After the sale" card, a separate "Promises to keep" card. Their detail lives in the conversation panel, the Follow-ups page and the "After the booking" tab.
+
+## 3. Rules that change a number
+
+Everything below differs from the pre-pilot dashboard. Each is limited to one-day pilot stores (`snapshot`) or to car stores unless stated; the standard stores keep the original rule.
+
+| Rule | Effect | Applies to |
+|---|---|---|
+| A conversation after the booking (delivery, accessories, a dispute) is left out of the sales numbers, is not scored, has no value | Sales counts show only sales conversations; the other is shown separately | pilot |
+| No real score means a dash, never a made-up number | "Score not available yet" | pilot |
+| A customer who already chose a model is not marked on "understand the need" and "ask the budget" | Skill bars show a dash for those; the score uses the other checks | pilot |
+| Test-drive check is shown but not scored (the dealer says it matters little) | 9 of 10 checks count (7 for finalising customers) | pilot |
+| Reps with fewer than 3 conversations are not ranked or rated | "1 chat", no Top/Coach label | pilot |
+| A single-rep store coaches on the rep's lowest skill, not always the first one | Coaching action names the real weakest step | pilot |
+| Value: team number, recorded amount, price said in the call, customer budget, indicative by model (3 models or fewer compared), else "–" | Source is shown next to each value | car stores |
+| A battery, charger or replacement cost is never a car price | The ₹10 lakh battery cost in #266 is not the car's value | car stores |
+| Budget is read only from the customer's own lines, not from range-in-km talk | | car stores |
+| "Quotation given" needs an on-road or ex-showroom figure from the rep or a quotation written for the customer; a spoken range ("15 to 17 lakh") is not a quotation | Overcounting removed | car stores |
+| An all-electric shortlist is fuel "Electric" (the rep listing petrol, diesel and CNG as other versions does not count) | | car stores |
+| Customers are named only from the team's notes ("Customer at 11:54 am" otherwise); message drafts do not greet by a name the team never gave | | pilot |
+
+## 4. What is checked before a push
+
+1. `node tools/audit-pilot.mjs`: compares every pilot conversation with the database (times, summary, rubric marks, score), the notes and the transcript (every English line sits on a real line; every price is on the line at its time; names spoken in the audio are flagged), and with the checked answers in `tests/pilot-golden.json`. Any FAIL means do not push. WARN needs a person to look.
+2. Browser check: serve the site (`node tools/serve.mjs 4173`) and open `/tools/check.html`. It loads every store at 1200 px and 375 px wide, walks the six pages, and fails on console errors, sideways scroll, a missing or unexpected heading, and any difference from the recorded standard stores. Also run on `/?dealer`.
+3. `node tools/check-csv.mjs data/cases/pilot.csv` (the audit runs it): the dashboard's own parser accepts the file.
+
+To change the contract on purpose: edit this file and `tests/contract.json` in the same commit and say why.

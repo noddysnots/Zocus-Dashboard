@@ -71,12 +71,16 @@ Final refresh, push, send the dealer `https://<site>/?dealer`. The link opens th
 
 1. a number the team sent ("entered by team")
 2. an amount recorded in the app ("recorded in the app")
-3. a price said in the conversation: the AI's quoted price if it found one, else the last rupee figure on a line about on-road, ex-showroom, price or quotation. Lines about EMI, down payment, discount, exchange or insurance are ignored, and only ₹3 lakh to ₹60 lakh counts ("said in the call")
-4. the customer's stated budget ("customer budget")
-5. the midpoint of the model's band in `data/price-list.json` ("indicative by model", shown with a ~)
-6. no model decided: no value. The conversation still counts everywhere except in rupee totals ("value not known")
+3. a price said in the conversation: the AI's quoted price if it found one, else the last rupee figure on a line about on-road, ex-showroom, price or quotation. Lines about EMI, down payment, discount, exchange, insurance, **a battery, a charger or a replacement** are ignored (a ₹10 lakh battery replacement cost once looked like a car price), and only ₹3 lakh to ₹60 lakh counts ("said in the call")
+4. the customer's stated budget, read only from the customer's own lines ("customer budget")
+5. the midpoint of the model's band in `data/price-list.json` ("indicative by model", shown with a ~), only when the customer compared **3 models or fewer**
+6. no model decided, or 4 or more models compared: no value. The conversation still counts everywhere except in rupee totals ("value not known")
 
 **Segment.** Team notes, else mapped from what the AI captured about the buyer: First car in the family, Family upgrade to a 7-seater, Switching to electric, Lifestyle and off-road, Replacing current car, Used car buyer, Business use, Daily city use, Family car, else "Not clear".
+
+**Quotation given.** Yes when the rep gave an on-road or ex-showroom figure (or a price for the variant), or a quotation was written for the customer. A spoken range ("15 to 17 lakh") or a rough price is **not** a quotation. "Promised" when the rep said it would be sent.
+
+**Fuel.** Petrol, diesel and electric as the customer discussed them. When every model compared is electric the fuel is Electric, whatever versions the rep listed.
 
 **Result.** Staff tag if there is one, else the AI's reading of the conversation. Unclear ones count as "Will return".
 
@@ -98,7 +102,7 @@ Final refresh, push, send the dealer `https://<site>/?dealer`. The link opens th
 
 The screen is built **conversation by conversation**, for the dealer's owner and managers.
 
-- **Overview:** the original dashboard layout and cards (briefing with the skill and results panel, Booking conversion, **Bookings won in rupees** and Conversations recorded, Team at a glance, Reps, Time with customers, Latest conversations), plus the pieces added for the pilot, in the same card style: the three journey cards (Exploring, Finalising, After booking), the day timeline, "After the sale: needs attention" and "Promises to keep". Where no price or booking exists the cards show a dash and say what is known (for example "None booked yet · ₹27.3L quoted so far").
+- **Overview:** the team's original layout and card style (briefing with the skill and results panel, Booking conversion, **Bookings won in rupees** and Conversations recorded, Do these next, Team at a glance, Reps, Time with customers, Latest conversations) with **three small additions**: an alert line at the top when a conversation after the booking needs attention, one line of stage chips (Exploring, Finalising, After booking) under the number cards, and one slim timeline of the day. The open promises are the entries of "Do these next"; the floor's note for the day is one muted sentence under the briefing. Where no price or booking exists the cards show a dash and say what is known (for example "None booked yet · ₹27.3L quoted so far"). What is fixed and what may be added is written in `docs/DASHBOARD_CONTRACT.md`.
 - **Conversation panel:** the five-part AI summary (Customer need, What happened, Outcome, Why, Next step), what the customer wants, **prices quoted** (written by Claude at each refresh from the AI summary and the recording), customer concerns, promises with messages, **How the rep did** (10 checks, Done / Partly / Missed, each with the reason and the line), the transcript (side talk and phone calls collapsed, English under key lines) and notes from the floor.
 - **Times:** start to end of each conversation everywhere, clock time on every transcript line, and "analysed at" in the panel footer.
 - **Scores:** from the backend's automotive scoring (points-score-v3): the checks that apply give the score (done 100, partly 50, missed 0): 9 of the 10 for early enquiries, 7 of the 10 for customers who have already chosen a model; the test-drive check is shown but not scored because the dealer says it matters little. A conversation with no real score shows "Score not available yet", never an invented number.
@@ -107,8 +111,9 @@ The screen is built **conversation by conversation**, for the dealer's owner and
 
 ### Refresh (each time the team posts notes)
 1. Paste the WhatsApp notes here. Claude updates `data/pilot-notes.json`: `rep`, `models`, `fuel`, `colour`, `remarks`, `prices` (what was quoted), `tr_en` (English for key transcript lines), `csv` (any column), `drop`.
-2. Claude runs `node tools/refresh-pilot.mjs`, reads the new conversations against the recording, checks prices and values, and commits locally.
-3. You push; Vercel redeploys; reload.
+2. Claude reads each new transcript **in full**, writes the notes, and runs `node tools/refresh-pilot.mjs`. The refresh exports (read-only), applies the notes and then runs **the audit** (`tools/audit-pilot.mjs`): times, summary, rubric marks and score against the database; every English line and every price against the transcript; names spoken in the audio; the checked answers in `tests/pilot-golden.json`. A FAIL stops the commit. Claude commits locally and sends you the list of things to confirm (names, stages, prices).
+3. Before every push Claude also runs the browser check (`/tools/check.html`: all stores, desktop and phone, the dealer link) and reports it.
+4. You push; Vercel redeploys; reload.
 
 A call is dropped only when the team says so (for example #263, a fragment, was dropped on 14 Nov).
 
@@ -121,6 +126,9 @@ Abhishek, 11:48 am: today's traffic is mostly model finalisation, accessory sele
 - **finalising**: the customer has chosen a model and is settling variant, price, finance, stock; "understand the need" and "ask the budget" are shown as "Not counted" and are left out of the score.
 - **after_booking**: accessories, payment, delivery or a dispute; not scored, left out of the sales numbers, shown under "After the sale" and in the "After the booking" tab (accessories and add-ons with prices, payment status, open issues). `payment` in the notes shows the payment status.
 The team's one-line note about the day goes in the notes file as `"daynote"` and is shown on the Overview.
+
+### Names
+Customers are shown as "Customer at 11:54 am" and are never named from the recording; message drafts do not greet by a name the team has not given. Reps are the floor nicknames and names the team gives. A name that is also **spoken in the audio** is flagged by the audit: for #266 the rep is Hardik (the team's word), while the recording also has the name Hardik said at 15:11 (the rep quoting a customer's reference: "Hardik bhai, it runs 500 plus"), at 23:18 (a customer's reply, "Hardik Joshi") and at 23:20 (the rep: "Hardik bhai, right?"). Whose name that is cannot be told from the audio. Please confirm with Abhishek; it is one line in `data/pilot-notes.json` to change.
 
 ### Things to know
 - **"Mark done" on promises is saved in the browser it was clicked in.** It does not sync, so the dealer's screen will not show what the team marked.

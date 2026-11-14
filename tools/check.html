@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard contract check</title>
+<style>
+body{font:14px/1.45 system-ui,-apple-system,sans-serif;margin:20px;color:#1d1b16;background:#fff}
+h1{font-size:20px;margin:0 0 4px}p{margin:4px 0 12px;color:#6b665c}
+table{border-collapse:collapse;margin-top:10px;font-size:13px}td,th{border:1px solid #ddd;padding:3px 8px;text-align:left;vertical-align:top}
+.ok{color:#0a7a3c}.fail{color:#b00020;font-weight:600}.sum{font-size:16px;font-weight:600;margin:10px 0}
+iframe{position:absolute;left:-9999px;top:0;border:0}
+code{background:#f3f1ea;padding:1px 4px;border-radius:4px}
+</style></head><body>
+<h1>Dashboard contract check</h1>
+<p>Loads every store at desktop and phone width, walks every page, and compares with <code>tests/contract.json</code> (see <code>docs/DASHBOARD_CONTRACT.md</code>). Open <code>/tools/check.html</code> on the local server. <code>?record</code> prints the standard stores' current fingerprints instead of comparing (used once, on the pre-pilot build, to write the contract).</p>
+<div id="sum" class="sum">Running…</div><div id="out"></div>
+<script>
+(async () => {
+  const RECORD = /[?&]record\b/.test(location.search);
+  const J = async u => (await fetch(u, { cache: 'no-store' })).json();
+  const C = RECORD ? { routes: ['home', 'insights', 'team', 'coaching', 'conversations', 'followups'], stores: {} } : await J('/tests/contract.json');
+  const cases = await J('/data/cases.json');
+  const ROUTES = C.routes, widths = [1200, 375];
+  const storeIds = RECORD ? ['sample', ...cases.stores.map(s => s.id)] : Object.keys(C.stores);
+  const norm = s => String(s || '').replace(/\s+/g, ' ').trim().replace(/^Good (morning|afternoon|evening)\.?/, 'Good time of day.');
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const rows = [], rec = {};
+  try { sessionStorage.setItem('zocus-skip-splash', '1'); } catch (e) {}
+  /* counts in the menu and customer rows on the Follow-ups page move with the date, so they are left out of the comparison */
+  const fp = (doc, route) => {
+    const t = e => norm(e && e.textContent);
+    return {
+      nav: [...doc.querySelectorAll('#nav a')].map(a => t(a).replace(/\d+$/, '')),
+      h: [...doc.querySelectorAll('#page h1, #page h2, #page h3')].map(t).filter(Boolean).filter(x => route !== 'followups' || !/₹/.test(x)),
+      kpi: [...doc.querySelectorAll('#page .kpi')].map(k => [t(k.querySelector('.label')), t(k.querySelector('.val'))]),
+    };
+  };
+  for (const id of storeIds) {
+    const spec = (C.stores || {})[id] || {}, storeId = id.split('@')[0];
+    const mode = spec.mode || 'all';
+    for (const w of widths) {
+      try { localStorage.setItem('zocus-store', storeId); localStorage.removeItem('zocus-period'); } catch (e) {}
+      const fr = document.createElement('iframe'); fr.style.width = w + 'px'; fr.style.height = '900px'; document.body.appendChild(fr);
+      const errs = [];
+      fr.src = '/?' + mode + '#home';
+      await new Promise(r => { fr.onload = r; });
+      const win = fr.contentWindow;
+      win.addEventListener('error', e => errs.push(String(e.message)));
+      const ce = win.console.error; win.console.error = (...a) => { errs.push(a.map(String).join(' ').slice(0, 160)); ce.apply(win.console, a); };
+      await wait(900);
+      for (const r of ROUTES) {
+        win.location.hash = '#' + r; await wait(450);
+        win.document.getAnimations().forEach(a => { try { a.finish(); } catch (e) {} });
+        const doc = win.document, f = fp(doc, r), bad = [];
+        const sw = doc.documentElement.scrollWidth, cw = doc.documentElement.clientWidth;
+        if (sw > cw + 1) bad.push(`sideways scroll (${sw} > ${cw})`);
+        if (errs.length) bad.push('errors: ' + errs.splice(0).join(' | '));
+        if (doc.querySelector('.zfatal')) bad.push('fatal message on screen');
+        if (!f.h.length) bad.push('page is empty');
+        if (RECORD) { if (w === 1200) (rec[id] ||= {})[r] = f; }
+        else {
+          const req = ((spec.required || {})[r] || []);
+          for (const need of req) if (!f.h.some(x => x.includes(need)) && !norm(doc.getElementById('page').innerText).includes(need)) bad.push('missing "' + need + '"');
+          const forbid = ((spec.forbidden || {})[r] || []);
+          for (const no of forbid) if (f.h.some(x => x.includes(no))) bad.push('should not be here: "' + no + '"');
+          const base = spec.fingerprint && spec.fingerprint[r];
+          if (base && w === 1200) {
+            const j = x => JSON.stringify(x);
+            if (j(base.nav) !== j(f.nav)) bad.push('menu differs: ' + j(f.nav));
+            if (j(base.h) !== j(f.h)) { const a = new Set(base.h), b = new Set(f.h); bad.push('headings differ; gone: ' + base.h.filter(x => !b.has(x)).join(' / ') + '; new: ' + f.h.filter(x => !a.has(x)).join(' / ')); }
+            if (j(base.kpi) !== j(f.kpi)) bad.push('cards differ: ' + j(f.kpi) + ' vs ' + j(base.kpi));
+          }
+          if (spec.mode === 'dealer' && w === 1200 && r === 'home') {
+            if (!doc.documentElement.classList.contains('locked')) bad.push('dealer link is not locked');
+            const sw = doc.getElementById('storeSel'); if (sw && win.getComputedStyle(sw).display !== 'none') bad.push('store switcher visible on the dealer link');
+          }
+        }
+        rows.push({ store: id, mode, width: w, route: r, bad });
+      }
+      fr.remove();
+    }
+  }
+  window.__rows = rows; window.__record = rec;
+  const nf = rows.filter(r => r.bad.length).length;
+  document.getElementById('sum').innerHTML = RECORD ? 'Recorded ' + Object.keys(rec).length + ' stores (see window.__record)' : (nf ? `<span class="fail">${nf} of ${rows.length} checks FAILED</span>` : `<span class="ok">All ${rows.length} checks passed</span>`);
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  document.getElementById('out').innerHTML = '<table><tr><th>Store</th><th>Mode</th><th>Width</th><th>Page</th><th>Result</th></tr>' + rows.map(r => `<tr><td>${esc(r.store)}</td><td>${esc(r.mode)}</td><td>${r.width}</td><td>${r.route}</td><td class="${r.bad.length ? 'fail' : 'ok'}">${r.bad.length ? esc(r.bad.join(' ; ')) : 'OK'}</td></tr>`).join('') + '</table>';
+  window.__done = true;
+})();
+</script></body></html>

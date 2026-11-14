@@ -1,0 +1,82 @@
+{
+  "_note": "Golden answers for the pilot conversations, checked by hand against the recordings on 14 Nov 2026 (see docs/DASHBOARD_CONTRACT.md). tools/audit-pilot.mjs compares the exported CSV with these, so a change to a reading rule that alters any of them is caught before it reaches the dealer. Only fields our own rules decide are pinned here. Scores, outcomes and AI text are the backend's and are not pinned. To change an answer on purpose, edit it here and say why in the commit.",
+  "must_not_contain_in_flags": [
+    "catalog",
+    "jewel"
+  ],
+  "prices_checked_by_hand": {
+    "_note": "Prices said in Hindi or Gujarati number words, where the audit cannot find digits. Each was read against the recording by hand on 14 Nov 2026: 261 0:49 'seventeen-fifty on road'; 262 4:13 '4 to 5 thousand more'; 264 2:50 'tees hazar' (30,000), 1:15 'gyarah sau' (1,100), 4:14 'das hazar paanch sau' (10,500), 10:25 'paanch sau' (500) and 'paintees sau' (3,500).",
+    "261": [
+      "0:49"
+    ],
+    "262": [
+      "4:13"
+    ],
+    "264": [
+      "2:50",
+      "1:15",
+      "4:14",
+      "10:25"
+    ]
+  },
+  "calls": {
+    "261": {
+      "rep_name": "Speed Racer",
+      "product": "Scorpio N",
+      "models_considered": "Scorpio N|XUV 7XO",
+      "fuel": "Petrol|Diesel",
+      "value_inr": "1609000",
+      "value_source": "call",
+      "quote_given": "yes",
+      "test_drive": "no",
+      "stage": "finalising",
+      "kind": "",
+      "scored": "yes",
+      "priorities": "Price and offers"
+    },
+    "262": {
+      "rep_name": "Black and White Stripe",
+      "product": "Bolero",
+      "models_considered": "Bolero B8",
+      "fuel": "Diesel",
+      "colour": "White",
+      "value_inr": "1121500",
+      "value_source": "call",
+      "quote_given": "yes",
+      "test_drive": "no",
+      "stage": "finalising",
+      "kind": "",
+      "scored": "yes",
+      "priorities": "Price and offers|Loan and finance"
+    },
+    "264": {
+      "rep_name": "Speed Racer",
+      "product": "Scorpio N",
+      "models_considered": "Scorpio N",
+      "value_inr": "",
+      "value_source": "",
+      "quote_given": "",
+      "stage": "after_booking",
+      "kind": "delivery",
+      "scored": "no",
+      "result_label": "Delivery dispute"
+    },
+    "266": {
+      "_why": "EV enquiry. The 10 lakh said at 10:00 is a battery replacement cost, not a car price; the petrol, diesel and CNG talk is the rep listing other versions; rough price ranges are not a quotation; a name said in the audio is not published as the customer.",
+      "rep_name": "Hardik",
+      "product": "XUV 3XO EV",
+      "models_considered": "XUV 3XO EV|BE 6|XEV 9e|XEV 9S",
+      "model_group": "ev",
+      "fuel": "Electric",
+      "value_inr": "",
+      "value_source": "",
+      "quote_given": "no",
+      "test_drive": "no",
+      "stage": "exploring",
+      "kind": "",
+      "scored": "yes",
+      "priorities": "Range and charging|Service|Features|Price and offers",
+      "customer_name": "Customer 5"
+    }
+  }
+}

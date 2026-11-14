@@ -105,7 +105,7 @@ const ic=(n,s=18)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="no
 function ring(score,size=38){score=Math.round(score);const r=(size-6)/2,c=2*Math.PI*r,col=score>=70?'var(--good)':score>=55?'var(--warn)':'var(--bad)',h=size/2;
  return `<svg class="ring" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="Score ${score} out of 100"><circle cx="${h}" cy="${h}" r="${r}" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle cx="${h}" cy="${h}" r="${r}" fill="none" stroke="${col}" stroke-width="3.5" stroke-linecap="round" class="rv" style="--len:${(c*score/100).toFixed(1)}" stroke-dasharray="${(c*score/100).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 ${h} ${h})"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" fill="var(--ink)" font-size="${Math.round(size*.32)}" font-weight="700" font-family="Figtree,system-ui">${score}</text></svg>`}
 const scoreCol=s=>s>=70?'var(--good)':s>=55?'var(--warn)':'var(--bad)';
-function outcomePill(c){if(c.kind==='delivery')return `<span class="pill bad">${esc(c.resultLabel||'Delivery issue')}</span>`;return c.outcome==='sold'?`<span class="pill good">${Wd.sold}</span>`:c.outcome==='followup'?'<span class="pill warn">Will return</span>':`<span class="pill bad">${Wd.lost}</span>`}
+function outcomePill(c){if(c.kind==='delivery')return `<span class="pill after">${esc(c.resultLabel||'Delivery issue')}</span>`;return c.outcome==='sold'?`<span class="pill good">${Wd.sold}</span>`:c.outcome==='followup'?'<span class="pill warn">Will return</span>':`<span class="pill bad">${Wd.lost}</span>`}
 function delta(cur,prev,opt){opt=opt||{};let diff,txt;if(!hasBase())return '';
  if(opt.pts){diff=Math.round((cur-prev)*100);txt=Math.abs(diff)+(Math.abs(diff)===1?' pt':' pts')}else{if(!prev)return '<span class="delta flat">new</span>';diff=Math.round((cur-prev)/prev*100);txt=Math.abs(diff)+'%'}
  if(diff===0)return '<span class="delta flat">no change</span>';
@@ -209,7 +209,7 @@ function leaks(L){return [0,1,2,3].map(k=>{const a=L.filter(c=>c.stage===k);retu
 
 /* ---------- Home: briefing, 3 numbers, 3 actions, team pulse ---------- */
 function computeActions(L){
- const rows=repRows(L),store=stats(L),acts=[],solo=rows.filter(r=>r.s.n).length<2;
+ const rows=repRows(L),store=stats(L),acts=[],solo=SNAP&&rows.filter(r=>r.s.n).length<2; // one-day pilot stores only: the standard stores keep their original rule
  const who=r=>r.rep.name==='Rep not tagged'?'the team':r.rep.first;
  let best=null;rows.forEach(r=>{if(!r.s.n)return;let weak=r.weak;if(solo)weak=SKILLS.reduce((a,k)=>r.s.skill[k.id]<r.s.skill[a]?k.id:a,SKILLS[0].id);
   const tied=r.L.filter(c=>c.outcome!=='sold'&&c.reason&&REASONS[c.reason].skill===weak);const v=sumv(tied);const sc=solo?tied.length+v:-r.gap*v;if(!best||sc>best.sc)best={...r,weak,tied,v,sc}});
@@ -220,7 +220,7 @@ function computeActions(L){
  if(top)acts.push(CAR?{impact:sumv(top.v),n:top.v.length,title:`Cut the wait on the ${PRODUCTS[top.k].label}`,body:`${plural(top.v.length,'customer')} wanted it and we could not give a quick delivery date.`,btn:'Demand',go:'#insights',tab:'want'}:
   {impact:sumv(top.v),n:top.v.length,title:`Restock ${lc(PRODUCTS[top.k].label)}`,body:`${plural(top.v.length,'customer')} asked and we had none.${/lightweight/i.test(PRODUCTS[top.k].label)?' Most wanted under 10 grams.':''}`,btn:'Demand',go:'#insights',tab:'want'});
  if(FLOOR)return floorActions(L).concat(acts.filter(a=>a.go!=='#insights')).slice(0,3);
- return acts.sort((a,b)=>b.impact-a.impact||b.n-a.n).slice(0,3)}
+ return acts.sort((a,b)=>b.impact-a.impact||(SNAP?b.n-a.n:0)).slice(0,3)}
 function lede(s,p,big){
  if(!s.n)return `<b>No conversations recorded ${inTxt()}.</b> ${ZD.spanDays<3?'New recordings appear after the next data refresh.':'Switch to 7 or 30 days to see the picture.'}`;
  const cmp=p.n?`, ${s.conv===p.conv?'the same as':s.conv>p.conv?'up from':'down from'} ${pct(p.conv)}${rangeDays()===1?' '+cmpTxt():''}`:'';
@@ -403,7 +403,7 @@ function renderTeam(){const L=cur(),P=prev(),rows=repRows(L),store=stats(L),p=st
  <div class="ktiles">${tiles}</div>
  <div class="cgrid3">
   ${FLAT?'':ZC.ccard('Score trend',Wd.Store+', 8 weeks',trend)}
-  ${rated.length>=2?ZC.ccard(hi?`${esc(hi.rep.first)} scores well but closes less`:'Score vs conversion','Dot size = conversations',sc):''}
+  ${rated.length>=2||(!SNAP&&rated.length)?ZC.ccard(hi?`${esc(hi.rep.first)} scores well but closes less`:'Score vs conversion','Dot size = conversations',sc):''}
   ${rated.length?ZC.ccard('Skills by rep','Green above '+Wd.store+', red below',grid):''}
  </div>
  <section class="card"><div class="card-h"><h2>Reps</h2><span class="hint">${rated.length?'Ranked by conversation score':'Ranked once a rep has 3 conversations'}</span></div>
@@ -605,47 +605,46 @@ function dayTimeline(L){if(!L.length)return '';
  const a=new Date(t0-10*6e4);a.setMinutes(a.getMinutes()<30?0:30,0,0);const b=new Date(t1+10*6e4);b.setMinutes(b.getMinutes()<=30?30:60,0,0);
  const lo=a.getTime(),sp=Math.max(b.getTime()-lo,36e5),ticks=[];const t=new Date(lo);if(t.getMinutes())t.setHours(t.getHours()+1,0,0,0);for(;t.getTime()<=lo+sp;t.setHours(t.getHours()+1))ticks.push(new Date(t));
  const blocks=L.map(c=>{const s=c.at.getTime(),w=Math.max((end(c)-s)/sp*100,1.6);return `<button class="tlb" data-conv="${c.id}" style="left:${((s-lo)/sp*100).toFixed(2)}%;width:${w.toFixed(2)}%;background:${c.kind==='delivery'?'#7B61FF':ZC.OUTCOME[c.outcome]}" title="${esc(tRange(c)+' · '+rname(REP[c.rep])+' · '+(c.kind==='delivery'?(c.resultLabel||'Delivery issue'):({sold:Wd.sold,followup:'Will return',lost:Wd.lost})[c.outcome]))}" aria-label="${esc(cname(c)+', '+tRange(c))}"><span>${w>6?c.dur+' min':''}</span></button>`}).join('');
- return `<section class="card tlcard"><div class="card-h"><h2>The day so far</h2><span class="hint">Each block is one conversation, from start to end. Empty stretches had no recording.</span></div>
+ return `<section class="card tlcard"><div class="card-h"><h2>The day so far</h2><span class="hint">One block per conversation, start to end</span></div>
   <div class="tl">${blocks}${ticks.map(d=>`<i class="tlt" style="left:${((d.getTime()-lo)/sp*100).toFixed(2)}%"></i>`).join('')}</div>
   <div class="tlax">${ticks.map(d=>`<span style="left:${((d.getTime()-lo)/sp*100).toFixed(2)}%">${h12(d.getHours())} ${ap(d.getHours())}</span>`).join('')}</div>
   ${ZC.legend([{name:Wd.sold,color:ZC.OUTCOME.sold},{name:'Will return',color:ZC.OUTCOME.followup},{name:Wd.lost,color:ZC.OUTCOME.lost}].concat(L.some(c=>c.kind==='delivery')?[{name:'After the sale',color:'#7B61FF'}]:[]))}</section>`}
 
 const STAGES_J={exploring:['Exploring','early enquiries'],finalising:['Finalising model and price','model, variant, price, finance'],after_booking:['After booking','accessories, payment, delivery']};
 const stageChip=c=>c.jstage&&STAGES_J[c.jstage]?`<span class="chip2 stg stg-${c.jstage}">${STAGES_J[c.jstage][0]}</span>`:'';
-const dayNoteHtml=()=>ZD.meta&&ZD.meta.dayNote?`<div class="daynote"><span class="mono">From the floor</span><p>${esc(ZD.meta.dayNote)}</p></div>`:'';
-function deliveryCard(c){return `<div class="card ccd ccd-del" role="button" tabindex="0" data-conv="${c.id}"><div class="ccd-h"><span class="ccd-t num">${tRange(c)}</span><span class="hint">${c.dur} min · ${esc(rname(REP[c.rep]))}</span>${stageChip(c)}${outcomePill(c)}</div>
-  <p class="ccd-need">${esc(clipTxt(c.sumNeed||(c.sum&&c.sum.wanted)||'',260))}</p>
-  <div class="ccd-row"><div><small>The issue</small>${esc(clipTxt(c.sumWhy||(c.sum&&c.sum.why)||'',170))}</div><div><small>Where it stands</small>${esc(clipTxt(c.sumOutcome||'',170))}</div><div><small>Next</small>${esc(clipTxt(c.sumNext||'',130))}</div>${c.payment?`<div><small>Payment</small>${esc(clipTxt(c.payment,150))}</div>`:''}</div>
-  <div class="ccd-dots"><span class="hint">Not scored: this was a delivery conversation, not a sales conversation.</span></div></div>`}
-function stageLine(LD){const n=k=>LD.filter(c=>c.jstage===k).length,b=[];if(n('exploring'))b.push(n('exploring')+' exploring');if(n('finalising'))b.push(n('finalising')+' finalising the model and price');if(n('after_booking'))b.push(n('after_booking')+' after booking');return b.length?`Today: ${b.join(', ')}. `:''}
-function richLede(L,open,nd){const n=L.length;if(!n)return nd?`<b>No sales conversations yet.</b> ${plural(nd,'delivery-day conversation')} ${nd===1?'needs':'need'} attention (shown below). ${open?`<b>${plural(open,'promise')} to keep.</b>`:''}`:'No conversations yet.';const q=L.filter(c=>c.quote==='yes').length,b=L.filter(c=>c.outcome==='sold').length;
- return `<b>${plural(n,'conversation')} so far</b> (${mins(L.reduce((a,c)=>a+c.dur,0))}). ${q===n?(n===1?'The customer':'Every customer')+' left with a quotation':q+' of '+n+' customers left with a quotation'}${b?`, ${b} booked`:', none booked yet'}. ${nd?`<b>${plural(nd,'delivery-day conversation')} ${nd===1?'needs':'need'} attention</b> (shown below the day). `:''}${open?`<b>${plural(open,'promise')} to keep.</b>`:'No promises waiting.'}`}
+const floorNote=()=>ZD.meta&&ZD.meta.dayNote?`<p class="floornote">${esc(ZD.meta.dayNote)}</p>`:'';
+/* three small additions to the original Overview, only when there is something to say */
+function alertLine(D){if(!D.length)return '';const c=D[0];
+ return `<button class="alertline" data-conv="${c.id}"><span class="adot" aria-hidden="true"></span><b>${plural(D.length,'delivery-day conversation')} ${D.length===1?'needs':'need'} attention</b><span class="atxt">${esc(c.resultLabel||'After the sale')} at ${ftime(c.at)}${(c.sumOutcome||c.sumNext)?' · '+esc(clipTxt(c.sumOutcome||c.sumNext,150)):''}</span>${ic('right',14)}</button>`}
+const STAGE_SHORT={exploring:'Exploring',finalising:'Finalising',after_booking:'After booking'};
+function stageBar(LD){const ks=Object.keys(STAGE_SHORT).filter(k=>LD.some(c=>c.jstage===k));if(!ks.length)return '';
+ return `<div class="stagebar"><span class="hint">Where customers are</span>${ks.map(k=>`<button class="chip2 stg stg-${k}" data-filter='${JSON.stringify({jstage:k})}'><b class="num">${LD.filter(c=>c.jstage===k).length}</b> ${STAGE_SHORT[k]}</button>`).join('')}</div>`}
+function richLede(L,open,nd){const n=L.length;if(!n)return nd?`<b>No sales conversations yet.</b> ${open?`<b>${plural(open,'promise')} to keep.</b>`:''}`:'No conversations yet.';const q=L.filter(c=>c.quote==='yes').length,b=L.filter(c=>c.outcome==='sold').length;
+ return `<b>${plural(n,'conversation')} so far</b> (${mins(L.reduce((a,c)=>a+c.dur,0))}). ${q===n?(n===1?'The customer':'Every customer')+' left with a quotation':q+' of '+n+' customers left with a quotation'}${b?`, ${b} booked`:', none booked yet'}. ${open?`<b>${plural(open,'promise')} to keep.</b>`:'No promises waiting.'}`}
 function modelsLine(L){const m={};L.forEach(c=>c.models.forEach(x=>m[x]=(m[x]||0)+1));const e=Object.entries(m).sort((a,b)=>b[1]-a[1]);return e.length?`<p class="hint" style="margin:0 2px 14px">Models talked about: ${e.map(([k,v])=>`<b style="color:var(--ink)">${esc(k)}</b> ${v}`).join(' · ')}</p>`:''}
 function renderHomeRich(){const L=cur(),D=DELV(),LD=allCur(),s=stats(L),rows=repRows(L),P=openPromises(LD),open=P.filter(x=>!x.done),short={good:'Top',neutral:'On track',bad:'Coach'};
  const quotedOpen=sumv(L.filter(c=>c.outcome!=='sold')),tot=L.reduce((a,c)=>a+c.dur,0),quoted=L.filter(c=>c.quote==='yes').length;
- const stageK=(k,tag)=>kpi({label:({exploring:'Exploring',finalising:'Finalising',after_booking:'After booking'})[k],tag,val:LD.filter(c=>c.jstage===k).length,sub:STAGES_J[k][1],delta:'',filter:{jstage:k}});
- const promises=`<section class="card" data-tour="actions"><div class="card-h"><h2>Promises to keep</h2><button class="link" data-go="#followups">All ${P.length}${ic('right',14)}</button></div>
-  <div class="acts">${open.length?open.slice(0,4).map((x,i)=>{const by=dueBy(x.c,x.p);return `<div class="act"><span class="n">${i+1}</span><div><h3>${esc(x.p.t)}</h3><p>${esc(cname(x.c))} · ${esc(rname(REP[x.c.rep]))}${x.p.due?' · '+esc(x.p.due)+(by?' (around '+ftime(by)+')':''):''}</p></div><div class="r">${x.p.d?`<button class="btn sm" data-act="copy" data-text="${esc(x.p.d)}">${ic('copy',14)}Copy message</button>`:''}<button class="btn ${i===0?'primary':''} sm" data-conv="${x.c.id}">Open${ic('right',14)}</button></div></div>`}).join(''):'<p class="hint" style="margin:0">Nothing promised so far.</p>'}</div></section>`;
+ /* "Do these next" is the original card; the promises made in today's conversations are its entries (the usual coaching actions take over when none are open) */
+ let acts=[];if(!open.length&&L.length){try{acts=computeActions(L)}catch(e){acts=[]}}
+ const entries=open.length?open.slice(0,4).map((x,i)=>{const by=dueBy(x.c,x.p);return `<div class="act"><span class="n">${i+1}</span><div><h3>${esc(x.p.t)}</h3><p>${esc(cname(x.c))} · ${esc(rname(REP[x.c.rep]))}${x.p.due?' · '+esc(x.p.due)+(by?' (around '+ftime(by)+')':''):''}</p></div><div class="r">${x.p.d?`<button class="btn sm" data-act="copy" data-text="${esc(x.p.d)}">${ic('copy',14)}Copy message</button>`:''}<button class="btn ${i===0?'primary':''} sm" data-conv="${x.c.id}">Open${ic('right',14)}</button></div></div>`}).join('')
+  :acts.length?acts.map((a,i)=>`<div class="act"><span class="n">${i+1}</span><div><h3>${a.title}</h3><p>${a.body}</p></div><div class="r">${a.impact?`<span class="pill gold num">${inr(a.impact)}</span>`:''}<button class="btn ${i===0?'primary':''} sm" ${a.filter?`data-filter='${JSON.stringify(a.filter)}'`:`data-go="${a.go}"`} ${a.tab?`data-tab="${a.tab}"`:''}>${a.btn}${ic('right',14)}</button></div></div>`).join(''):'<p class="hint" style="margin:0">Nothing promised so far.</p>';
+ const next=`<section class="card" data-tour="actions"><div class="card-h"><h2>Do these next</h2>${open.length?`<button class="link" data-go="#followups">All ${P.length} promises${ic('right',14)}</button>`:'<span class="hint">Ranked by customers</span>'}</div><div class="acts">${entries}</div></section>`;
  const team=`<section class="card" data-tour="pulse"><div class="card-h"><h2>Team at a glance</h2><button class="link" data-go="#team">Full team${ic('right',14)}</button></div>
   <div class="pulse">${rows.map(r=>`<button class="pchip" data-go="#rep-${r.rep.id}">${rg({scored:r.s.n>0,score:r.s.score},54)}<b>${esc(r.rep.first)}</b><span class="pill ${r.status[0]}">${r.thin?plural(r.s.n,'chat'):short[r.status[0]]}</span></button>`).join('')}</div>
   <p class="hint" style="margin:10px 0 0">Ring shows conversation score out of 100. ${Wd.Store} average ${s.score}.${rows.some(r=>r.thin)?' Reps with fewer than 3 conversations are not rated yet.':' Tap a rep to coach.'}</p></section>`;
- return `<div class="homegrid"><section class="hero" data-tour="brief">
+ return `${alertLine(D)}<div class="homegrid"><section class="hero" data-tour="brief">
   <span class="mono">${ic('spark',14)} AI briefing · ${esc(ZD.store)} · ${WDL[TODAY.getDay()]} ${fdate(TODAY)}</span>
   <h1>${greet()}</h1>
-  <p class="lede">${stageLine(LD)}${richLede(L,open.length,D.length)}</p>
+  <p class="lede">${richLede(L,open.length,D.length)}</p>${floorNote()}
   </section>${timelessPanel(s)}</div>
   <div class="waveband" data-wave-anchor aria-hidden="true"><span class="wavehint">Live voice waves · hover or click</span></div>
- ${dayNoteHtml()}
  <section class="kpis" data-tour="kpis">
   ${kpi({label:Wd.conv,tag:'Output',val:s.n?pct(s.conv):'–',sub:`${s.sold} of ${s.n} customers · ${quoted} left with a quotation`,delta:'',go:'#insights'})}
   ${kpi({label:Wd.closed,tag:'Output',val:s.soldValue?inr(s.soldValue):'–',sub:s.soldValue?Wd.tagged:(quotedOpen?`None booked yet · ${inr(quotedOpen)} quoted so far`:'None booked yet'),delta:'',filter:{outcome:'sold'}})}
   ${kpi({label:'Conversations recorded',tag:'Input',val:s.n,sub:`${mins(tot)} with customers${D.length?` · plus ${D.length} after booking`:''}`,delta:'',go:'#team'})}
  </section>
- <section class="kpis" data-tour="journey">${stageK('exploring','Upper funnel')}${stageK('finalising','Mid funnel')}${stageK('after_booking','After the sale')}</section>
- ${valueNote(L)}${L.length>=8?floorCards(L):modelsLine(L)}
- ${dayTimeline(LD)}
- ${D.length?`<section class="card attn"><div class="card-h"><h2>After the sale: needs attention</h2><span class="hint">Customers who already booked</span></div><div class="ccds">${D.map(deliveryCard).join('')}</div></section>`:''}
- <div class="homegrid2">${promises}${team}</div>${dayCards(L)}`}
+ ${stageBar(LD)}${valueNote(L)}${L.length>=8?floorCards(L):modelsLine(L)}
+ <div class="homegrid2">${next}${team}</div>${dayTimeline(LD)}${dayCards(L)}`}
 
 const CHK_GROUP=[['need','Understanding the need',['need']],['budget','Asking the budget',['budget']],['pitch','Showing the right model',['options','experience','value_proof']],['objection','Handling price doubts',['price_offers','concerns']],['close','Closing and next step',['decision_timing','ask','next_step']]];
 function richChecks(c){if(!c.scored||!c.aiChecks.length)return `<p class="hint" style="margin:8px 0 0">Score not available yet.</p>`;

@@ -53,10 +53,16 @@ if (meta.shown) {
   for (const w of chk.warnings || []) console.log('Note: ' + w);
   if (!chk.ok) { console.log('Not committed because the dashboard would reject this file.'); process.exit(1); }
 } else console.log(`\nNothing ready to show yet (${meta.recorded ? 'still being transcribed or analysed' : 'no recordings for that date'}). The dashboard will say "No conversations yet".`);
+/* the audit: CSV against the database, the notes, the transcript and the checked answers (tools/audit-pilot.mjs). A FAIL stops the commit. */
+let audit = '', auditOk = true;
+try { audit = sh('node', ['tools/audit-pilot.mjs']); } catch (e) { audit = (e.stdout || '') + (e.stderr || ''); auditOk = false; }
+const al = audit.split('\n').filter(l => /^(WARN|FAIL)/.test(l)), tail = audit.trim().split('\n').pop();
+console.log('\nAudit: ' + tail); al.forEach(l => console.log('  ' + l));
+if (!auditOk) { console.log('Not committed because the audit found a problem. Fix it (or, if the reading is right, update tests/pilot-golden.json and say why), then run again.'); process.exit(1); }
 if (argv.includes('--no-commit')) { console.log('Not committed (--no-commit).'); process.exit(0); }
 const files = [csv, metaF, ...(notesF ? [notesF] : [])];
 sh('git', ['add', '-f', ...files]);
 let changed = true; try { sh('git', ['diff', '--cached', '--quiet', '--', csv, ...(notesF ? [notesF] : [])]); changed = false; } catch { changed = true; }
 if (!changed) { sh('git', ['reset', '-q', '--', metaF]); try { sh('git', ['checkout', '-q', '--', metaF]); } catch {} console.log('No change in the data since the last commit. Nothing committed.'); process.exit(0); }
-sh('git', ['commit', '-q', '-m', `Pilot data refresh: ${meta.shown} conversations as of ${meta.exportedLocal}\n\nCo-Authored-By: Claude <noreply@anthropic.com>`, '--', ...files]);
+sh('git', ['commit', '-q', '-m', `Pilot data refresh: ${meta.shown} conversations as of ${meta.exportedLocal}\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`, '--', ...files]);
 console.log('Committed locally. Push to GitHub to update the Vercel site.');
