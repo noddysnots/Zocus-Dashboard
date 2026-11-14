@@ -6,7 +6,9 @@
   "team",
   "coaching",
   "conversations",
-  "followups"
+  "followups",
+  "report",
+  "report-detailed"
  ],
  "stores": {
   "sample": {
@@ -768,6 +770,22 @@
     ],
     "followups": [
      "Follow-ups"
+    ],
+    "report": [
+     "Day report",
+     "Booking conversion",
+     "Funnel",
+     "The day so far",
+     "Models talked about",
+     "Rep performance",
+     "Impact points",
+     "Follow-ups to do tonight"
+    ],
+    "report-detailed": [
+     "Day report (detailed)",
+     "Contents",
+     "The day in one table",
+     "How these numbers are worked out"
     ]
    },
    "forbidden": {
@@ -809,6 +827,22 @@
     ],
     "followups": [
      "Follow-ups"
+    ],
+    "report": [
+     "Day report",
+     "Booking conversion",
+     "Funnel",
+     "The day so far",
+     "Models talked about",
+     "Rep performance",
+     "Impact points",
+     "Follow-ups to do tonight"
+    ],
+    "report-detailed": [
+     "Day report (detailed)",
+     "Contents",
+     "The day in one table",
+     "How these numbers are worked out"
     ]
    },
    "forbidden": {
@@ -851,6 +885,22 @@
     ],
     "followups": [
      "Follow-ups"
+    ],
+    "report": [
+     "Day report",
+     "Booking conversion",
+     "Funnel",
+     "The day so far",
+     "Models talked about",
+     "Rep performance",
+     "Impact points",
+     "Follow-ups to do tonight"
+    ],
+    "report-detailed": [
+     "Day report (detailed)",
+     "Contents",
+     "The day in one table",
+     "How these numbers are worked out"
     ]
    }
   }

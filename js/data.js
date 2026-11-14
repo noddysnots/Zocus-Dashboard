@@ -171,7 +171,7 @@ function modal(title,body){const root=document.getElementById('modalRoot');
 function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function snapCountLabel(ds){const all=ds.CONVS||[],sales=all.filter(c=>c.kind!=='delivery').length,del=all.length-sales;
   return sales+' sales conversation'+(sales===1?'':'s')+(del?' · '+del+' after booking':'')}
-function snapActions(ds){return ds.snapshot&&!ds.empty?'<button data-zact="report">Day report (PDF)</button><button data-zact="crmpage">CRM records</button><button data-zact="crm">CRM sheet (CSV)</button>':''}
+function snapActions(ds){return ds.snapshot&&!ds.empty?'<button data-zact="report">Day report (2 pages)</button><button data-zact="report-detailed">Day report (detailed)</button><button data-zact="crmpage">CRM records</button><button data-zact="crm">CRM sheet (CSV)</button>':''}
 function menuHtml(){const ds=window.ZD;
   if(ds.focus)return '<div class="dm-info"><b>'+esc(ds.store)+'</b><span>'+(ds.snapshot?snapCountLabel(ds):(ds.CONVS?ds.CONVS.length:0)+' conversations')+'</span></div>'+storeOptions().map(o=>'<button data-zact="store" data-id="'+esc(o.id)+'"'+(o.id===ds.storeId?' aria-current="true"':'')+'><span class="dm-dot"></span>'+esc(o.label)+'</button>').join('')+snapActions(ds)+(ds.rawText?'<button data-zact="export">Export current data (CSV)</button>':'')+(ds.empty?'':'<button data-zact="tour">Show me around</button>');
   if(ds.locked)return '<div class="dm-info"><b>'+esc(ds.store)+'</b><span>'+(ds.snapshot?snapCountLabel(ds):(ds.CONVS?ds.CONVS.length:0)+' conversations')+'</span></div>'+snapActions(ds)+(ds.rawText?'<button data-zact="export">Export current data (CSV)</button>':'')+(ds.empty?'':'<button data-zact="tour">Show me around</button>');
@@ -205,6 +205,7 @@ document.addEventListener('click',async e=>{
   else if(a==='mclose'){document.getElementById('modalRoot').innerHTML=''}
   else if(a==='upload'){document.getElementById('zfile').click()}
   else if(a==='report'){toggleMenu(false);location.hash='#report'}
+  else if(a==='report-detailed'){toggleMenu(false);location.hash='#report-detailed'}
   else if(a==='crmpage'){toggleMenu(false);const q=[];if(window.ZD&&window.ZD.locked)q.push('dealer');try{const m=(location.hash||'').match(/^#(?:rep|coach)-(.+?)(?:\/|$)/);const id=m&&decodeURIComponent(m[1]);const rep=id&&(window.ZD.REPS||[]).find(r=>r.id===id);if(rep)q.push('rep='+encodeURIComponent(rep.first||rep.name))}catch(e){}location.href='crm.html'+(q.length?'?'+q.join('&'):'')}
   else if(a==='crm'){toggleMenu(false);try{const r=await fetch('data/cases/'+window.ZD.storeId+'-crm.csv',{cache:'no-store'});if(!r.ok)throw 0;download('zocus-crm-sheet.csv',await r.text())}catch(err){toast('The CRM sheet is not ready yet.')}}
   else if(a==='export'){download((window.ZD.isSample?'zocus-sample':'zocus-data')+'.csv',window.ZD.rawText);toggleMenu(false)}

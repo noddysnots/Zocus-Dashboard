@@ -860,32 +860,83 @@ html.emptyday .seg,html.emptyday #rangeSel,html.emptyday [data-act="palopen"],ht
 .objtip{padding:8px 10px;border-radius:10px;background:var(--gold-soft)}
 .objrep{margin-top:14px}
 .stocktbl td{vertical-align:top;font-size:13.5px;min-width:150px}
-.rpt{max-width:980px;margin:0 auto}
+.rpt{max-width:980px;margin:0 auto;overflow-x:hidden}
+.rpt-doc{margin:0;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 .rpthead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:6px 0 18px}.rpthead h1{margin:4px 0 2px}
 .rptconv{margin-top:26px;padding-top:18px;border-top:2px solid var(--line)}
 .rptconv .dhead{position:static;padding:8px 0 12px;background:none;border:0}
 .rptconv .dbody{padding:0;overflow:visible;display:flex;flex-direction:column;gap:12px}
-@media print{
- @page{margin:12mm}
- body{background:#fff!important}
- #waves,.top,.bnav,.waveband,.noprint,.livebar,.btnrow,.link,#toastRoot{display:none!important}
- .page{padding:0!important;max-width:none!important}
- .card{box-shadow:none!important;break-inside:avoid;background:#fff!important}
- .rptconv{break-before:page;border-top:0;margin-top:0}
- .tlb,.pill,.chip2,.bar i,.objtip{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rpt-summary .kpis{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 8px}
+.rpt-summary .kpi{padding:10px 12px;min-height:0}
+.rpt-summary .kpi .val{font-size:24px}
+.rpt-summary .kpi .sub{font-size:11.5px}
+.rpt-summary .card{padding:10px 12px;margin:0 0 8px}
+.rpt-summary .card-h{margin-bottom:4px}
+.rpt-summary .card-h h2{font-size:14.5px;margin:0}
+.rpt-summary .tlcard{margin-bottom:6px}
+.rpt-summary .tlcard .lg{margin-top:4px;font-size:11px}
+.rpt-summary .stagebar{margin:2px 0 0}
+.rpt-summary .drop{margin:6px 0 0;font-size:13px;line-height:1.3;color:var(--ink)}
+.rpt-summary .imp,.rpt-summary .fulist{margin:0;padding-left:16px}
+.rpt-summary .imp li,.rpt-summary .fulist li{margin:2px 0;font-size:12.5px;line-height:1.3}
+.rpt-summary .fulist{columns:2;column-gap:14px}
+.rpt-summary .fulist li{break-inside:avoid}
+.rpt-summary .fulist .hint{font-size:11px}
+.rpt-summary .rpt-p2 .bl-r{min-height:16px}
+.rpt-summary .rpt-p2 .card{margin:0 0 6px;padding:8px 10px}
+.rpt-summary .bl{gap:2px}
+.rpt-summary .bl-r{min-height:18px;gap:6px}
+.rpt-summary .bl-l{font-size:12px}
+.rpt-summary .bl-v{font-size:11.5px}
+.rpt-summary .tbl{font-size:12.5px}
+.rpt-summary .tbl th,.rpt-summary .tbl td{padding:4px 6px}
+.rpt-summary .rpthead{margin:0 0 8px}
+.rpt-summary .rpthead h1{font-size:22px}
+.rpt-p2head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin:0 0 6px;flex-wrap:wrap}
+.rpt-toc-list{margin:0;padding-left:20px;columns:1}
+.rpt-toc-list li{margin:3px 0;font-size:13.5px;break-inside:avoid}
+.rpt-toc-list a{color:inherit;text-decoration:none}
+.rpt-toc-list a:hover{text-decoration:underline}
+.rpt .tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.rpt .bl,.rpt .zc,.rpt svg{max-width:100%}
+@media(max-width:640px){
+ .rpt-summary .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .rpthead{align-items:flex-start}
+ .rpt .tbl th:nth-child(n+5),.rpt .tbl td:nth-child(n+5){display:none}
 }
-.crmx summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;cursor:pointer;list-style:none}.crmx summary::-webkit-details-marker{display:none}
-.crmgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px 22px;margin-top:12px}
-.crmg h4{margin:0 0 4px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.crmg dl{margin:0}.crmg dl>div{padding:5px 0;border-top:1px solid var(--line)}
-.crmg dt{font-size:11.5px;color:var(--muted)}.crmg dd{margin:1px 0 0;font-size:13.5px;line-height:1.35}
-.crmg dd.empty{color:var(--faint)}.crmg dd small{display:block;font-size:10.5px;color:var(--faint)}
-@media print{.crmx>summary{display:block}}
-.partx{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
-.pill.crit{background:rgba(192,57,43,.16);color:#a3261b;font-weight:600;white-space:normal}
-.critcard{border-color:rgba(192,57,43,.35)}
-.howcalc{padding:12px 16px}.howcalc>summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;font-size:12.5px;color:var(--muted)}.howcalc>summary::-webkit-details-marker{display:none}
-.howcalc>summary .link{margin-left:auto;white-space:nowrap}
-.howcalc h3{margin:16px 0 4px;font-size:15px}.howtbl td{vertical-align:top;font-size:13px}.howtbl td.hint{font-size:11.5px}
-@media print{.howcalc>summary{display:block}}
+@media print{
+ @page{size:A4;margin:10mm}
+ html,body{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ #waves,.top,.bnav,.waveband,.noprint,.livebar,.btnrow,.link,#toastRoot,.snapbar,.dm{display:none!important}
+ .page{padding:0!important;max-width:none!important;margin:0!important}
+ .rpt{max-width:none;margin:0}
+ .rpt .card,.rpt .kpi{box-shadow:none!important;background:#fff!important}
+ .rpt-keep,.rpt-summary .kpi,.rpt-summary .card,.rpt-summary .stagebar,.rpt-toc,.rpt-detailed .tblwrap tr,.rpt .bl-r,.rpt .tlcard{break-inside:avoid;page-break-inside:avoid}
+ .rpt-detailed .card{break-inside:auto;page-break-inside:auto}
+ .rpt-detailed .rpt-keep,.rpt-detailed .howcalc{break-inside:avoid;page-break-inside:avoid}
+ .rptconv{break-before:auto;page-break-before:auto;border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+ .rpt-summary .page-break-after,.rpt-summary .rpt-p1{break-after:page;page-break-after:always}
+ .rpt-summary .rpt-p2{break-before:auto}
+ .rpt-summary .rpt-p2head{display:flex!important}
+ .rpt-summary .card{padding:6px 8px;margin:0 0 5px}
+ .rpt-summary .kpi{padding:6px 8px}
+ .rpt-summary .kpi .val{font-size:20px}
+ .rpt-summary .card-h h2{font-size:12.5px}
+ .rpt-summary .drop,.rpt-summary .imp li,.rpt-summary .fulist li{font-size:11px;line-height:1.25;margin:1px 0}
+ .rpt-summary .bl-r{min-height:15px}
+ .rpt-summary .bl-l,.rpt-summary .bl-v,.rpt-summary .tbl{font-size:10.5px}
+ .rpt-summary .tbl th,.rpt-summary .tbl td{padding:2px 4px}
+ .rpt-summary .rpthead{margin:0 0 4px}
+ .rpt-summary .rpthead h1{font-size:18px;margin:2px 0}
+ .rpt-summary .tl{height:28px}
+ .rpt-summary .tlax{font-size:9px}
+ .rpt-summary .tlcard .lg{display:none}
+ .rpt-summary .fulist{columns:2;column-gap:10px}
+ .rpt-summary .rpt-p2 .bl i{height:8px}
+ .rpt-summary .rpthead .btnrow{display:none!important}
+ .tlb,.pill,.chip2,.bar i,.objtip,.bl i,.bl-p i,.sb i,.heat,.rpt .bl,.rpt svg,.zc{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .rpt .kpi,.rpt .card,.rpt .bl,.rpt svg,.rpt .zc{font-size:inherit}
+ .howcalc>summary{display:block}
+ .crmx>summary{display:block}
+}
 
