@@ -390,8 +390,18 @@ const wk=(W,f)=>W.map(x=>x.s.n>=2?f(x.s):null);
 const dotOf=k=>`<i class="sdot ${k}"></i>`;
 function renderTeam(){const L=cur(),P=prev(),rows=repRows(L),store=stats(L),p=stats(P),W=weekly(CONVS);
  const cls=(v,st)=>v>=st+5?'g':v<=st-5?'b':'w';
- const rated=rows.filter(r=>!r.thin),top=rated[0]||rows[0],low=rated[rated.length-1]||rows[rows.length-1],need=rated.filter(r=>r.status[0]==='bad');
- const lead=(rows.length?`${Wd.Store} score is <b>${store.score}</b>${p.n?`, ${store.score>=p.score?'up':'down'} from ${p.score}`:''}. ${rated.length?`<b>${esc(top.rep.first)}</b> leads at ${top.s.score}.`:`No rep has 3 conversations yet, so reps are not ranked.`}${need.length?` ${plural(need.length,'rep')} need${need.length===1?'s':''} coaching, furthest behind is <b>${esc(low.rep.first)}</b> on ${SK[low.weak].label.toLowerCase()} (${low.s.skill[low.weak]} vs ${store.skill[low.weak]}).`:''}`:'No recordings in this period.')+untagNote(L);
+ const rated=rows.filter(r=>!r.thin),shown=rows.filter(r=>r.s.n),teamRows=shown.slice().sort((a,b)=>b.s.score-a.s.score||b.s.n-a.s.n);
+ const top=rated[0]||rows[0],low=rated[rated.length-1]||rows[rows.length-1],need=rated.filter(r=>r.status[0]==='bad');
+ const bestConv=L.filter(c=>c.scored!==false).reduce((m,c)=>Math.max(m,c.score||0),0);
+ let lead;
+ if(!rows.length)lead='No recordings in this period.';
+ else if(SNAP){
+  const leader=rated.find(r=>r.s.score>=store.score);
+  lead=`${Wd.Store} score is <b>${store.score}</b>. ${leader?`<b>${esc(leader.rep.first)}</b> leads at ${leader.s.score}.`:`Scores are strict; the best conversation today scored <b>${bestConv}</b>.`} ${plural(shown.length,'rep')}, ${rated.length} with enough conversations to compare.${need.length?` ${plural(need.length,'rep')} need${need.length===1?'s':''} coaching, furthest behind is <b>${esc(low.rep.first)}</b> on ${SK[low.weak].label.toLowerCase()} (${low.s.skill[low.weak]} vs ${store.skill[low.weak]}).`:''}`;
+ }else{
+  lead=`${Wd.Store} score is <b>${store.score}</b>${p.n?`, ${store.score>=p.score?'up':'down'} from ${p.score}`:''}. ${rated.length?`<b>${esc(top.rep.first)}</b> leads at ${top.s.score}.`:`No rep has 3 conversations yet, so reps are not ranked.`}${need.length?` ${plural(need.length,'rep')} need${need.length===1?'s':''} coaching, furthest behind is <b>${esc(low.rep.first)}</b> on ${SK[low.weak].label.toLowerCase()} (${low.s.skill[low.weak]} vs ${store.skill[low.weak]}).`:''}`;
+ }
+ lead+=untagNote(L);
  const tiles=[
   ZC.tile({label:'Conversation score',value:store.score,spark:SP(wk(W,x=>x.score)),sub:delta(store.score,p.score)+VS()}),
   RICH?'':ZC.tile({label:Wd.conv,value:pct(store.conv),spark:SP(wk(W,x=>x.conv*100)),sub:delta(store.conv,p.conv,{pts:true})+VS()}),
@@ -399,19 +409,20 @@ function renderTeam(){const L=cur(),P=prev(),rows=repRows(L),store=stats(L),p=st
   ZC.tile({label:Wd.closed,value:inr(store.soldValue),spark:SP(wk(W,x=>x.soldValue)),sub:delta(store.soldValue,p.soldValue)+VS()})].join('');
  const trend=ZC.lineChart({labels:W.map(x=>x.label),series:[{name:Wd.Store+' score',values:wk(W,x=>x.score)}],aria:'Store conversation score by week for the last 8 weeks'});
  const sc=ZC.scatter({points:rated.filter(r=>r.s.n).map(r=>({x:r.s.score,y:Math.round(r.s.conv*100),size:r.s.n,label:r.rep.first,href:'#rep-'+r.rep.id,tip:`${r.rep.name}|Score ${r.s.score}|Conversion ${pct(r.s.conv)}|${plural(r.s.n,'conversation')}`})),xLabel:'Conversation score',yLabel:'Conversion %',ySuffix:'%',refX:store.score,refY:Math.round(store.conv*100),refLabel:Wd.store+' avg',aria:'Each rep plotted by conversation score and conversion'});
- const grid=ZC.heatGrid({cols:SKILLS.map(k=>SHORT[k.id]),rows:rated.map(r=>({label:r.rep.first,attr:`data-go="#rep-${r.rep.id}"`,cells:SKILLS.map(k=>({text:r.s.skill[k.id],cls:cls(r.s.skill[k.id],store.skill[k.id]),tip:`${r.rep.name}|${k.label}: ${r.s.skill[k.id]}|${Wd.Store} ${store.skill[k.id]}`}))})).concat([{label:Wd.Store,foot:true,cells:SKILLS.map(k=>({text:store.skill[k.id],cls:'n'}))}])});
+ const grid=ZC.heatGrid({cols:SKILLS.map(k=>SHORT[k.id]),rows:teamRows.map(r=>({label:r.rep.first+', '+plural(r.s.n,'conversation'),attr:`data-go="#rep-${r.rep.id}"`,cells:SKILLS.map(k=>({text:r.s.skill[k.id]+'/100',cls:r.thin?'thin':cls(r.s.skill[k.id],store.skill[k.id]),tip:`${r.rep.name}|${k.label}: ${r.s.skill[k.id]} / 100|${Wd.Store} ${store.skill[k.id]}`}))})).concat([{label:Wd.Store+' average, all '+plural(store.n,'conversation'),foot:true,cells:SKILLS.map(k=>({text:store.skill[k.id]+'/100',cls:'n'}))}])});
  const hi=rated.filter(r=>r.s.score>=store.score&&r.s.conv<store.conv).sort((a,b)=>a.s.conv-b.s.conv)[0];
+ let rankN=0;
  return phead('Team',`${plural(REPS.length,'rep')} ${inTxt()}. Tap a row to open it.`)+
  `<div class="lead"><span class="orb" aria-hidden="true"></span><p style="margin:0">${lead}</p></div>
  <div class="ktiles">${tiles}</div>
  <div class="cgrid3">
   ${FLAT?'':ZC.ccard('Score trend',Wd.Store+', 8 weeks',trend)}
   ${rated.length>=2||(!SNAP&&rated.length)?ZC.ccard(hi?`${esc(hi.rep.first)} scores well but closes less`:'Score vs conversion','Dot size = conversations',sc):''}
-  ${rated.length?ZC.ccard('Skills by rep','Green above '+Wd.store+', red below',grid):''}
+  ${shown.length?ZC.ccard('Skills by rep',SNAP?'Scores out of 100 · thin rows not coloured against the '+Wd.store:'Green above '+Wd.store+', red below',grid):''}
  </div>
- <section class="card"><div class="card-h"><h2>Reps</h2><span class="hint">${rated.length?'Ranked by conversation score':'Ranked once a rep has 3 conversations'}</span></div>
+ <section class="card"><div class="card-h"><h2>Reps</h2><span class="hint">${SNAP?'3 or more conversations are needed to rank':'Ranked by conversation score'}</span></div>
  <div class="xr-h trow"><span>#</span><span>Rep</span><span class="r">Score</span><span class="r">Conv.</span><span class="r">Recorded</span><span>${FLAT?'':'8-week score'}</span><span></span></div>
- ${rows.map((r,i)=>{const RW=weekly(CONVS.filter(c=>c.rep===r.rep.id));return `<details class="xrow"><summary class="trow"><span class="num rk">${r.thin?'–':i+1}</span><span class="nm"><b>${esc(r.rep.name)}</b><span class="st">${dotOf(r.status[0])}${r.status[1]}</span></span><span class="r num"><b>${r.s.score}</b></span><span class="r num">${pct(r.s.conv)}</span><span class="r num">${r.s.n}</span><span>${SP(wk(RW,x=>x.score),{w:96,h:24})}</span>${ic('chev',16)}</summary>
+ ${teamRows.map(r=>{const RW=weekly(CONVS.filter(c=>c.rep===r.rep.id));const rk=r.thin?'<span class="rk-note">needs 3</span>':(++rankN);return `<details class="xrow"><summary class="trow"><span class="num rk">${rk}</span><span class="nm"><b>${esc(r.rep.name)}</b><span class="st">${dotOf(r.status[0])}${r.status[1]}</span></span><span class="r num"><b>${r.s.score}</b><span class="of100">/100</span></span><span class="r num">${pct(r.s.conv)}</span><span class="r num">${r.s.n}</span><span>${SP(wk(RW,x=>x.score),{w:96,h:24})}</span>${ic('chev',16)}</summary>
   <div class="xr-b"><div class="skills5">${SKILLS.map(k=>`<div class="skill"><div class="s2"><b style="font-weight:500">${SHORT[k.id]}</b><span class="num"><b style="color:var(--ink)">${r.s.skill[k.id]}</b> / ${store.skill[k.id]}</span></div><div class="bar"><i style="width:${r.s.skill[k.id]}%;background:${scoreCol(r.s.skill[k.id])}"></i><span class="tick" style="left:${store.skill[k.id]}%"></span></div></div>`).join('')}</div>
   <div class="xr-f"><span class="hint">Weakest vs ${Wd.store}: <b style="color:var(--ink)">${SK[r.weak].label}</b> (${r.gap>0?'+':''}${r.gap}). ${inr(r.s.soldValue)} closed from ${plural(r.s.sold,Wd.sale)}.</span><div class="btnrow"><button class="btn primary sm" data-go="#rep-${r.rep.id}/coaching">Coaching plan${ic('right',14)}</button><button class="btn sm" data-go="#rep-${r.rep.id}">Profile</button><button class="btn sm" data-go="#rep-${r.rep.id}/conversations">Conversations</button></div></div></div></details>`}).join('')}
  </section>`}

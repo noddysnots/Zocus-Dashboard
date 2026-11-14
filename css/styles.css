@@ -408,10 +408,20 @@ button.bl-r:hover,.bl-r.on{background:rgba(29,26,21,.06)}
 table.hg{width:100%;border-collapse:collapse;font-size:12.5px}
 .hg th{font:500 10px var(--f-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--faint);padding:0 2px 6px;text-align:center;white-space:nowrap}
 .hg td{padding:2px;text-align:center}.hg .hg-n{text-align:left;font-weight:500;white-space:nowrap;padding-right:8px}
-.hg .heat{display:block;min-width:0;padding:3px 0;border-radius:6px;font-size:12px}
+.hg .heat{display:block;min-width:0;padding:3px 0;border-radius:6px;font-size:11px;white-space:nowrap}
 .heat.n{color:var(--muted);background:rgba(29,26,21,.05)}
+.heat.thin{color:var(--muted);background:rgba(29,26,21,.03);opacity:.72;font-weight:500}
+.hg .hg-n{white-space:normal;max-width:140px;line-height:1.25}
 .hg tr.click{cursor:pointer}.hg tr.click:hover .hg-n{text-decoration:underline}
 .hg tr.foot td{padding-top:6px}
+.rk-note{font:500 11px/1.2 var(--f-mono,inherit);letter-spacing:.02em;color:var(--muted);text-transform:none}
+.of100{font-weight:500;font-size:11px;color:var(--muted);margin-left:1px}
+@media (max-width:860px){
+  .hg{font-size:11px}
+  .hg .hg-n{max-width:96px;padding-right:4px}
+  .hg .heat{font-size:10px;padding:2px 0}
+  .rk-note{font-size:10px}
+}
 .seg.mini{align-self:flex-start;margin-bottom:6px;max-width:100%;overflow-x:auto}.seg.mini button{padding:4px 10px;font-size:12px}
 
 /* collapsible cards and rows */

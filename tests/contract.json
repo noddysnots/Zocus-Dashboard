@@ -752,7 +752,13 @@
      "Insights"
     ],
     "team": [
-     "Team"
+     "Team",
+     "Skills by rep",
+     "Showroom average",
+     "Scores out of 100",
+     "3 or more conversations are needed to rank",
+     "enough conversations to compare",
+     "needs 3"
     ],
     "coaching": [
      "Coaching"
@@ -788,7 +794,12 @@
      "Insights"
     ],
     "team": [
-     "Team"
+     "Team",
+     "Skills by rep",
+     "Showroom average",
+     "Scores out of 100",
+     "3 or more conversations are needed to rank",
+     "enough conversations to compare"
     ],
     "coaching": [
      "Coaching"
@@ -824,7 +835,13 @@
      "Insights"
     ],
     "team": [
-     "Team"
+     "Team",
+     "Skills by rep",
+     "Showroom average",
+     "Scores out of 100",
+     "3 or more conversations are needed to rank",
+     "enough conversations to compare",
+     "needs 3"
     ],
     "coaching": [
      "Coaching"

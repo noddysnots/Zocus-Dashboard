@@ -16,7 +16,7 @@ Decided with the team on 13 Nov. This replaces the earlier plan (one login per r
 - Giving a quotation is the big step; a test drive does not move the needle much.
 - 8 reps for regular customers, 2 for EV; the EV rep shows the EV first.
 
-(This was the first design. The Overview is now conversation by conversation: see "How the pilot day is shown" below.) The quotation is still the key step; the funnel is Talked, Need understood, Options shown, **Quotation given**, Booked; and there are cards for the model mix (best sellers vs other models vs EV), models compared, what customers care about, fuel, colour, availability and test drives. The first action is always "send the quotation to customers who left without one". Reps with fewer than 3 conversations are not ranked or rated. Add fuel, colour and "quotation given?" to the WhatsApp line when they are not said aloud.
+(This was the first design. The Overview is now conversation by conversation: see "How the pilot day is shown" below.) The quotation is still the key step; the funnel is Talked, Need understood, Options shown, **Quotation given**, Booked; and there are cards for the model mix (best sellers vs other models vs EV), models compared, what customers care about, fuel, colour, availability and test drives. The first action is always "send the quotation to customers who left without one". On the Team page every rep with a conversation is shown; ranks and Top/Coach labels still need 3 conversations. Add fuel, colour and "quotation given?" to the WhatsApp line when they are not said aloud.
 
 ## Who sees what
 
@@ -61,7 +61,7 @@ Final refresh, push, send the dealer `https://<site>/?dealer`. The link opens th
 
 ## How each number is worked out
 
-**Rep.** Team notes, else `Rep / Customer` typed in the app, else "Rep not tagged". Comparing reps with each other needs at least two tagged reps with three conversations each; until then each rep is compared with the showroom average.
+**Rep.** Team notes, else `Rep / Customer` typed in the app, else "Rep not tagged". On Team, every rep with a conversation is listed; a rank number and a "leads" claim need three conversations (and for "leads", a score at or above the showroom). Thin rows stay on Skills by rep without green/red against the showroom.
 
 **Customer.** Team notes, else the name typed in the app, else "Customer 1, 2, …" in the order of the day.
 
@@ -106,7 +106,7 @@ The screen is built **conversation by conversation**, for the dealer's owner and
 - **Conversation panel:** the five-part AI summary (Customer need, What happened, Outcome, Why, Next step), what the customer wants, **prices quoted** (written by Claude at each refresh from the AI summary and the recording), customer concerns, promises with messages, **How the rep did** (10 checks, Done / Partly / Missed, each with the reason and the line), the transcript (side talk and phone calls collapsed, English under key lines) and notes from the floor.
 - **Times:** start to end of each conversation everywhere, clock time on every transcript line, and "analysed at" in the panel footer.
 - **Scores:** the backend's own (points-score-v3): the mean of every check it marked, done 100, partly 50, missed 0. Since 14 Nov, 7 pm this includes the test-drive check and, for customers who already chose a model, need and budget, so the dashboard shows the same numbers as the backend (best today 50). The scorer is strict. A conversation with no real score shows "Score not available yet", never an invented number.
-- **Reps** are nicknames from the floor (rep 1 Speed Racer, rep 2 Black and White Stripe). A rep is ranked only from 3 conversations.
+- **Reps** are nicknames from the floor (rep 1 Speed Racer, rep 2 Black and White Stripe). On Team, every rep appears on Skills by rep (scores out of 100); a rank number and a "leads" claim need 3 conversations and, for "leads", a score at or above the showroom.
 - **The dealer link** (the site address plus `/?dealer`) hides the store menu, the demo, the "left out" counts and the first-visit tour.
 
 ### Refresh (each time the team posts notes)
