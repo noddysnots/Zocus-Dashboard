@@ -237,16 +237,11 @@ function homePanel(s){const W=weekly(CONVS),by=o=>cur().filter(c=>c.outcome===o)
 const mins=m=>m>=60?Math.floor(m/60)+' h '+String(Math.round(m%60)).padStart(2,'0')+' min':Math.round(m)+' min';
 const WDL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const clock=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})\s*$/);if(!m)return '';const h=+m[1];return (h%12||12)+':'+m[2]+(h<12?' am':' pm')};
-/* One-day snapshot bar: which day, when it was last updated, what is still on its way, and the count at each earlier update. No hourly view. */
+/* One-day snapshot bar: day + latest update time; analysing count only when something is still on its way. No update history. */
 function snapBar(){if(!SNAP)return '';const m=ZD.meta||{},bits=[`<b>${WDL[TODAY.getDay()]} ${fdate(TODAY)}</b>`];
  if(m.exportedLocal){const d=String(m.exportedLocal).slice(0,10),same=!m.date||d===String(m.date).slice(0,10);bits.push('updated '+(same?'':fdate(new Date(d+'T12:00'))+', ')+clock(m.exportedLocal))}
- const salesN=CONVS.filter(c=>c.kind!=='delivery').length,delN=CONVS.length-salesN;
- bits.push(plural(salesN,'sales conversation')+(delN?` · ${delN} after booking`:''));
- if(m.analysing&&m.analysing.length)bits.push(`<b>${m.analysing.length} being analysed</b>`);
- const lo=ZD.locked?[]:(m.leftOut||[]);if(lo.length){const by={};lo.forEach(x=>by[x.why]=(by[x.why]||0)+1);bits.push(`${lo.length} left out (${Object.entries(by).map(([k,n])=>(n>1?n+' × ':'')+esc(lc(k))).join(', ')})`)}
- const raw=(m.history||[]).filter(h=>h.shown>0),H=[];
- raw.forEach(h=>{const k=clock(h.at);if(H.length&&clock(H[H.length-1].at)===k)H[H.length-1]=h;else H.push(h)});
- return `<div class="livebar"><div class="livehead"><span class="livedot" aria-hidden="true"></span><span>${bits.join(' · ')}</span></div>${H.length>1?`<div class="snaplog"><span class="mono">Updates</span>${H.map(h=>`<span class="num"><b>${clock(h.at)}</b> ${plural(h.shown,'conversation')}</span>`).join('')}</div>`:''}</div>`}
+ if(m.analysing&&m.analysing.length)bits.push(m.analysing.length===1?'1 being analysed':m.analysing.length+' being analysed');
+ return `<div class="livebar"><div class="livehead"><span class="livedot" aria-hidden="true"></span><span>${bits.join(' · ')}</span></div></div>`}
 /* Where a rupee value came from. Indicative values (the model's typical price) are marked with ~ wherever they are shown. */
 const VSRC={call:'said in the call',budget:'customer budget',indicative:'indicative by model',team:'entered by team',recorded:'recorded in the app'};
 const cleanModel=s=>{const t=String(s||'').replace(/\s*\(model not named\)/gi,'').trim();return t||'Model not named'};
@@ -635,7 +630,8 @@ const stageChip=c=>c.jstage&&STAGES_J[c.jstage]?`<span class="chip2 stg stg-${c.
 const floorNote=()=>ZD.meta&&ZD.meta.dayNote?`<p class="floornote">${esc(ZD.meta.dayNote)}</p>`:'';
 /* three small additions to the original Overview, only when there is something to say */
 function alertLine(D){if(!D.length)return '';const c=D[0];
- return `<button class="alertline" data-conv="${c.id}"><span class="adot" aria-hidden="true"></span><b>${plural(D.length,'delivery-day conversation')} ${D.length===1?'needs':'need'} attention</b><span class="atxt">${esc(c.resultLabel||'After the sale')} at ${ftime(c.at)}${(c.sumOutcome||c.sumNext)?' · '+esc(clipTxt(c.sumOutcome||c.sumNext,150)):''}</span>${ic('right',14)}</button>`}
+ const detail=`${esc(c.resultLabel||'After the sale')} at ${ftime(c.at)}${(c.sumOutcome||c.sumNext)?' · '+esc(clipTxt(c.sumOutcome||c.sumNext,150)):''}`;
+ return `<button class="alertline" data-conv="${c.id}"><span class="adot" aria-hidden="true"></span><b>${plural(D.length,'delivery-day conversation')} ${D.length===1?'needs':'need'} attention</b><span class="atxt">${detail}</span>${ic('right',14)}</button>`}
 const STAGE_SHORT={exploring:'Exploring',finalising:'Finalising',after_booking:'After booking'};
 function stageBar(LD){const ks=Object.keys(STAGE_SHORT).filter(k=>LD.some(c=>c.jstage===k));if(!ks.length)return '';
  return `<div class="stagebar"><span class="hint">Where customers are</span>${ks.map(k=>`<button class="chip2 stg stg-${k}" data-filter='${JSON.stringify({jstage:k})}'><b class="num">${LD.filter(c=>c.jstage===k).length}</b> ${STAGE_SHORT[k]}</button>`).join('')}</div>`}

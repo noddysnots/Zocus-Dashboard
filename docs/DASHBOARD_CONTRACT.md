@@ -25,7 +25,8 @@ Original blocks, in the original order, with the original card style:
 
 | Slot | What | Shown when |
 |---|---|---|
-| Alert line (top) | "1 delivery-day conversation needs attention" with the AI outcome, opens the conversation | a conversation after the booking (a delivery, a dispute) exists |
+| Status line (top) | One short line: day · updated time (e.g. "Saturday 14 Nov · updated 7:23 pm"); add " · N being analysed" only while something is still analysing. No update history, no sales/after-booking/left-out counts (those live on the number cards and "How these numbers are worked out"). On `?dealer`, "left out" never appears | one-day pilot snapshot |
+| Alert line (top) | One compact row: dot + "1 delivery-day conversation needs attention" + chevron; opens the conversation. On phone, title only (no body). On desktop, optional AI outcome text on the same line with ellipsis | a conversation after the booking (a delivery, a dispute) exists |
 | Stage chips (under the number cards) | Exploring · Finalising · After booking, with counts; tap to filter | always on a one-day pilot |
 | The day so far (before Reps) | one slim timeline of the day | always on a one-day pilot |
 
@@ -43,7 +44,7 @@ The floor asked for more detail per conversation because volumes are low. Nothin
 | Follow-ups page | Follow-ups written by hand from the recording; our own suggestions carry a "Suggested" pill and are not counted in the menu badge |
 | Coaching page | One card, "Objections today and how they were answered", per rep, with a suggested line |
 | Insights | One tab, last in the row: "Demand vs stock" |
-| Data menu | **"Day report (2 pages)"** (`#report`): a two-page A4 summary for the dealer (headline numbers, funnel, timeline, stage chips, models chart, rep table, impact points, tonight's follow-ups), printed by the browser. **"Day report (detailed)"** (`#report-detailed`): the full day write-up (same conversation sections as the panel, with a contents list and "How these numbers are worked out" open). Both work on the locked `?dealer` link. "CRM records": opens `crm.html` (Sales.mai-style forms filled from `crm_json`, sales conversations only). "CRM sheet (CSV)": one row per visit, with blank columns for the dealer. On pilot / dealer, the menu and the live bar count **sales conversations** the same way as Team (delivery-day rows are listed as "after booking", not in the sales total) |
+| Data menu | **"Day report (2 pages)"** (`#report`): a two-page A4 summary for the dealer (headline numbers, funnel, timeline, stage chips, models chart, rep table, impact points, tonight's follow-ups), printed by the browser. **"Day report (detailed)"** (`#report-detailed`): the full day write-up (same conversation sections as the panel, with a contents list and "How these numbers are worked out" open). Both work on the locked `?dealer` link. "CRM records": opens `crm.html` (Sales.mai-style forms filled from `crm_json`, sales conversations only). "CRM sheet (CSV)": one row per visit, with blank columns for the dealer. On pilot / dealer, the menu counts **sales conversations** the same way as Team (delivery-day rows are listed as "after booking", not in the sales total) |
 
 Added 14 Nov, 6 pm: a folded **CRM record** card in the conversation panel (the rep app's fields, filled from the conversation, with sources), a **Parts of this visit** card (only when one visit was recorded in several parts), and a CRM sheet laid out like the rep app. Nothing was added to the Overview or the menus.
 
@@ -87,8 +88,9 @@ Price tables in the conversation panel show the exact rupee figure (for example 
 
 ## Added 14 Nov, evening
 
-- **Pilot count wording:** Data menu and live bar say "8 sales conversations · 1 after booking" so they match Team's "Conversations recorded" (8). Delivery-day #264 is not a sales conversation.
+- **Pilot count wording:** Data menu says "8 sales conversations · 1 after booking" so it matches Team's "Conversations recorded" (8). Delivery-day #264 is not a sales conversation. The live status line no longer repeats those counts.
 - **CRM records page:** `crm.html` (top-bar CRM icon next to Data, and from the Data menu). Sales.mai-style phone forms filled from `crm_json`, read-only, filterable by rep. Pilot reps shown as **Sachin** (CSV R1 / Black and White Stripe) and **Vishvaraj** (CSV R2 / Lead rep).
-- **Conversations labels (14 Nov, evening):** list and search use `cname` ("Customer at 5:51 pm"), never the CSV "Customer N" counter; reps use display names (Sachin / Vishvaraj); "Who came in and who booked" groups free-text `customer_type` into a short fixed set (floor wording stays in the panel); "(model not named)" is stripped from product/model labels everywhere; long model lines are clipped in the list; the list omits the duplicate time column on the pilot; the Updates strip keeps one entry per clock time; `~` on a value still means typical model price, not a quote.
+- **Conversations labels (14 Nov, evening):** list and search use `cname` ("Customer at 5:51 pm"), never the CSV "Customer N" counter; reps use display names (Sachin / Vishvaraj); "Who came in and who booked" groups free-text `customer_type` into a short fixed set (floor wording stays in the panel); "(model not named)" is stripped from product/model labels everywhere; long model lines are clipped in the list; the list omits the duplicate time column on the pilot; `~` on a value still means typical model price, not a quote.
+- **Live bar (14 Nov, late):** no Updates history box; status is one line (day · updated time, plus analysing only when needed); alert is one compact row on phone (title + chevron). Day report pages stay unaffected (live bar already omitted on `#report` / `#report-detailed`).
 - **Pilot-only data (14 Nov, late):** other stores and sample/demo CSVs removed from the shipped tree; Data menu no longer offers a sample store.
 
