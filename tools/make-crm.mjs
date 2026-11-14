@@ -23,7 +23,7 @@ const COLS = [
   ['Customer name (dealer)'], ['Mobile (dealer)'], ['Enquiry / SalesGenie ID (dealer)'], ['Need-analyzer answers (dealer)'], ['Counter punch-in time (dealer)'], ['Booking amount paid (dealer)'], ['Booking date (dealer)'], ['Promised delivery date (dealer)'], ['SalesGenie follow-up result (dealer)'], ['Final outcome (dealer)']];
 const q = v => { const s = String(v ?? '').replace(/\b[6-9]\d{4}[ -]?\d{5}\b/g, '').replace(/\s+/g, ' ').trim(); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
 const head = COLS.map(c => q(c[0])).join(',');
-const body = rows.map(r => { const c = J(r.crm_json, {}), s = J(r.stock_json, {}), o = J(r.objections_json, []), p = J(r.promises_json, []); return COLS.map(([, f]) => q(f ? f(r, c, s, o, p) : '')).join(','); });
+const body = rows.map(r => { const c = J(r.crm_json, {}), s = J(r.stock_json, {}), o = J(r.objections_json, []).length ? J(r.objections_json, []) : J(r.concerns_json, []), p = J(r.promises_json, []); return COLS.map(([, f]) => q(f ? f(r, c, s, o, p) : '')).join(','); });
 fs.writeFileSync(path.join(root, 'data/cases/pilot-crm.csv'), '﻿' + [head, ...body].join('\n') + '\n');
 fs.writeFileSync(path.join(root, 'data/crm-template.csv'), '﻿' + head + '\n');
 console.log(`CRM sheet: ${rows.length} rows, ${COLS.length} columns (${COLS.filter(c => !c[1]).length} left for the dealer).`);

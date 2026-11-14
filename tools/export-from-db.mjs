@@ -199,6 +199,7 @@ const skip = { range: 0, noOutcome: 0, noScore: 0, dropped: 0 }, src = { checks:
 const isCar = o.vertical === 'car';
 /* team notes for a pilot day: rep, customer, segment, model, value, drop (see data/pilot-notes.json) */
 const DAYNOTE = (() => { if (!o.notes) return ''; try { return JSON.parse(fs.readFileSync(path.resolve(root, o.notes), 'utf8')).daynote || ''; } catch { return ''; } })();
+const BACKEND_ONLY = (() => { if (!o.notes) return false; try { return !!JSON.parse(fs.readFileSync(path.resolve(root, o.notes), 'utf8')).backend_only; } catch { return false; } })();
 const NOTES = (() => { if (!o.notes) return {}; try { return JSON.parse(fs.readFileSync(path.resolve(root, o.notes), 'utf8')).calls || {}; } catch (e) { console.error('Could not read the notes file ' + o.notes + ': ' + e.message); return {}; } })();
 const from = val('--date') || o.date || val('--from'), to = val('--date') || o.date || val('--to');
 let lastDay = rows.length ? fmt(rows.at(-1).captured_at, false) : null;
@@ -209,7 +210,8 @@ const out = [];
 for (const r of rows) {
   const day = fmt(r.captured_at, false);
   if ((from && day < from) || (to && day > to) || (dayN && day < dayN)) { skip.range++; continue; }
-  const note = NOTES[String(r.id)] || {};
+  const note = { ...(NOTES[String(r.id)] || {}) };
+  if (BACKEND_ONLY) { delete note.stock; delete note.objections; delete note.followups; } // show only what the backend analysis says: no hand-written objections, stock notes or follow-ups
   if (note.drop) { skip.dropped++; continue; }
   const sumAll = String(r.summary || r.result?.summary || '');
   const suggested = /(taking|take|collect\w*) delivery|delivery today|before delivery|pre-?delivery|hand ?over/i.test(sumAll) && /accessor|insurance|payment|coating|RTO/i.test(sumAll) ? 'after_booking' : /quot|on-?road|ex-?showroom|discount|financ|loan|variant|booking|price|stock|delivery/i.test(sumAll) ? 'finalising' : 'exploring';
