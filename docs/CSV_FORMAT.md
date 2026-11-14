@@ -94,3 +94,21 @@ The repo already has `GET /api/v1/organizations/:orgId/interactions/export?forma
 Floor columns (car stores, all optional; written by the exporter from the transcript, team notes override): `models_considered` (models named, `|` between), `model_group` (`best` best seller, `other`, `ev`), `fuel` (`Diesel|Petrol|Electric`), `colour`, `quote_given` (`yes` / `promised` / `no`), `test_drive` (`yes` / `offered` / `no`), `availability` (`yes` / `no`) with `availability_quote`, `priorities` (Performance, Safety, Features, Space, Comfort, Mileage, Price and offers, Availability, Resale, Service), `intent` (`high` / `medium` / `low`, the AI's reading), `decision` (`decided` / `choosing` / `exploring`). When `quote_given` is present the Overview leads with customers, high intent and quotations, and the funnel step 3 is "Quotation given".
 
 When `vertical` is `car` the dashboard uses showroom wording (Booked, test drive, on-road price) and the reason codes read: `browse` just enquiring, `stock` long waiting period, `design` not convinced after the test drive, `making` on-road price too high, `budget` over budget or EMI, `competitor` another brand, `family` family approval, `exchange` exchange value too low. `stage_reached` `product_shown` means "test drive done". `product` is the model; `Model not decided` when none was named.
+
+## Conversation-first columns (pilot snapshot stores; all optional)
+
+| Column | Meaning |
+|---|---|
+| `ended_at` | end of the conversation, `YYYY-MM-DD HH:MM`; with it the Overview uses the conversation-first layout |
+| `analysed_at` | when the AI analysis finished |
+| `scored` | `no` when there is no real score; `score` and skill columns may then be blank |
+| `sum_need`, `sum_happened`, `sum_outcome`, `sum_why`, `sum_next` | the AI summary in five parts, unclipped |
+| `ai_checks` | now `MET`, `PARTLY` or `NOT_MET: label (id). reason ❝quote❞`, ten checks |
+| `promises_json` | list of `{t title, d draft message, q quote, k kind, ph phrase, due}` |
+| `concerns_json` | list of `{t concern, s done/partly/open, a answer}` |
+| `prices_json` | list of `{m model or variant, p rupees or text, b basis, at time in the recording}` |
+| `flags`, `remarks` | warnings from the AI (`|` between) and the team's note |
+| `f_budget`, `f_preference`, `f_timing`, `f_competitor` | what the AI captured from the customer |
+| `tr_en` | JSON map of transcript time (`m:ss`) to an English line |
+
+Transcript speaker labels: `Rep`, `Customer`, `Customer's companion`, `Background`, `Other voice`, `Other staff`. `Background` and `Other voice` are collapsed as side talk.

@@ -93,3 +93,21 @@ Final refresh, push, send the dealer `https://<site>/?dealer`. The link opens th
 - Number words in Hindi ("atharah lakh") are not read as prices; digits and English number words are.
 - The price bands are placeholders until the dealer shares a price list.
 - Not built: the add-ons section ("After the booking"), a PDF report, a multi-week Mahindra sample store.
+
+## How the pilot day is shown (from 14 Nov, 11 am)
+
+The screen is built **conversation by conversation**, for the dealer's owner and managers.
+
+- **Overview, "Today at the showroom":** one sentence of facts, the day timeline (each conversation from start to end; gaps are visible), **Promises to keep** (what the rep promised each customer, when, and a ready message with Copy and Mark done), one card per conversation, and a small day strip. Bigger charts return at 8 or more conversations.
+- **Conversation panel:** the five-part AI summary (Customer need, What happened, Outcome, Why, Next step), what the customer wants, **prices quoted** (written by Claude at each refresh from the AI summary and the recording), customer concerns, promises with messages, **How the rep did** (10 checks, Done / Partly / Missed, each with the reason and the line), the transcript (side talk and phone calls collapsed, English under key lines) and notes from the floor.
+- **Times:** start to end of each conversation everywhere, clock time on every transcript line, and "analysed at" in the panel footer.
+- **Scores:** from the backend's automotive scoring (points-score-v3): 9 of the 10 checks give the score (done 100, partly 50, missed 0); the test-drive check is shown but not scored because the dealer says it matters little. A conversation with no real score shows "Score not available yet", never an invented number.
+- **Reps** are nicknames from the floor (rep 1 Speed Racer, rep 2 Black and White Stripe). A rep is ranked only from 3 conversations.
+- **The dealer link**  hides the store menu, the demo, the "left out" counts and the first-visit tour.
+
+### Refresh (each time the team posts notes)
+1. Paste the WhatsApp notes here. Claude updates `data/pilot-notes.json`: `rep`, `models`, `fuel`, `colour`, `remarks`, `prices` (what was quoted), `tr_en` (English for key transcript lines), `csv` (any column), `drop`.
+2. Claude runs `node tools/refresh-pilot.mjs`, reads the new conversations against the recording, checks prices and values, and commits locally.
+3. You push; Vercel redeploys; reload.
+
+A call is dropped only when the team says so (for example #263, a fragment, was dropped on 14 Nov).

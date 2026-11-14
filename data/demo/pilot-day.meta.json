@@ -3,25 +3,18 @@
  "exportedAt": "2026-11-14T14:35:00.000Z",
  "exportedLocal": "2026-11-14 20:05",
  "date": "2026-11-14",
- "recorded": 37,
- "shown": 34,
+ "recorded": 19,
+ "shown": 17,
  "analysing": [
   {
    "id": 7101,
-   "at": "2026-11-14 18:40",
+   "at": "2026-11-14 19:48",
    "rep": "Sneha Patil",
-   "min": 47
+   "min": 14
   }
  ],
  "failed": [],
- "unscored": [
-  {
-   "id": 7102,
-   "at": "2026-11-14 18:05",
-   "rep": "Rohan Desai",
-   "min": 2
-  }
- ],
+ "unscored": [],
  "leftOut": [
   {
    "id": 7103,
@@ -32,37 +25,37 @@
  "history": [
   {
    "at": "2026-11-14 12:05",
-   "shown": 5
+   "shown": 3
   },
   {
    "at": "2026-11-14 16:10",
-   "shown": 21
+   "shown": 9
   },
   {
    "at": "2026-11-14 20:05",
-   "shown": 34
+   "shown": 17
   }
  ],
  "reps": [
   {
    "name": "Rohan Desai",
-   "recorded": 7
+   "recorded": 4
   },
   {
    "name": "Meera Iyer",
-   "recorded": 9
+   "recorded": 2
   },
   {
    "name": "Imran Qureshi",
-   "recorded": 5
+   "recorded": 4
   },
   {
    "name": "Sneha Patil",
-   "recorded": 5
+   "recorded": 2
   },
   {
    "name": "Vikram Nair",
-   "recorded": 8
+   "recorded": 5
   }
  ]
 }
