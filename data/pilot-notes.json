@@ -1,5 +1,5 @@
 {
-  "note": "Team notes for the pilot day, from the Zocus WhatsApp group, plus what Claude read from the recordings at each refresh. One entry per conversation, keyed by the conversation number. Fields: rep (nickname), customer, segment, model / models (as the customer saw them), fuel, colour, value (rupees, set by hand), remarks (shown on the conversation), prices (what was quoted: m = model or variant, p = rupees or text, b = basis, at = time in the recording), tr_en (English for key transcript lines, keyed by the line's time), csv (any CSV column to override, for example objection_quote_en), kind (delivery = a conversation after the sale, not a sales pitch), result_label, drop (true to leave the call out) with why.",
+  "note": "Team notes for the pilot day, from the Zocus WhatsApp group, plus what Claude read from the recordings at each refresh. One entry per conversation, keyed by the conversation number. Fields: rep (nickname), customer, segment, model / models (as the customer saw them), fuel, colour, value (rupees, set by hand), remarks (shown on the conversation), prices (what was quoted: m = model or variant, p = rupees or text, b = basis, at = time in the recording), tr_en (English for key transcript lines, keyed by the line's time), csv (any CSV column to override, for example objection_quote_en), stage (exploring, finalising or after_booking), payment, kind (delivery = a conversation after the sale, not a sales pitch), result_label, drop (true to leave the call out) with why.",
   "calls": {
     "261": {
       "rep": "Speed Racer",
@@ -78,7 +78,8 @@
         "9:24": "The Z2, the base Scorpio, comes to 16.50 lakh; the insurance may still change.",
         "9:36": "It comes to 16,42,000.",
         "9:45": "There are small differences: no roof rails, no spoiler, 4 speakers instead of 6. I can give you the car for 16,09,000."
-      }
+      },
+      "stage": "finalising"
     },
     "262": {
       "rep": "Black and White Stripe",
@@ -138,7 +139,8 @@
         "14:15": "Bolero B8, we want it in white.",
         "16:15": "I will tell you within an hour. I will get confirmation from Bhavnagar.",
         "16:57": "I will call you on this number."
-      }
+      },
+      "stage": "finalising"
     },
     "263": {
       "drop": true,
@@ -151,7 +153,7 @@
       "models": [
         "Scorpio N"
       ],
-      "remarks": "Customer dispute on delivery day, not a sales pitch. The customer was taking delivery of a Scorpio N and was choosing accessories before delivery, which led to a dispute over the ceramic coating bundled into the booking deal.",
+      "remarks": "Delivery-day conversation, not a sales pitch. The customer was taking delivery of a Scorpio N today and choosing accessories, which led to a dispute over the ceramic coating bundled into the booking deal. A store colleague helped with accessories, and the rep took phone calls part-way through. The rep said first that the booking cannot be cancelled, then that the customer would get a cheque for the full amount.",
       "prices": [
         {
           "m": "Ceramic coating in the booking deal",
@@ -211,8 +213,17 @@
         "18:04": "The deal is fine, we are not refusing. Get it done in Palanpur. It is a Mahindra, it can be done anywhere. Why should I always go to Jodhpur?",
         "18:46": "The car will not come here for service.",
         "19:47": "Do not cancel, but at least arrange for Palanpur. Why would I come 400 kilometres? A showroom is 100 km from me.",
-        "20:13": "You have to get the coating done here. You can do it whenever you want afterwards."
-      }
+        "20:13": "You have to get the coating done here. You can do it whenever you want afterwards.",
+        "7:01": "Have you brought cash or will it be online?",
+        "7:03": "Cash. Both are possible.",
+        "7:07": "Work out how much of your payment is still balance.",
+        "16:52": "I am ready to take it and get it done; it is not available right now.",
+        "17:05": "The Diwali holidays were on, so we cannot get anything done now.",
+        "17:17": "You will get a cheque for the full amount."
+      },
+      "stage": "after_booking",
+      "payment": "Final payment being worked out: the customer said cash (both cash and online possible); only the coating and accessories amounts were left. Insurance and RTO follow once payment is in."
     }
-  }
+  },
+  "daynote": "From the floor (Abhishek, 11:48 am): today's traffic is mostly customers finalising the model, choosing accessories and finalising payment. On a normal day it is mostly early enquiries, so today's numbers are not typical."
 }
