@@ -49,7 +49,7 @@ if (!noDb) {
     const env = Object.fromEntries(read('.env').split('\n').filter(l => l.includes('=') && !l.startsWith('#')).map(l => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()]));
     const db = new pg.Client({ connectionString: (env.DATABASE_URL || '').replace('sslmode=require', 'sslmode=require&uselibpqcompat=true') });
     await db.connect(); await db.query('SET default_transaction_read_only = on');
-    const ids = rows.map(r => +r.conversation_id.replace(/\D/g, ''));
+    const ids = [...new Set(rows.flatMap(r => { let pj = []; try { pj = JSON.parse(r.parts_json || '[]'); } catch {} return [+r.conversation_id.replace(/\D/g, ''), ...pj.map(x => x.id)]; }))];
     const res = await db.query(`select s.id, s.captured_at, s.ended_at, s.deleted_at, s.summary, ar.completed_at analysed_at, ar.result,
         (select execution_scoring from analysis_runs x where x.session_id=s.id and x.purpose='scoring' and x.status='succeeded' order by x.id desc limit 1) scoring
       from sessions s left join analysis_runs ar on ar.id=s.current_analysis_run_id where s.id = any($1)`, [ids]);
@@ -69,21 +69,27 @@ for (const r of rows) {
     else {
       if (d.deleted_at) fail(id, 'deleted in the database but still in the file');
       local(d.captured_at) === r.captured_at ? ok(id, `start time matches the database (${r.captured_at})`) : fail(id, `start time ${r.captured_at} differs from the database ${local(d.captured_at)}`);
+      let pj = []; try { pj = JSON.parse(r.parts_json || '[]'); } catch {}
+      if (pj.length) {
+        for (const q of pj) { const dq = dbRows[q.id]; if (!dq) { fail(id, `part #${q.id} not found in the database`); continue; } const okS = local(dq.captured_at).slice(11) === q.at, okE = dq.ended_at && local(dq.ended_at).slice(11) === q.end; okS && okE ? ok(id, `part #${q.id} times match the database (${q.at} to ${q.end})`) : fail(id, `part #${q.id} times ${q.at}-${q.end} differ from the database ${local(dq.captured_at).slice(11)}-${dq.ended_at ? local(dq.ended_at).slice(11) : 'none'}`); const sp2 = parts(dq.summary || dq.result?.summary); [['need', 'Customer need'], ['happened', 'What happened'], ['outcome', 'Outcome'], ['why', 'Why'], ['next', 'Next step']].every(([k, n2]) => norm(q.sum[k]) === norm(sp2[n2] || '')) ? ok(id, `part #${q.id}: the five summary parts match the database`) : fail(id, `part #${q.id}: summary parts differ from the database`); }
+        const lastEnd = pj.map(q => q.end).sort().at(-1); r.ended_at.slice(11) === lastEnd ? ok(id, `end time is the last part's (${lastEnd})`) : fail(id, `end time ${r.ended_at.slice(11)} is not the last part's ${lastEnd}`);
+      } else {
       d.ended_at && local(d.ended_at) === r.ended_at ? ok(id, `end time matches the database (${r.ended_at.slice(11)})`) : fail(id, `end time ${r.ended_at} differs from the database ${d.ended_at ? local(d.ended_at) : 'none'}`);
       d.analysed_at && local(d.analysed_at) === r.analysed_at ? ok(id, `analysed-at matches (${r.analysed_at.slice(11)})`) : fail(id, `analysed-at ${r.analysed_at} differs from the database ${d.analysed_at ? local(d.analysed_at) : 'none'}`);
+      }
       const sp = parts(d.summary || d.result?.summary), map = { sum_need: 'Customer need', sum_happened: 'What happened', sum_outcome: 'Outcome', sum_why: 'Why', sum_next: 'Next step' };
       const bad = Object.entries(map).filter(([c, k]) => norm(r[c]) !== norm(sp[k] || '')).map(([c]) => c);
       bad.length ? fail(id, 'summary parts differ from the database: ' + bad.join(', ')) : ok(id, 'the five summary parts match the database word for word');
       const sc = d.scoring;
       if (r.scored === 'yes' && sc?.eligibility?.eligible && Array.isArray(sc.checks)) {
         const na = r.stage === 'finalising' ? ['need', 'budget'] : [], mism = [];
-        for (const c of sc.checks) { const want = na.includes(c.id) ? 'NA' : MK[c.mark], m = r.ai_checks.match(new RegExp('(MET|PARTLY|NOT_MET|NA): [^|]*?\\(' + c.id + '\\)')); if (!m || m[1] !== want) mism.push(`${c.id}: file ${m ? m[1] : 'missing'}, database ${want}`); }
+        for (const c of sc.checks.filter(c => PTS[c.mark] != null)) { const want = na.includes(c.id) ? 'NA' : MK[c.mark], m = r.ai_checks.match(new RegExp('(MET|PARTLY|NOT_MET|NA): [^|]*?\\(' + c.id + '\\)')); if (!m || m[1] !== want) mism.push(`${c.id}: file ${m ? m[1] : 'missing'}, database ${want}`); }
         mism.length ? fail(id, 'rubric marks differ: ' + mism.join('; ')) : ok(id, `all ${sc.checks.length} rubric marks match the database`);
         const cnt = sc.checks.filter(c => RUB_COUNT.includes(c.id) && !na.includes(c.id) && PTS[c.mark] != null), want = cnt.length ? Math.round(cnt.reduce((a, c) => a + PTS[c.mark], 0) / cnt.length) : null;
         want === +r.score ? ok(id, `score ${r.score} recomputes from the ${cnt.length} counted checks`) : fail(id, `score ${r.score} but the counted checks give ${want}`);
       } else if (r.scored === 'no') { r.score === '' ? ok(id, 'not scored, and no score is shown') : fail(id, 'marked not scored but has a score of ' + r.score); }
-      const dt = d.ended_at ? Math.round((new Date(d.ended_at) - new Date(d.captured_at)) / 60000) : null;
-      dt != null && Math.abs(dt - +r.duration_min) <= 1 ? ok(id, `length ${r.duration_min} min matches the database`) : warn(id, `length ${r.duration_min} min, database says ${dt} min between start and end`);
+      const dt = pj.length ? pj.reduce((a, q) => a + (dbRows[q.id] && dbRows[q.id].ended_at ? Math.round((new Date(dbRows[q.id].ended_at) - new Date(dbRows[q.id].captured_at)) / 60000) : 0), 0) : d.ended_at ? Math.round((new Date(d.ended_at) - new Date(d.captured_at)) / 60000) : null;
+      dt != null && Math.abs(dt - +r.duration_min) <= (pj.length || 1) ? ok(id, `length ${r.duration_min} min matches the database`) : warn(id, `length ${r.duration_min} min, database says ${dt} min between start and end`);
     }
   }
 
@@ -121,7 +127,8 @@ for (const r of rows) {
   for (const [role, nm] of [['rep', note.rep], ['customer', note.customer]]) {
     if (!nm) continue; const tok = String(nm).trim(); if (tok.length < 3) continue;
     const hits = L.filter(l => new RegExp('\\b' + tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(l.text));
-    hits.length ? warn(id, `the ${role} name "${nm}" is also spoken in the audio: ${hits.map(h => h.at + ' ' + h.who).join(', ')}. Confirm who it belongs to`) : ok(id, `the ${role} name "${nm}" is a floor nickname (not in the audio)`);
+    const conf = (golden.confirmed_names?.[String(n)] || []).includes(tok);
+    hits.length && conf ? ok(id, `the ${role} name "${nm}" is also spoken in the audio (${hits.map(h => h.at + ' ' + h.who).join(', ')}); confirmed by the floor`) : hits.length ? warn(id, `the ${role} name "${nm}" is also spoken in the audio: ${hits.map(h => h.at + ' ' + h.who).join(', ')}. Confirm who it belongs to`) : ok(id, `the ${role} name "${nm}" is a floor nickname (not in the audio)`);
   }
   /* drafts: no greeting by a name the team did not give */
   const greet = pr.filter(p => /^\s*(?:[Nn]amaste|[Nn]amaskar|[Hh]ello|[Hh]i|[Hh]ey|[Dd]ear)[\s,]+(?!(?:Sir|Madam|Sahab|Saheb|Ji|I|We|Please|Thank|Thanks|Your|The)\b)[A-Z][a-z]+/.test(p.d || '') && !note.customer);

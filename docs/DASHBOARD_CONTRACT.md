@@ -45,6 +45,8 @@ The floor asked for more detail per conversation because volumes are low. Nothin
 | Insights | One tab, last in the row: "Demand vs stock" |
 | Data menu | "Day report (PDF)": one long page built from the same panel sections, printed by the browser. "CRM sheet (CSV)": one row per visit, with blank columns for the dealer |
 
+Added 14 Nov, 6 pm: a folded **CRM record** card in the conversation panel (the rep app's fields, filled from the conversation, with sources), a **Parts of this visit** card (only when one visit was recorded in several parts), and a CRM sheet laid out like the rep app. Nothing was added to the Overview or the menus.
+
 A booked customer with open follow-ups shows "Booked · follow-up open" in the panel and the day report.
 
 ## 3. Rules that change a number

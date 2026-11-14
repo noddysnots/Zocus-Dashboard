@@ -863,4 +863,11 @@ html.emptyday .seg,html.emptyday #rangeSel,html.emptyday [data-act="palopen"],ht
  .rptconv{break-before:page;border-top:0;margin-top:0}
  .tlb,.pill,.chip2,.bar i,.objtip{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
-
+.crmx summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;cursor:pointer;list-style:none}.crmx summary::-webkit-details-marker{display:none}
+.crmgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px 22px;margin-top:12px}
+.crmg h4{margin:0 0 4px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.crmg dl{margin:0}.crmg dl>div{padding:5px 0;border-top:1px solid var(--line)}
+.crmg dt{font-size:11.5px;color:var(--muted)}.crmg dd{margin:1px 0 0;font-size:13.5px;line-height:1.35}
+.crmg dd.empty{color:var(--faint)}.crmg dd small{display:block;font-size:10.5px;color:var(--faint)}
+@media print{.crmx>summary{display:block}}
+.partx{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}

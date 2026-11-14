@@ -192,7 +192,7 @@ const CHK = { D1: 'need', D2: 'need', D4: 'need', D3: 'budget', P1: 'pitch', P2:
 const SOP = { discovery: 'need', product_knowledge: 'pitch', objection_handling: 'objection', competitor_handling: 'objection' };
 const reasonCode = t => { const s = (t || '').toLowerCase(); if (!s) return ''; if (/family|approval|discuss|husband|wife|mother|parents/.test(s)) return 'family'; if (/competitor|another|other jeweller|elsewhere/.test(s)) return 'competitor'; if (/budget|price|cost|making|charge|discount|expensive/.test(s)) return 'budget'; if (/design|style|pattern/.test(s)) return 'design'; if (/stock|unavailable|size/.test(s)) return 'stock'; if (/browsing|just looking/.test(s)) return 'browse'; return clip(t, 60); };
 
-const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'customer_quote_en', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_quote_en', 'objection_reply', 'objection_reply_en', 'objection_at_sec', 'followup_due', 'followup_done', 'rep_tenure', 'store_name', 'owner_name', 'zocus_url', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'value_source', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision', 'ended_at', 'analysed_at', 'scored', 'sum_need', 'sum_happened', 'sum_outcome', 'sum_why', 'sum_next', 'promises_json', 'concerns_json', 'flags', 'remarks', 'prices_json', 'f_budget', 'f_preference', 'f_timing', 'f_competitor', 'tr_en', 'kind', 'result_label', 'stage', 'stage_src', 'payment_status', 'start_sec', 'test_drive_note', 'visit', 'visit_history', 'arrived', 'need_form', 'stock_json', 'objections_json', 'crm_json'];
+const head = ['conversation_id', 'captured_at', 'rep_name', 'outcome', 'value_inr', 'product', 'score', 'score_need', 'score_budget', 'score_pitch', 'score_objection', 'score_close', 'reason', 'stage_reached', 'customer_name', 'customer_phone', 'duration_min', 'customer_type', 'in_stock', 'competitor', 'competitor_offer', 'keywords', 'customer_quote', 'customer_quote_en', 'summary_wanted', 'summary_happened', 'summary_why', 'summary_next', 'objection', 'objection_resolved', 'objection_quote', 'objection_quote_en', 'objection_reply', 'objection_reply_en', 'objection_at_sec', 'followup_due', 'followup_done', 'rep_tenure', 'store_name', 'owner_name', 'zocus_url', 'ai_coaching', 'ai_coaching_quote', 'ai_commitments', 'ai_next_action', 'ai_notes', 'ai_checks', 'transcript', 'vertical', 'talk_rep_pct', 'segments_n', 'quality', 'ai_model', 'value_source', 'models_considered', 'model_group', 'fuel', 'colour', 'quote_given', 'test_drive', 'availability', 'availability_quote', 'priorities', 'intent', 'decision', 'ended_at', 'analysed_at', 'scored', 'sum_need', 'sum_happened', 'sum_outcome', 'sum_why', 'sum_next', 'promises_json', 'concerns_json', 'flags', 'remarks', 'prices_json', 'f_budget', 'f_preference', 'f_timing', 'f_competitor', 'tr_en', 'kind', 'result_label', 'stage', 'stage_src', 'payment_status', 'start_sec', 'test_drive_note', 'parts_json', 'visit', 'visit_history', 'arrived', 'need_form', 'stock_json', 'objections_json', 'crm_json'];
 const DERIVED = {}; const mark = (col, how) => { (DERIVED[col] ||= { how, n: 0 }).n++; };
 const exported = new Set(), unscored = []; let fixtureN = 0, heldN = 0, partialN = 0;
 const skip = { range: 0, noOutcome: 0, noScore: 0, dropped: 0 }, src = { checks: 0, 'analysis review': 0 }, srcN = {}, calls = [];
@@ -370,6 +370,29 @@ for (const r of rows) {
   (res.objections || []).forEach(x => { if (!concerns.some(c => jac(c.t, x.theme) > 0.3)) concerns.push({ t: x.theme, s: x.resolution ? 'partly' : 'open', a: clip(x.resolution || '', 240) }); });
   const flagsAI = (res.warnings || []).filter(w => !/jewell?ery|catalog(?:ue)?|tanishq/i.test(w)).map(w => /interrupt|someone else|other person/i.test(w) ? 'Phone calls or other conversations interrupted the recording' : /multi-person|several people|multiple people|excluded spans/i.test(w) ? 'Several people were speaking' : clip(w, 120));
   exported.add(r.id); fixtureN += r.ai_provider === 'fictional_fixture' ? 1 : 0; heldN += r.ai_held ? 1 : 0; partialN += r.quality && r.quality !== 'complete' ? 1 : 0;
+  /* The rep's CRM record, as the rep's app lays it out (14 Nov screenshots): what we can fill from the recording and the backend analysis. Each value carries its source.
+     Not inferred, on purpose: age, gender, address (dealer fields). Unknown stays empty. */
+  function buildCrm() {
+    const c = note.crm || {}, T = (v, src) => v ? [String(v), src] : ['', ''];
+    const evAll = considered.length && considered.every(m => m.ev), evAny = considered.some(m => m.ev);
+    const REMARK = { making: 'Price negotiation', stock: 'Stock or delivery time', competitor: 'Comparing with another brand or dealer', design: 'Not yet convinced about the car', budget: 'Budget', browse: 'Just enquiring', family: 'Family decision', exchange: 'Exchange value' };
+    const rcode = outcome === 'sold' ? '' : carReason(lossFinal);
+    const remarkType = isDelivery ? 'Delivery issue' : outcome === 'sold' ? 'Booked' : (REMARK[rcode] || 'Decision not finalized');
+    const stageTxt = isDelivery ? 'After booking' : outcome === 'sold' ? 'Booking' : testDrive === 'yes' ? 'Test drive' : 'Enquiry';
+    const pr = promises.find(x => !x.s) || promises[0], other = considered.map(m => m.label).filter(l => l !== product);
+    const purchase = c.purchase_type ? [c.purchase_type, 'recording'] : /^First car/.test(carSegment([fld(res, 'profile'), fld(res, 'purpose'), fld(res, 'preference')].join(' . '))) ? ['First car', 'backend reading'] : ['', ''];
+    const lost = outcome !== 'sold' && !isDelivery;
+    return { note: 'Filled from the recording, the backend analysis and the floor. Empty = not said or a dealer field. Source: recording, backend, floor, rule.', groups: [
+      ['Enquiry', [['Segment', evAll ? 'BEV' : evAny ? 'ICE and BEV' : (considered.length ? 'ICE' : ''), 'recording'], ['Enquiry type', ...T(c.enquiry_type, 'floor')], ['Source', ...T(c.source, 'floor')], ['Stage', stageTxt, 'backend'], ['Likely purchase', ...T(c.likely_purchase || (isDelivery ? '' : fld(res, 'timing')), c.likely_purchase ? 'recording' : 'backend')], ['Purchase type', ...purchase], ['Sales consultant', repName, 'team'], ['Enquiry date and time', fmt(r.captured_at), 'database']]],
+      ['Product', [['Model', product, 'recording'], ['Product interest', considered.length ? 'Primary' : '', 'rule'], ['Also considered', other.join(', '), 'recording']]],
+      ['Variant', [['Variant', ...T(c.variant, 'recording')], ['Colour', colours.join(', '), 'recording'], ['Seating', ...T(c.seating, 'recording')], ['Fuel', fuel.join(', '), 'recording']]],
+      ['Customer profile', [['Occupation', ...T(c.occupation, 'recording')], ['Age band', '', ''], ['Gender', '', ''], ['Address, PIN, tehsil, district', '', '']]],
+      ['Owned vehicles', [['Make and model', ...T(c.owned, 'recording')], ['Exchange', ...T(c.exchange, 'recording')], ['Registration', ...T(c.registration, 'recording')]]],
+      ['Test drive and booking', [['Test drive', testDrive === 'yes' ? 'Done' : testDrive === 'offered' ? 'Talked about' : 'Not done', note.test_drive_note ? 'floor' : 'recording'], ['Booking', outcome === 'sold' ? 'Booked' : isDelivery ? 'Booked earlier' : 'Not booked', isDelivery ? 'floor' : 'backend'], ['Delivery wanted', ...T(c.delivery_wanted, 'recording')], ['Finance or cash', ...T(c.payment, 'recording')]]],
+      ['Follow-up', [['Next follow-up', pr ? pr.t : '', pr ? 'backend' : ''], ['Due', pr ? (pr.due || '') : '', pr && pr.due ? 'backend' : ''], ['Followed by', repName, 'team'], ['Remark type', remarkType, 'rule'], ['Remarks', clip(sumParts['Why'] || '', 160), 'backend'], ['Comments', clip(sumParts['Next step'] || '', 160), 'backend'], ['Call duration', dmin ? dmin + ' min' : '', 'database']]],
+      ['Lost reason', [['Lost reason', lost ? (REMARK[rcode] || '') : '', lost ? 'backend' : ''], ['Detailed reason', lost ? clip(lossFinal, 160) : '', lost ? 'backend' : ''], ['Sales consultant remark', '', ''], ['Sales manager remark', '', '']]]]
+      .map(([g, f]) => ({ g, f })) };
+  }
   const rec = {
     conversation_id: 'ZC-' + r.id, captured_at: fmt(r.captured_at), rep_name: repName, outcome, value_inr: value, value_source: vsrc, product,
     kind: isDelivery ? 'delivery' : '', scored: scored && !isDelivery ? 'yes' : 'no', score: isDelivery ? '' : overall, score_need: isDelivery ? '' : sk.need ?? '', score_budget: isDelivery ? '' : sk.budget ?? '', score_pitch: isDelivery ? '' : sk.pitch ?? '', score_objection: isDelivery ? '' : sk.objection ?? '', score_close: isDelivery ? '' : sk.close ?? '',
@@ -391,7 +414,7 @@ for (const r of rows) {
     ended_at: r.ended_at ? fmt(r.ended_at) : '', analysed_at: r.analysed_at ? fmt(r.analysed_at) : '', sum_need: sumParts['Customer need'] || '', sum_happened: sumParts['What happened'] || '', sum_outcome: sumParts['Outcome'] || '', sum_why: sumParts['Why'] || '', sum_next: sumParts['Next step'] || '',
     promises_json: promises.length ? JSON.stringify(promises) : '', concerns_json: concerns.length ? JSON.stringify(concerns) : '', flags: [...new Set(flagsAI)].join('|'), remarks: note.remarks || '', prices_json: note.prices ? JSON.stringify(note.prices) : '',
     f_budget: fld(res, 'budget'), f_preference: fld(res, 'preference'), f_timing: fld(res, 'timing'), f_competitor: fld(res, 'competitor'), tr_en: note.tr_en ? JSON.stringify(note.tr_en) : '',
-    result_label: isDelivery ? (note.result_label || 'After booking') : '', stage: jStage, stage_src: stageSrc, visit: note.visit || '', visit_history: note.history || '', arrived: note.arrived || '', need_form: note.need_form || '', stock_json: note.stock ? JSON.stringify(note.stock) : '', objections_json: note.objections ? JSON.stringify(note.objections) : '', crm_json: note.crm ? JSON.stringify(note.crm) : '',
+    result_label: isDelivery ? (note.result_label || 'After booking') : '', stage: jStage, stage_src: stageSrc, visit: note.visit || '', visit_history: note.history || '', arrived: note.arrived || '', need_form: note.need_form || '', stock_json: note.stock ? JSON.stringify(note.stock) : '', objections_json: note.objections ? JSON.stringify(note.objections) : '', crm_json: isCar ? JSON.stringify(buildCrm()) : (note.crm ? JSON.stringify(note.crm) : ''),
     test_drive_note: note.test_drive_note || '', payment_status: note.payment || '', start_sec: String(new Date(r.captured_at).getUTCSeconds()),
     quality: r.quality && r.quality !== 'complete' ? r.quality : '', ai_model: r.ai_model || '', talk_rep_pct: wRep + wCust ? Math.round(100 * wRep / (wRep + wCust)) : '', segments_n: turns.length || '',
   };
@@ -400,6 +423,42 @@ for (const r of rows) {
   if (note.csv && note.csv.outcome) { const cl = calls.at(-1); if (cl) cl.outcome = note.csv.outcome; } // the refresh list shows the result the dashboard will show
   if (rec.keywords) mark('keywords', 'objection themes used as keywords');
   out.push(head.map(h => rec[h] ?? ''));
+}
+/* ---------- merging one customer's visit that was recorded in more than one part (notes file: "merges": [{"parts": [275, 281]}]) ----------
+   One row: the first part's analysis (summary, checks, score) plus each part's own summary in parts_json; time span, length, promises, concerns, prices, English lines
+   and the transcript (with clock times kept right and a divider line) are combined. The merge waits until every part has been exported. */
+const MERGES = (() => { if (!o.notes) return []; try { return JSON.parse(fs.readFileSync(path.resolve(root, o.notes), 'utf8')).merges || []; } catch { return []; } })();
+const merged = [], mergePending = [];
+for (const m of MERGES) {
+  const ids = (m.parts || []).map(x => 'ZC-' + x), idx = ids.map(id => out.findIndex(l => l[head.indexOf('conversation_id')] === id));
+  if (idx.length < 2 || idx.some(i => i < 0)) { mergePending.push({ parts: m.parts, missing: (m.parts || []).filter((x, k) => idx[k] < 0) }); continue; }
+  const col = h => head.indexOf(h), get = (l, h) => l[col(h)], rows2 = idx.map(i => out[i]), base = rows2[0].slice();
+  const startMin = l => { const [d, t] = get(l, 'captured_at').split(' '), [hh, mm] = t.split(':'); return Date.UTC(...d.split('-').map((v, i) => i === 1 ? v - 1 : +v), +hh, +mm) / 6e4; };
+  const off = rows2.map(l => Math.round((startMin(l) - startMin(rows2[0])) * 60 + (+get(l, 'start_sec') || 0) - (+get(rows2[0], 'start_sec') || 0)));
+  const mmss2 = n => Math.floor(n / 60) + ':' + String(n % 60).padStart(2, '0'), shift = (k, by) => { const mm = String(k).match(/^(\d+):(\d{2})$/); return mm ? mmss2(+mm[1] * 60 + +mm[2] + by) : k; };
+  const jp = (l, h, d) => { try { return get(l, h) ? JSON.parse(get(l, h)) : d; } catch { return d; } };
+  const set = (h, v) => { base[col(h)] = v; };
+  const uniq = a => [...new Set(a.filter(Boolean))], split = (l, h) => String(get(l, h) || '').split('|').filter(Boolean);
+  set('ended_at', rows2.map(l => get(l, 'ended_at')).sort().at(-1) || '');
+  const endOf = l => get(l, 'ended_at') ? startMin({ [col('captured_at')]: get(l, 'ended_at') }) : null;
+  set('duration_min', rows2.reduce((a, l) => a + (+get(l, 'duration_min') || 0), 0)); set('segments_n', rows2.reduce((a, l) => a + (+get(l, 'segments_n') || 0), 0));
+  set('transcript', rows2.map((l, k) => { const lines = String(get(l, 'transcript') || '').split('\n').map(x => { const mm = x.match(/^\[(\d+):(\d{2})\] ([\s\S]*)$/); return mm ? `[${mmss2(+mm[1] * 60 + +mm[2] + off[k])}] ${mm[3]}` : x; }); return (k ? [`[${mmss2(off[k])}] Part ${k + 1}: ${m.label || 'The visit continues'} (recording ${m.parts[k]}, ${get(l, 'captured_at').slice(11)})`] : []).concat(lines).join('\n'); }).join('\n'));
+  set('tr_en', JSON.stringify(Object.assign({}, ...rows2.map((l, k) => Object.fromEntries(Object.entries(jp(l, 'tr_en', {})).map(([a, b]) => [shift(a, off[k]), b]))))));
+  set('prices_json', JSON.stringify(rows2.flatMap((l, k) => jp(l, 'prices_json', []).map(p => ({ ...p, at: shift(p.at, off[k]) })))));
+  set('promises_json', JSON.stringify(rows2.flatMap(l => jp(l, 'promises_json', []))));
+  set('concerns_json', JSON.stringify(rows2.flatMap(l => jp(l, 'concerns_json', []))));
+  set('flags', uniq(rows2.flatMap(l => split(l, 'flags'))).join('|')); set('remarks', uniq(rows2.map(l => get(l, 'remarks'))).join(' '));
+  for (const h of ['models_considered', 'fuel', 'colour', 'priorities']) set(h, uniq(rows2.flatMap(l => split(l, h))).join('|'));
+  const last = rows2.at(-1), anySold = rows2.some(l => get(l, 'outcome') === 'sold');
+  set('outcome', anySold ? 'sold' : get(last, 'outcome')); if (get(last, 'value_inr') !== '') { set('value_inr', get(last, 'value_inr')); set('value_source', get(last, 'value_source')); }
+  if (rows2.some(l => get(l, 'test_drive') === 'yes')) set('test_drive', 'yes'); if (rows2.some(l => get(l, 'quote_given') === 'yes')) set('quote_given', 'yes');
+  set('test_drive_note', rows2.map(l => get(l, 'test_drive_note')).find(Boolean) || ''); set('visit_history', rows2.map(l => get(l, 'visit_history')).find(Boolean) || ''); set('visit', rows2.map(l => get(l, 'visit')).find(Boolean) || '');
+  set('stage', get(last, 'stage')); set('analysed_at', rows2.map(l => get(l, 'analysed_at')).sort().at(-1) || '');
+  const crms = rows2.map(l => jp(l, 'crm_json', { groups: [] })); if (crms.every(c => c.groups && c.groups.length)) set('crm_json', JSON.stringify({ ...crms[0], groups: crms[0].groups.map((g, gi) => ({ g: g.g, f: g.f.map((f, fi) => { const fixed = ['Enquiry date and time', 'Sales consultant'].includes(f[0]); const pick = fixed ? f : (crms.slice().reverse().map(c => c.groups[gi].f[fi]).find(x => x[1]) || f); return pick; }) })) }));
+  const parts = rows2.map((l, k) => ({ id: +m.parts[k], at: get(l, 'captured_at').slice(11), end: (get(l, 'ended_at') || '').slice(11), min: +get(l, 'duration_min') || 0, rep: get(l, 'rep_name'), label: k ? (m.label || 'The visit continues') : 'First part', score: get(l, 'score'), sum: { need: get(l, 'sum_need'), happened: get(l, 'sum_happened'), outcome: get(l, 'sum_outcome'), why: get(l, 'sum_why'), next: get(l, 'sum_next') } }));
+  set('parts_json', JSON.stringify(parts)); mark('parts_json', 'one visit recorded in several parts: merged into one row, each part keeps its own backend summary');
+  out[idx[0]] = base; idx.slice(1).sort((a, b) => b - a).forEach(i => out.splice(i, 1)); merged.push(m.parts);
+  const ci = m.parts.map(id => calls.findIndex(c => c.id === id)); if (ci[0] >= 0) { const c0 = calls[ci[0]]; c0.min = parts.reduce((a, q) => a + q.min, 0); c0.rep = parts.map(q => q.rep).filter((v, i, a) => a.indexOf(v) === i).join(', then '); const c1 = ci.slice(1).filter(i => i >= 0).map(i => calls[i]); if (c1.length) { c0.outcome = c1.at(-1).outcome; if (c1.at(-1).value !== '') { c0.value = c1.at(-1).value; c0.source = c1.at(-1).source; } } ci.slice(1).filter(i => i >= 0).sort((a, b) => b - a).forEach(i => calls.splice(i, 1)); }
 }
 const file = path.resolve(root, o.file || val('--out', `data/db-export-${slug}.csv`)), metaPath = file.replace(/\.csv$/, '.meta.json');
 const scoped = allSessions.filter(x => inRange(x.captured_at)), isDrop = x => !!(NOTES[String(x.id)] || {}).drop, kept = scoped.filter(x => !isDrop(x));

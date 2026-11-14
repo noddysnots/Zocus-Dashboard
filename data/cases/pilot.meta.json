@@ -1,25 +1,12 @@
 {
  "dayNote": "From the floor (Abhishek, 11:48 am): today's traffic is mostly customers finalising the model, choosing accessories and finalising payment. On a normal day it is mostly early enquiries, so today's numbers are not typical.",
  "store": "Mahindra showroom (pilot)",
- "exportedAt": "2026-11-14T12:14:49.521Z",
- "exportedLocal": "2026-11-14 17:44",
+ "exportedAt": "2026-11-14T13:10:34.063Z",
+ "exportedLocal": "2026-11-14 18:40",
  "date": "2026-11-14",
- "recorded": 9,
- "shown": 6,
- "analysing": [
-  {
-   "id": 274,
-   "at": "2026-11-14 15:58",
-   "rep": "Rep not tagged",
-   "min": 48
-  },
-  {
-   "id": 276,
-   "at": "2026-11-14 17:39",
-   "rep": "Rep not tagged",
-   "min": 5
-  }
- ],
+ "recorded": 10,
+ "shown": 9,
+ "analysing": [],
  "failed": [],
  "unscored": [],
  "leftOut": [
@@ -35,13 +22,19 @@
    "at": "17:02",
    "min": 14,
    "why": "recording marked partial"
+  },
+  {
+   "id": 278,
+   "at": "17:51",
+   "min": 20,
+   "why": "recording marked partial, ends mid-conversation"
   }
  ],
  "valueSources": {
   "budget": 1,
-  "call": 1,
-  "none": 2,
-  "indicative": 2
+  "call": 2,
+  "none": 3,
+  "indicative": 3
  },
  "history": [
   {
@@ -67,6 +60,22 @@
   {
    "at": "2026-11-14 17:39",
    "shown": 6
+  },
+  {
+   "at": "2026-11-14 18:31",
+   "shown": 8
+  },
+  {
+   "at": "2026-11-14 18:32",
+   "shown": 9
+  },
+  {
+   "at": "2026-11-14 18:40",
+   "shown": 8
+  },
+  {
+   "at": "2026-11-14 18:40",
+   "shown": 9
   }
  ],
  "reps": [
@@ -80,7 +89,7 @@
   },
   {
    "name": "Hardik",
-   "recorded": 1
+   "recorded": 2
   },
   {
    "name": "Lead rep",
@@ -88,7 +97,7 @@
   },
   {
    "name": "Rep not tagged",
-   "recorded": 1
+   "recorded": 3
   }
  ]
 }
