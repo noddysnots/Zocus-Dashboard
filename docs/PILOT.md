@@ -132,6 +132,6 @@ Customers are shown as "Customer at 11:54 am" and are never named from the recor
 
 ### Things to know
 - **"Mark done" on promises is saved in the browser it was clicked in.** It does not sync, so the dealer's screen will not show what the team marked.
-- **Outcome tags:** a result comes from a tag set in the app when there is one, otherwise from the AI. #261 shows "Did not book" because someone tagged it "no" in the app, while the AI reads the customer as still considering. Change it in the notes (`"csv": {"outcome": "followup"}`) if the tag was wrong.
+- **Outcome tags:** a result comes from a tag set in the app when there is one, otherwise from the AI. #261 was tagged "no" in the app while the AI reads the customer as still considering; on 14 Nov the user chose "Will return", set in the notes (`"csv": {"outcome": "followup"}`). The tag in the app is unchanged.
 - **Seconds:** clock times on transcript lines are the recording start plus the offset, shown to the minute.
 - **The pilot file in the public repository contains the full transcripts**, including any names spoken in the room and in side talk (accepted on 12 Nov).

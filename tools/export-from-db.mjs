@@ -393,6 +393,7 @@ for (const r of rows) {
   };
   if (note.csv) Object.assign(rec, note.csv);
   if (note.csv && (note.csv.value_inr || note.csv.value_source)) { const cl = calls.at(-1); if (cl) { if (note.csv.value_inr) cl.value = +note.csv.value_inr; if (note.csv.value_source) cl.source = note.csv.value_source; } }
+  if (note.csv && note.csv.outcome) { const cl = calls.at(-1); if (cl) cl.outcome = note.csv.outcome; } // the refresh list shows the result the dashboard will show
   if (rec.keywords) mark('keywords', 'objection themes used as keywords');
   out.push(head.map(h => rec[h] ?? ''));
 }
