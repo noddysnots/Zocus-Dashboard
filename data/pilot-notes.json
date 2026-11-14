@@ -1,5 +1,85 @@
 {
-  "note": "Team notes for the pilot day, from the Zocus WhatsApp group. One entry per conversation, keyed by the conversation number (the # shown in the dashboard and in the refresh list). Any field can be left out. rep = showroom rep who handled it; customer = customer name; segment = customer type; model = car discussed; value = rupees, only when the team wants to set it by hand; drop = true to leave the call out of the dashboard; why = reason for dropping, shown as a count on the dashboard.",
-  "example": { "261": { "rep": "Rohan", "customer": "Mr Shah", "segment": "Family upgrade to a 7-seater", "model": "Scorpio N", "value": 2150000 }, "263": { "drop": true, "why": "Recording cut short" } },
-  "calls": {}
+  "note": "Team notes for the pilot day, from the Zocus WhatsApp group, plus what Claude read from the recordings at each refresh. One entry per conversation, keyed by the conversation number. Fields: rep (nickname), customer, segment, model / models (as the customer saw them), fuel, colour, value (rupees, set by hand), remarks (shown on the conversation), prices (what was quoted: m = model or variant, p = rupees or text, b = basis, at = time in the recording), tr_en (English for key transcript lines, keyed by the line's time), csv (any CSV column to override, for example objection_quote_en), drop (true to leave the call out) with why.",
+  "calls": {
+    "261": {
+      "rep": "Speed Racer",
+      "models": ["Scorpio N", "XUV 7XO"],
+      "fuel": "Petrol|Diesel",
+      "remarks": "Several phone calls interrupted the rep and the customer.",
+      "prices": [
+        { "m": "XUV 7XO petrol, base", "p": 1750000, "b": "on-road, about", "at": "0:49" },
+        { "m": "Scorpio-N base (Z2)", "p": 1650000, "b": "about; insurance still to change", "at": "9:24" },
+        { "m": "Scorpio-N Z4", "p": 1642000, "b": "as said", "at": "9:36" },
+        { "m": "Scorpio-N Z2, with fewer features", "p": 1609000, "b": "final offer", "at": "9:45" },
+        { "m": "Scorpio-N Z8 Select, manual", "p": 2125000, "b": "about", "at": "4:02" },
+        { "m": "Scorpio-N Z8 Select, automatic", "p": 2275000, "b": "about", "at": "4:02" },
+        { "m": "Scorpio-N, automatic quotation", "p": 1998000, "b": "ex-showroom, since March the prices rose", "at": "8:11" }
+      ],
+      "csv": {
+        "value_inr": 1609000,
+        "value_source": "call",
+        "customer_quote_en": "Is there any discount?",
+        "objection_quote_en": "Is there any discount?",
+        "objection_reply_en": "There is no discount on the Scorpio, and there is a waiting period on the car. When do you want it?",
+        "customer_type": "Choosing a manual Scorpio-N"
+      },
+      "tr_en": {
+        "0:10": "XUV 700 in petrol or diesel?",
+        "0:49": "If you take petrol, it comes to about 17.50 lakh on-road.",
+        "1:03": "If you want a Scorpio-N, the base model comes to around 16.50 lakh. I will send the base-model quotation on WhatsApp, give me your number.",
+        "2:46": "Give me the Scorpio-N quotation.",
+        "3:02": "With a 50% loan on a 16 lakh car you pay 8 lakh down and take an 8 lakh loan; the EMI gets bigger if you put less down. The Z8 Select has front fog lamps, leather seat covers and 17 inch alloys.",
+        "4:02": "The Z8 Select manual comes to around 21.25 lakh; the automatic around 22.75 lakh.",
+        "5:38": "Is there any discount?",
+        "5:40": "There is no discount on the Scorpio, there is a waiting period. When do you want the car?",
+        "5:51": "I will give you a discount on the insurance, there is a 3+3 insurance offer.",
+        "7:57": "Yes, it has gone up. When did you get the earlier quotation?",
+        "8:11": "Prices went up after March, and insurance rates too. The automatic is now 19,98,000 ex-showroom. I can give you a quotation for the automatic or the manual, whichever you want.",
+        "8:46": "If you want the base model, when do you need it? The Kia is a fine option, but Mahindra is better on suspension and engine. I will send the quotation on WhatsApp.",
+        "9:13": "In price? Around 16 to 17 lakh.",
+        "9:24": "The Z2, the base Scorpio, comes to 16.50 lakh; the insurance may still change.",
+        "9:36": "It comes to 16,42,000.",
+        "9:45": "There are small differences: no roof rails, no spoiler, 4 speakers instead of 6. I can give you the car for 16,09,000."
+      }
+    },
+    "262": {
+      "rep": "Black and White Stripe",
+      "models": ["Bolero B8"],
+      "fuel": "Diesel",
+      "colour": "White",
+      "remarks": "Several phone calls interrupted the rep and the customer. A finance person (Mahindra Finance) joined the conversation.",
+      "prices": [
+        { "m": "Bolero B8, white", "p": 1121500, "b": "after dropping the 12,500 warranty", "at": "5:14" },
+        { "m": "Fancy number 2000", "p": 18000, "b": "extra", "at": "0:34" },
+        { "m": "Accessories", "p": "10,000 to 18,000", "b": "optional", "at": "6:15" },
+        { "m": "3-year full insurance (1+2 plan)", "p": "premium to be checked", "b": "to be quoted", "at": "6:30" }
+      ],
+      "csv": {
+        "customer_quote_en": "Drop the 21,500, come on.",
+        "objection_quote_en": "Drop the 21,500, come on.",
+        "objection_reply_en": "How can I drop 21,500, sir? There is no discount. There is no margin in the car, where would I take it from? And I do not have a car in stock.",
+        "customer_type": "Wants a white Bolero B8 with finance"
+      },
+      "tr_en": {
+        "0:34": "The fancy number costs 18,000 rupees.",
+        "0:42": "The 2000 number. White.",
+        "2:17": "And what about the loan?",
+        "2:40": "We will do it that way; if your CIBIL score is good it is quick. Give me your mobile number.",
+        "3:37": "There is no discount from the company on this. The car is not here with us right now. Once you are final, book it and the car will come.",
+        "4:13": "The insurance I mentioned is a 1+2 plan, one year full and two years third party. I will arrange three years of full insurance for you.",
+        "5:14": "I will drop the warranty. It comes to 11,21,500.",
+        "5:20": "Drop that 21,500.",
+        "5:23": "How can I drop 21,500, sir? If there is no discount, how can I do it? There is no margin in the car, and I do not have a car in stock.",
+        "5:38": "About a month for the car, maybe sooner.",
+        "6:15": "Accessories: there are many things, I will give you the whole list. Take what you need, 18,000 or 10,000 worth.",
+        "6:30": "I have to get the premium worked out. First I will check if the car has arrived, then with the engine and chassis number I will get the insurance premium and give you the figure. Give me an hour and I will confirm.",
+        "8:18": "We do not have the car right now. I will check in Bhavnagar; if it is there I will get it here. If not, I would say a month, and I will do it as fast as I can.",
+        "8:39": "The 12,500 warranty I will drop, so it comes to about 11,21,500.",
+        "14:15": "Bolero B8, we want it in white.",
+        "16:15": "I will tell you within an hour. I will get confirmation from Bhavnagar.",
+        "16:57": "I will call you on this number."
+      }
+    },
+    "263": { "drop": true, "why": "not a sales conversation" }
+  }
 }

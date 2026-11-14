@@ -1,1 +1,244 @@
-conversation_id,captured_at,rep_name,outcome,value_inr,product,score,score_need,score_budget,score_pitch,score_objection,score_close,reason,stage_reached,customer_name,customer_phone,duration_min,customer_type,in_stock,competitor,competitor_offer,keywords,customer_quote,customer_quote_en,summary_wanted,summary_happened,summary_why,summary_next,objection,objection_resolved,objection_quote,objection_quote_en,objection_reply,objection_reply_en,objection_at_sec,followup_due,followup_done,rep_tenure,store_name,owner_name,zocus_url,ai_coaching,ai_coaching_quote,ai_commitments,ai_next_action,ai_notes,ai_checks,transcript,vertical,talk_rep_pct,segments_n,quality,ai_model,value_source,models_considered,model_group,fuel,colour,quote_given,test_drive,availability,availability_quote,priorities,intent,decision
+conversation_id,captured_at,rep_name,outcome,value_inr,product,score,score_need,score_budget,score_pitch,score_objection,score_close,reason,stage_reached,customer_name,customer_phone,duration_min,customer_type,in_stock,competitor,competitor_offer,keywords,customer_quote,customer_quote_en,summary_wanted,summary_happened,summary_why,summary_next,objection,objection_resolved,objection_quote,objection_quote_en,objection_reply,objection_reply_en,objection_at_sec,followup_due,followup_done,rep_tenure,store_name,owner_name,zocus_url,ai_coaching,ai_coaching_quote,ai_commitments,ai_next_action,ai_notes,ai_checks,transcript,vertical,talk_rep_pct,segments_n,quality,ai_model,value_source,models_considered,model_group,fuel,colour,quote_given,test_drive,availability,availability_quote,priorities,intent,decision,ended_at,analysed_at,scored,sum_need,sum_happened,sum_outcome,sum_why,sum_next,promises_json,concerns_json,flags,remarks,prices_json,f_budget,f_preference,f_timing,f_competitor,tr_en
+ZC-261,2026-11-14 10:36,Speed Racer,lost,1609000,Scorpio N,56,50,50,75,50,50,making,price_quoted,Customer 1,,11,Choosing a manual Scorpio-N,,Kia (raised by salesperson as a possibility),,Customer asked for a discount on the vehicle|Customer questioned price increase versus earlier quotation,discount biscount kai?,Is there any discount?,Scorpio N (also discussed: XUV 7XO) · Manual Scorpio-N; also asked about XUV 700 diesel/petrol base model,"Customer need: Customer first asked about the XUV 700 in diesel or petrol, then moved to a manual Scorpio-N, mentioning about 50% down payment, 12 lakh down and a 16-17 lakh price range. What happened: Salesperson quoted XUV 700 petrol base at about 17.50 lakh on-road, Scorpio-N Z2 at 16.50 lakh, Z4",,Send quotations on WhatsApp,making,yes,discount biscount kai?,Is there any discount?,Scorpio ma discount nathi waiting chhe gadi ma,"There is no discount on the Scorpio, and there is a waiting period on the car. When do you want it?",338,2026-11-14,no,,Mahindra showroom (pilot),,,,,Salesperson will send the quotation on WhatsApp | Salesperson offered to arrange the Z2 for 16.09 lakh,,"Competitor was raised by salesperson, not stated by customer","PARTLY: Understood what the customer wants (need). The store learned fuel type, gearbox and exchange car, but never asked who drives or the use; the offering shifted around. ❝petrol ma ke diesel ma?❞ | PARTLY: Asked the budget (budget). Budget was asked only after prices were quoted; customer later said 16-17 lakh and 50% loan, and the store steered to Z2 and Z4. ❝range ma tame vicharo cho?❞ | MET: Showed the right options (options). The store showed Scorpio-N Z8 Select, Z2 and Z4 variants, listed XUV700 variants and compared Kia. ❝pachi Scorpio-N ni requirement hoy to Scorpio-N tamare 16.50 ma❞ | NOT_MET: Offered a test drive or showroom visit (experience). No test drive or showroom experience was offered or booked. | PARTLY: Explained why this car is worth it (value_proof). Store explained features and claimed Mahindra is best on suspension and engine, without any proof or warranty detail. ❝ema tamare aagad na fog lamp chhe pachi aa leather seat cover chhe❞ | PARTLY: Gave a clear price and offers (price_offers). Prices and a loan split were given, but with no on-road breakup, shifting quotes, and only an insurance-based discount scheme when pushed. ❝dakhla tarike gadi ni kimat 16 lakh rupiya hoy to tame 8 lakh rupiya down payment bharso❞ | PARTLY: Answered the customer's concerns (concerns). Discount, price increase and Kia comparison were raised; answered with insurance offer, price-rise explanation and unsupported claims, nothing resolved. ❝discount biscount kai?❞ | PARTLY: Found out when and how they decide (decision_timing). Store asked when the car is needed and mentioned involving the customer's spouse, but no joint visit or plan was made. ❝gadi kyare joiye chhe?❞ | PARTLY: Asked for the booking (ask). Store offered to hold a price and send quotations but never asked for a booking or token. ❝quotation tamne WhatsApp ma number ma nakhi dau❞ | PARTLY: Agreed a next step with a date (next_step). Store took a number and promised a WhatsApp quotation, but no date or visit was agreed. ❝nahi to aam kahu chu base model nu quotation tamne WhatsApp ma nakhu etle khyal aave❞","[0:10] Rep: XUV 700 ma petrol ma ke diesel ma?
+[0:15] Customer: diesel ma
+[0:17] Rep: diesel ma variant
+[0:19] Customer: kayu?
+[0:27] Rep: range ma tame vicharo cho?
+[0:29] Customer: range batavo
+[0:31] Rep: e pramane model suggest karu ne
+[0:39] Customer's companion: kem ke 700 base model thi
+[0:41] Rep: 18 lakh
+[0:42] Customer: diesel? petrol
+[0:49] Rep: petrol? petrol leso to tamare thase 1750 jevu thase on road
+[0:55] Customer: base model ma
+[1:03] Rep: pachi Scorpio-N ni requirement hoy to Scorpio-N tamare 16.50 ma biji koi company ma gadi vicharo cho? apde Scorpio-N ma base model aavse 15-16 ni gantry hoy to Scorpio-N base model aavse 16.50 ni aaspas thase nahi to aam kahu chu base model nu quotation tamne WhatsApp ma nakhu etle khyal aave ke je kehvu hoy ha second number chhe number bolo ne tamaro
+[1:51] Customer's companion: 81603 81 603
+[2:08] Rep: 602
+[2:10] Customer's companion: 603
+[2:11] Rep: 3
+[2:12] Customer's companion: 80330
+[2:14] Rep: 80
+[2:15] Customer's companion: 33
+[2:16] Rep: 33
+[2:17] Customer's companion: 0
+[2:26] Rep: biji 7 seater ma gadi koi aam first time levi chhe? juni gadi chhe? exchange ma chhe?
+[2:39] Customer's companion: Ciaz
+[2:40] Rep: Ciaz chhe em?
+[2:46] Customer: Scorpio-N nu quotation aapo ne
+[2:49] Rep: e to aapne batavyu Z8 down payment tamare ketlu karvu? normal puchi saku down payment ketlu loan karavani hase ke?
+[3:00] Customer: 50%
+[3:02] Rep: 50% 50% loan karavani dakhla tarike gadi ni kimat 16 lakh rupiya hoy to tame 8 lakh rupiya down payment bharso 8 lakh ni loan karavso tamare jo dakhla tarike evi requirement hoy ke tamare down payment vadhare bhari sakta hoy amuku vadhare bhari sakta hoy etle bharvana aam to EMI tamare moti thai jay karvi hoy to kari sako tamare Z8 Select model aave chhe Scorpio-N ma ema tamare aagad na fog lamp chhe pachi aa leather seat cover chhe normal tamare function pramane badhu aavi jay 17 inch na alloy wheel chhe Z8 Select
+[3:35] Customer: Select chhe su price chhe eni?
+[3:38] Rep: auto ma? auto levi chhe?
+[3:42] Customer: apde auto levi chhe ne? auto nu kyo auto ke manual?
+[3:50] Customer's companion: manual
+[3:53] Customer: auto ma ne manual ma lakh rupiya no fer pade
+[3:56] Rep: ha
+[3:58] Customer: auto ne manual ma lakh do lakh no fer pade
+[4:02] Rep: tame Select model leso ne manual ma tamare thase 21.25 lakh ni aaspas thase ne oli lyo to tamare 22.75 ni aaspas jo requirement tamare down payment ni vadhare hoy to tamne suggest kari saku e model
+[4:23] Customer: ketlu badhu bharvu?
+[4:24] Customer's companion: 10 lakh
+[4:26] Customer: 12 lakh
+[4:29] Rep: auto j levi chhe?
+[4:30] Customer: na na manual nu kyo manual
+[4:33] Rep: manual
+[4:50] Customer's companion: aama ketla variant aave?
+[4:55] Rep: variant ma 700 ma pan chha variant aavse base model MX aave pachi AX3, AX5, AX7, AX7L tame khali suggest karu chu tamare je requirement hoy e pramane model lai sako hu tamne khali suggestion aampu chu khali ke tame aa model ek var vichari sako tamare aa model ma chhe ne feature less gadi aavi jase bahar thi kai function nakhava nahi pade
+[5:25] Customer: shema?
+[5:26] Rep: Select model ma
+[5:28] Customer: Select model ketla ma pade?
+[5:35] Rep: 21.25 lakh ma ketlu discount?
+[5:38] Customer: discount biscount kai?
+[5:40] Rep: Scorpio ma discount nathi waiting chhe gadi ma gadi kyare joiye chhe?
+[5:49] Customer: discount chhe j nahi?
+[5:51] Rep: vima ma tamne kari dais atyare 3+3 vima ma offer aave chhe vima ma discount kari dais
+[5:57] Customer: kaik to karo
+[6:00] Rep: aama nathi thay evu vima ma tamne chhe ne 1+2 aapis ne ema 3+3 ma discount chale chhe scheme ma
+[6:07] Customer: tamne bahu sari pade Rajkot Rajkot thi ketlo fer pade? 2050 ma pade
+[6:16] Rep: hello haji ola ben e vaat thai ti customer aavya ta e evu hoy vyavastha hoy to ek var tame vyavastha tamare hoy to ek var try karo vandho nahi to have ek var madam ne phone kari ne aavjo ne tya nakar ek advisor no number aapu ek kam karo ne tya chhe ne number lakho 90337279 46 ma phone karo e madam tya na j madam chhe Z8 Select lidhelu hatu?
+[7:09] Customer: 2051
+[7:11] Rep: manual?
+[7:12] Customer: manual aa rya Morbi kadhyu e ne? Morbi nu quotation chhe be lakh down
+[7:40] Rep: auto nu quotation kadhavyu tu? aama ene auto lakhyu chhe
+[7:46] Customer: ha auto auto tyare auto nu kadhavyu tu bhav vadhyo su ke?
+[7:56] Customer's companion: price vadhare chhe?
+[7:57] Rep: ha vadhigyo chhe jo aama tamare jovu hoy to aa ketla samay pehla kadhavelu chhe?
+[8:05] Customer: aa kadhavelu 7 ek mahina jevu thayu March ni aaspas
+[8:11] Rep: March ni aaspas kharu ne pachi bhav vadhi gya chhe atyare insurance ma bhav vadhi gya chhe badhi jagya e auto ma atyare chhe ne 19,98,000 ex-showroom thai gai chhe jo auto nu jotu hoy to auto nu quotation aampu manual nu jotu hoy to manual nu aampu
+[8:30] Customer: manual e j ne manual emay biju 2275 kyo cho tame e 21
+[8:46] Rep: saru chalo ane tamare jo base model ni requirement hoy base model tame kyare joiye chhe? Select model nakar biji koi company ma Kia ni gadi vicharo cho ne? Kia ni gadi vicharo no doubt barabar chhe pan aa suspension babate Mahindra tamne best re engine babate evu hoy to ek var vichar karjo gadi no quotation tamne WhatsApp ma number ma nakhi dau
+[9:13] Customer: price ma? 16-17 ni aaspas
+[9:19] Rep: 2051 thai jay
+[9:20] Customer's companion: Z2 ma leso ne tame Z2 tamne karavi dau
+[9:24] Rep: Z2 base model Scorpio ma e tamare 16.50 lakh ma thay chhe ema haju vima ma ferfar thai jay
+[9:32] Customer: Z4 ketla ma thay?
+[9:36] Rep: 16,42,000 ma thay chhe
+[9:39] Customer: ema su su aave? Select ma aave ne Z2 ma su fer pade?
+[9:45] Rep: ha zaza fer pade upar roof rail na aave pachi spoiler na aave sound system ma ena fer padi jay ema 6 aave to 4 speaker aave 16,09,000 ma tamne gadi muki dais
+[10:09] Background: Abhishek Abhishek hu main Siddharth bhai ki jagah pe aaya hu isliye fir main yaha pe
+[10:17] Rep: oi Aditya
+[10:18] Background: ha?
+[10:19] Rep: aapko dekha nahi isliye
+[10:20] Background: ha ha ha wo meri baat hui thi Hitesh bhai se baat hui thi main yaha pe fir substitute aaj ke liye nahi nahi Siddharth bhai ki jagah pe nahi nahi koi nahi main disturb nahi karna chahta tha isliye main chupchap baitha tha",car,78,81,,claude-sonnet-5-5,call,Scorpio N|XUV 7XO,best,Petrol|Diesel,,yes,no,no,,Price and offers,high,choosing,2026-11-14 10:47,2026-11-14 11:21,yes,"Customer first asked about the XUV 700 in diesel or petrol, then moved to a manual Scorpio-N, mentioning about 50% down payment, 12 lakh down and a 16-17 lakh price range.","Salesperson quoted XUV 700 petrol base at about 17.50 lakh on-road, Scorpio-N Z2 at 16.50 lakh, Z4 at 16.42 lakh and Z8 Select manual at about 21.25 lakh. Customer pushed for a discount; salesperson said none is available on the vehicle and offered a 3+3 insurance scheme discount instead. Customer also compared an older quotation, and salesperson said prices had risen since March.",The conversation ended with the customer still comparing Scorpio-N variants and no purchase or booking confirmed.,"The customer was looking for a lower price and discount, and none was available on the vehicle itself beyond the insurance scheme.",Salesperson said the quotation would be sent on WhatsApp to the number given and offered to arrange the Z2 for 16.09 lakh; no date was agreed.,"[{""t"":""Send Scorpio-N quotation on WhatsApp"",""d"":""Hello, I can share the Scorpio-N quotation with you on WhatsApp so you can review the options. Please let me know if you would like it for the manual Z2, Z4 or Z8 Select."",""q"":""quotation tamne WhatsApp ma number ma nakhi dau"",""k"":""uncertain"",""ph"":"""",""due"":""""}]","[{""t"":""No discount offered on Scorpio-N"",""s"":""partly"",""a"":""Salesperson said there is no discount on Scorpio, offered a discount on insurance via a 3+3 scheme, and offered the Z2 at 16.09 lakh""},{""t"":""Price has gone up since earlier quotation"",""s"":""partly"",""a"":""Salesperson said prices rose since March, including insurance""},{""t"":""Comparison with Kia"",""s"":""partly"",""a"":""""}]",Phone calls or other conversations interrupted the recording,Several phone calls interrupted the rep and the customer.,"[{""m"":""XUV 7XO petrol, base"",""p"":1750000,""b"":""on-road, about"",""at"":""0:49""},{""m"":""Scorpio-N base (Z2)"",""p"":1650000,""b"":""about; insurance still to change"",""at"":""9:24""},{""m"":""Scorpio-N Z4"",""p"":1642000,""b"":""as said"",""at"":""9:36""},{""m"":""Scorpio-N Z2, with fewer features"",""p"":1609000,""b"":""final offer"",""at"":""9:45""},{""m"":""Scorpio-N Z8 Select, manual"",""p"":2125000,""b"":""about"",""at"":""4:02""},{""m"":""Scorpio-N Z8 Select, automatic"",""p"":2275000,""b"":""about"",""at"":""4:02""},{""m"":""Scorpio-N, automatic quotation"",""p"":1998000,""b"":""ex-showroom, since March the prices rose"",""at"":""8:11""}]",Customer said 16-17 lakh price range; 12 lakh down payment; 50% loan,Manual Scorpio-N; also asked about XUV 700 diesel/petrol base model,,Kia (raised by salesperson as a possibility),"{""0:10"":""XUV 700 in petrol or diesel?"",""0:49"":""If you take petrol, it comes to about 17.50 lakh on-road."",""1:03"":""If you want a Scorpio-N, the base model comes to around 16.50 lakh. I will send the base-model quotation on WhatsApp, give me your number."",""2:46"":""Give me the Scorpio-N quotation."",""3:02"":""With a 50% loan on a 16 lakh car you pay 8 lakh down and take an 8 lakh loan; the EMI gets bigger if you put less down. The Z8 Select has front fog lamps, leather seat covers and 17 inch alloys."",""4:02"":""The Z8 Select manual comes to around 21.25 lakh; the automatic around 22.75 lakh."",""5:38"":""Is there any discount?"",""5:40"":""There is no discount on the Scorpio, there is a waiting period. When do you want the car?"",""5:51"":""I will give you a discount on the insurance, there is a 3+3 insurance offer."",""7:57"":""Yes, it has gone up. When did you get the earlier quotation?"",""8:11"":""Prices went up after March, and insurance rates too. The automatic is now 19,98,000 ex-showroom. I can give you a quotation for the automatic or the manual, whichever you want."",""8:46"":""If you want the base model, when do you need it? The Kia is a fine option, but Mahindra is better on suspension and engine. I will send the quotation on WhatsApp."",""9:13"":""In price? Around 16 to 17 lakh."",""9:24"":""The Z2, the base Scorpio, comes to 16.50 lakh; the insurance may still change."",""9:36"":""It comes to 16,42,000."",""9:45"":""There are small differences: no roof rails, no spoiler, 4 speakers instead of 6. I can give you the car for 16,09,000.""}"
+ZC-262,2026-11-14 10:47,Black and White Stripe,followup,1121500,Bolero,50,100,0,50,50,50,stock,price_quoted,Customer 2,,17,Wants a white Bolero B8 with finance,,,,"Customer asked for the 21,500 to be dropped; salesperson said no margin and no discount|Delivery timeline: stock unavailable, about a month","E 21,500 mukki dyo haalo.","Drop the 21,500, come on.","Bolero (also discussed: Scorpio N) · Bolero B8, white colour, 2000 number, private passing","Customer need: Customer wants a white Bolero B8 with a 2000 fancy number, private passing, immediate delivery and Mahindra Finance loan support. What happened: Salesperson explained B8 has mag wheels, quoted 11,21,500 after dropping the 12,500 warranty, offered 3-year full insurance, and refused a 2",White Bolero B8 not in stock locally and a discount gap,Update customer on white Bolero B8 stock,making,no,"E 21,500 mukki dyo haalo.","Drop the 21,500, come on.","21,500 kem mukki sakay saheb? Discount nathi to kevi rite tamne kari shakay? Haju 1000-2000 rupiya nu maan hoy ne to hu rakhu. 21,000 rupiya to gaadi ma margin j nathi, hu kya thi tamne karu? Plus ma mari aagad gaadi nathi. Samjya?","How can I drop 21,500, sir? There is no discount. There is no margin in the car, where would I take it from? And I do not have a car in stock.",320,2026-11-17,no,,Mahindra showroom (pilot),,,,,Salesperson will check the vehicle with Bhavnagar and confirm within about an hour | Salesperson will get the insurance premium checked and quote the 3-year insurance figure,,No customer budget discussed,"MET: Understood what the customer wants (need). The store learned the customer wants a white Bolero B8 with private passing, immediate delivery and finance, and worked to that. ❝Ha to B8 j.❞ | NOT_MET: Asked the budget (budget). No price band or comfortable on-road budget was asked before the price and totals were quoted; the customer only pushed for a lower total. | PARTLY: Showed the right options (options). The store compared B6 and B8 and offered accessories and a 3-year insurance add-on, but the customer fixed on B8 and no alternative models were shown. ❝B6 ma ne B8 ma... B6 ma mag wheel no aave. B8 ma mag wheel aave. Khali B6 ma paachhal nu wiper no aave.❞ | NOT_MET: Offered a test drive or showroom visit (experience). No test drive or vehicle viewing was offered or done; the car was not even in stock. | PARTLY: Explained why this car is worth it (value_proof). The store explained B8 features and the insurance structure, but gave no warranty terms or documentary proof of value. ❝B6 ma ne B8 ma... B6 ma mag wheel no aave. B8 ma mag wheel aave. Khali B6 ma paachhal nu wiper no aave.❞ | PARTLY: Gave a clear price and offers (price_offers). A figure of 11,21,500 after dropping warranty was quoted, but there was no clear breakup, the insurance amount was left open, and no discount was available. ❝Aa je me tamne aapyu ne vima nu, e 1 plus 2 etle ek varsh no full ane be varsh no third party aave. Aa vima ma hu tamne jovdavi daish ke tamare tran varsh no in❞ | PARTLY: Answered the customer's concerns (concerns). Discount, delivery time and insurance pricing were answered with explanations, but the discount demand and rival-dealer delivery promises were left unresolved. ❝Aama chhe ne, hu tamne kahu, company nu kai discount chhe nai. Aama vastu kevi chhe ke je kai hoy e, discount no hoy etle maan rakhvanu hoy. Ema maan rakhvanu j❞ | PARTLY: Found out when and how they decide (decision_timing). Delivery urgency and a finance contact were known, and the store promised a stock update within an hour, but no joint decision step was planned. ❝Ane delivery nu planning kyar nu chhe?❞ | PARTLY: Asked for the booking (ask). The store suggested booking once final but never asked for a booking amount or token. ❝Aama chhe ne, hu tamne kahu, company nu kai discount chhe nai. Aama vastu kevi chhe ke je kai hoy e, discount no hoy etle maan rakhvanu hoy. Ema maan rakhvanu j❞ | PARTLY: Agreed a next step with a date (next_step). The store took the customer's number and promised to call within an hour after checking stock, but no firm date or booking was agreed. ❝Bolo ne mobile number tamaro.❞","[0:04] Customer: Aa Bolero ni Kimat shu chhe?
+[0:14] Rep: B6 ma ne B8 ma... B6 ma mag wheel no aave. B8 ma mag wheel aave. Khali B6 ma paachhal nu wiper no aave.
+[0:19] Customer's companion: Olo aama aave ne?
+[0:20] Rep: Aama aave. Mag wheel aave. Aa ferfar chhe, bijo kai lambo ferfar nathi.
+[0:25] Customer: Ha.
+[0:26] Rep: To tuk ma tamare mag wheel ne a badhu jotu hoy to pachhi B8 levay.
+[0:29] Customer: Ha to B8 j.
+[0:30] Rep: B8 ni kar ne.
+[0:32] Customer's companion: Olu aave ne, atyare olu ughade ne...
+[0:34] Rep: 18,000 rupiya ni kimat chhe.
+[0:36] Customer's companion: E to olu khuli gayi chhe, 18,000 chhe.
+[0:40] Rep: Aa pasand number levana?
+[0:42] Customer: 2000 valo. White.
+[1:06] Rep: Ema colour ma kai bhav ma ferfar nathi. Private passing aj karvanu chhe ne?
+[1:16] Customer: Ha, private passing.
+[1:18] Rep: Taxi passing ma ne ema insurance ma ne ema ghano badho ferfar aavto hoy etle me kidhu puchhi lau.
+[2:01] Customer: Hu?
+[2:11] Rep: Ane delivery nu planning kyar nu chhe?
+[2:14] Customer: Aapne taatkalik. Atyare.
+[2:15] Rep: Tuk ma joti j... joiye j chhe evu j chhe ne?
+[2:17] Customer: Ha. Ane aapdu loan nu su aavtu hase?
+[2:21] Rep: Loan ma aama tamara document upar aadhar chhe.
+[2:24] Customer: E badhu ok chhe.
+[2:26] Rep: Return bharo chho tame?
+[2:27] Customer: Na.
+[2:28] Rep: 7-12 upar karvani thase. 7-12 ketla vigha ni chhe?
+[2:31] Customer: Bahu. Aa na j chhe. Pela ek loan hati maare.
+[2:34] Customer's companion: Mahindra ni loan hati maare.
+[2:36] Customer: Tya Sudhirsinh paase chalu. Emne kai bank ma aave?
+[2:38] Customer's companion: Ha, Mahindra ni.
+[2:40] Rep: E aapne ema j karshu karan ke CIBIL score ne e saru hoy to jaldi... Ha pohchi gaya. Ha kai vandho nai. Bolo ne mobile number tamaro.
+[2:58] Customer: 98253...
+[3:01] Rep: 98253
+[3:04] Customer: 89992.
+[3:06] Other voice: Khedut khatedar, khedut khatedar.
+[3:15] Customer: Jo bolavine kahu.
+[3:17] Customer's companion: Atlu?
+[3:19] Customer: Atyare gaadi hoy to j. Ha hoy to Bolero. Bolero... Biji aapne aaje levi chhe e batao.
+[3:36] Customer's companion: Aama ketla chhe...?
+[3:37] Rep: Aama chhe ne, hu tamne kahu, company nu kai discount chhe nai. Aama vastu kevi chhe ke je kai hoy e, discount no hoy etle maan rakhvanu hoy. Ema maan rakhvanu j hoy. Atyare aapdi aagad gaadi chhe nai. Tamare final thaay to booking karavi naakho. Gaadi aave...
+[3:52] Customer: Final j chhe.
+[3:53] Rep: Gaadi aave tyare ema hu mara thi je kai best thaay e hu tamne karish.
+[3:57] Customer: Tame mane aa... e hoy ne atyare to kyo.
+[4:02] Rep: Aam jo, discount aama kai chhe j nai. Company taraf thi kai thodu ghanu hoy ne to ame e aapi daiye barabar? Biju kai aama kari na shakay.
+[4:11] Customer: Leva de to lai jaavani.
+[4:13] Rep: Aa je me tamne aapyu ne vima nu, e 1 plus 2 etle ek varsh no full ane be varsh no third party aave. Aa vima ma hu tamne jovdavi daish ke tamare tran varsh no insurance full thaay ne evu tamne karavdavi daish. Ema tamare thodu ghanu plus minus aavshe. Ane tamne benefit e re ke bija varshe tamare... ha 15-20 hajar rupiya jevu premium aave. Bija varshe ne trija varshe tuk ma 30 ek hajar rupiya jevu thaay be varsh nu ganiye. Atyare 4-5 hajar vadhare aapo ne to tran varsh no insurance full thai jaay. Discount nathi etle hu tamne aavi rite kari dau.
+[4:45] Customer: Total aapo aatlu. Ahi na... ghara na j dyo ne. Vima ma badhu aamathi j kaapi lejo.
+[4:58] Rep: Number levana 2000.
+[5:02] Customer: E to hamna khuli j chhe series. Thodu k modhu... Be di aagad ni vaarta.
+[5:14] Rep: Hu aana warranty na baad kari dau chhu. 11,21,500 thaay.
+[5:20] Customer: E 21,500 mukki dyo haalo.
+[5:23] Rep: 21,500 kem mukki sakay saheb? Discount nathi to kevi rite tamne kari shakay? Haju 1000-2000 rupiya nu maan hoy ne to hu rakhu. 21,000 rupiya to gaadi ma margin j nathi, hu kya thi tamne karu? Plus ma mari aagad gaadi nathi. Samjya?
+[5:37] Customer: E aapsho ketla di ma?
+[5:38] Rep: Gaadi ma atyare hu tamne ek mahina jevu kahu. Velu thaay to...
+[5:41] Customer's companion: Atyare be gaadi padi j chhe.
+[5:42] Rep: B6 chhe.
+[5:43] Customer's companion: B8 j chhe.
+[5:44] Rep: To have stock aavto aavyo nathi, gaadi kadach aavi gayi hase. Aave etle tamne maare devi j chhe. Hu samjyo, maare atyare aave to maare bapor e nath aavani.
+[5:52] Customer: Aaje aavo ne maare.
+[5:54] Rep: To hamna tamne update aapi dau, stock aave etle tamne update aapi dau.
+[5:57] Customer: Ame badhu puchhine j karyu emne. Janakbhai ne te pela hu puchhi gayo to, aavi gayo to. Be gaadi hu lai gayo ne aa triji chhe maari gaadi. Ek gaadi to kaali lai gayo, black colour.
+[6:07] Rep: Tamari badhi vaat sachi, aatla di raja hati.
+[6:10] Customer: Raja ma gami e te company ma je karyu hoy e, chhodi jaay 20,000 rupiya.
+[6:15] Rep: Accessories ma shunya chhe. Accessories ma ghani badhi vastu aave, hu tamne aakhu list aapi dau, tamne em laage ke aa maare jaruriyat ni vastu chhe e tamare levani. Pachhi tame 18,000 ni lyo to bhaley ane 10,000 ni lyo to bhaley.
+[6:27] Customer: Ahi na... ghara no akhado kahu chhu.
+[6:30] Rep: Enu premium maare kadhavavu padshe karan ke gaadi nu pela hu jaani lau, jo aavi gayi hoy ne to eni engine chassis number laine hu insurance nu premium kadhavi ne pachhi hu tamne aakdo aapi dau, emnam ema kai na shakay. Mane kalak no time aapo, hu kalak ma tamne confirm kari dau.
+[6:46] Customer: Kalak ma je gaadi aavi gayi hoy to aapne badhu nakki karine vyavahar puro kariye. Ola pachhi document nu su kyo?
+[6:57] Rep: Loan maate? Loan maate Aadhar card, PAN card, 6 mahina nu bank statement...
+[7:02] Customer: Sudhirsinh aaya j ghare aavine lai jaay. Aamna j karvo ke aamno olo karvo?
+[7:07] Customer's companion: E to Mahindra no j rakhay.
+[7:09] Customer: Khali e na karta hu Manya ma...
+[7:10] Customer's companion: Aapne enu j... maltu hoy ne e male. Ena aabhar e bhaley emne maltu hoy, aapne su vaandho? Ene 5-25 hajar male emne bhaley ne faaydo, aapne to su vaandho?
+[7:23] Rep: Gaadi nu hu jovdavi lau, hamna ema evu chhe aaje j showroom khulyo ne etle badha have aavya chhe. Gaadi nu update aave ne etle hu tamne...
+[7:31] Customer: Kahi dyo, gaadi jo mali jaay em hoy to maare kaal nath karvu. Ha ane AC vaali. Kar ne tyare kai, atyare aavi gayi hoy to jaava de. Ha. Ha, ha. Kahi de rahi jaay. Vima kढavay.
+[8:08] Rep: Hello. Bapu, Bolero B8 white colour nikli gayi aagad thi?
+[8:13] Customer: Na e badhu j aave. Ha, ha.
+[8:18] Rep: Mahina nu kyo atyare. Aapdi aagad atyare nathi gaadi nikli. Bhavnagar ma stock aave ne etle hu tya jovdavi lau, jo Bhavnagar hase to aayathi tamne magavi daish. Kadach e na hoy to tamne mahina no kahu chhu, baaki jetlu velu thaay etlu velu karavi daish.
+[8:38] Customer: Bhav kyo to.
+[8:39] Rep: Bhav ma me tamne atyare je kidhu e warranty na 12,500 chhe e hu tamne baad kari daish, etle 11,21,500 jevu thaay etle 11,21,000 gano. Barabar, ane vima ma premium kadhavi lyo etle je kai plus minus aavtu hoy e...
+[8:51] Customer: Ahi na... ghara no puchho aapne.
+[8:54] Rep: Jo aama vastu kevi chhe ke mara thi thaatu hoy e maare best karvanu chhe. Samjya? Ane ema thoda ghana plus minus thaatu hoy e to amne khabar hoy ke 2000-3000 rupiya vaahe kadi gaadi jaava na devani hoy. Maare ek gaadi ma me 1 plus 2 nu je premium aapyu tu ena karta 1000 rupiya sasto kari didho tran varsh no. Amuk ma 10,000 vadhare aave, amuk ma 5,000 ochha aave. E aapda haath ma na hoy. Vastu kevi chhe ke hu ne engine chassis number aapu, e system ma jove, ema je aakdo lakhelo aave e maare tamara paase thi levo pade. Mane thodo time aapo, hu tamne gaadi ni update kahi dau ke aatla time ma gaadi mali jaashe.
+[9:27] Customer: Na Jashubha bhav puchh. Number chhe ne bapu?
+[9:33] Rep: Me tame number aapyo e chhe ne aapdo? Ema hu WhatsApp kari dau. 90330 11913 3691. E Vijaybhai chhe, Vijayrajsinh. E rahya 700, 700 aamathi lai gyo chhe.
+[10:04] Customer: E maaro j, maaro ramakdu j chhe.
+[10:17] Rep: Emne kadach model samajva ma bhul thai hase, B6 padi chhe.
+[10:21] Customer's companion: B6 to amari paase hati. Me vechi nakhi.
+[10:23] Rep: Kadach emne B6 nu kidhu hase ke B6 mali jaashe.
+[10:26] Customer's companion: Na, na. E beina bhave aam naakhya maara paase.
+[10:30] Rep: Hello.
+[10:39] Customer: Ha bha. Ha. Ha, ha.
+[10:48] Rep: E Bapu Dhanteras nu kidhu tu. Na emne white j... emne grey joti ti, ema time jaajo kidho etle pachhi white ma kareli, ek vaar B6 joti ti.
+[10:58] Customer: Ha, ha.
+[11:01] Other voice: Kya Bhanubhai? Nava varsh na Ram Ram Bhanubhai.
+[11:04] Customer: Jo aa black male ne aaje? Ha to white tamari chhe?
+[11:10] Other voice: Aa gaadi aapo haalo to. Pass ma to aapne Bolero pass karvi chhe aapne. 16 ni nikli chhe ne B6 ne badle 16 nikli chhe ne tare?
+[11:26] Customer: Olu ekathi rupiya ma vaahe dyo to aana bhegu.
+[11:28] Other voice: Rajubhai kon?
+[11:30] Customer: Na na olu aagad na vaali chhe ne, dada.
+[11:35] Rep: Vijayrajsinh Mahindra Finance ma chhe ane Rajeshbhai Mahindra Finance ma chhe.
+[11:39] Customer's companion: Aaya koi nathi atyare?
+[11:40] Rep: Aaya chhe, aaya j chhe. Bolavi lau.
+[11:41] Customer's companion: Ubha ryo bolavo ma. Ubha ryo ek minute chalu rakhjo.
+[11:45] Customer: Ha, ha kahi de kahi de, nakki nath kahi de.
+[11:48] Rep: Gaadi aavk ma chhe nai to olu kashu kaam na thaay ne, khota dhakka thaay. Aaya stage ma aagad aavo ne haalo ne.
+[11:57] Customer: Ha bolave chhe jo.
+[12:03] Customer's companion: Ha aaya j. Ha aaya chhe.
+[12:10] Customer: Ha ek j minute ha. Aapo joi lyo.
+[12:13] Customer's companion: Na de Rajubhai ne.
+[12:14] Customer: Aapo Rajubhai ne.
+[12:18] Rep: Hello, hello. Aaya jai mataji. Ha, ha. Kai vandho nai. Joi lyo, joi lyo. Bhav ma nakki j chhe kaka. Bolero na aapne... tamne me aamna j kidhu ke aatla... Emna ma vima no ne warrant no hu tamne kari daish. Ema 21,500 aavta hase, barabar? Me warranty kaadhi nakhu to je 12,500 aave e kaadhi nakhiye. Vima tran varsh no full thaay ne e hu karavi daish. Ema ek premium jovdavi lau pachhi je kai thaatu hase e hu kahevaish. Kadach 1000-2000 vadhare ochha thashe ne, kadach maano ke me tamne je kimat aapi ena thi 2000 vadhare thaashe to e hu laish nai.
+[13:08] Customer: Ahi na, na, varas sudhi... bol, bol.
+[13:11] Rep: Tran varas sudhi tamare vimo jovano j nathi. Chotha varshe vimo...
+[13:15] Customer: Atyare be varas gaadi rakhiye, chotha varshe vechi nakhiye.
+[13:19] Customer's companion: Aa hamna vechi ti be varas vaahe.
+[13:21] Rep: Premium maari aagad aakdo aave ne to hu aakdo kahi shaku.
+[13:24] Customer's companion: Bija varshe j vechi didhi. Aaya pela aavya to company ma dekhaadva to emne mane bhav ma thodo k fer padyo to.
+[13:30] Customer: Dhanteras na aavya chhodava te. Te to black to navi chhodavi j gya ame. E bhatija aatu chhodavi.
+[13:36] Rep: Ola bhai nu naam su aapda Jaisinhbha...
+[13:38] Customer: Vijay. E to maaro bhatijo, e to tamne gaadi aapi...
+[13:43] Rep: Emna naam ni tya karvani?
+[13:44] Customer: Na, maara naam ni.
+[13:46] Customer's companion: Maara naam ni hati ne e vechi. Lai didhi 6 lakh ma.
+[13:50] Customer: E to kharo Bolero no rasiyo chhe.
+[13:55] Customer's companion: Athwadiya, athwadiya ma tamne devi pade, ame koik na gaada laine aavya hoy.
+[14:03] Customer: Aa to malak chhe, aato nathi khabar padti. White colour.
+[14:07] Customer's companion: Black kadach em na pade, white to mali j jaay ne, amare to white joiye.
+[14:12] Customer: Aa 9 varas thi show-room ma to chhe j.
+[14:15] Rep: Bolero B8, Bolero B8 amne white colour joiye chhe.
+[14:20] Customer: Ha, jaava dyo. Khabar nathi...
+[14:24] Customer's companion: Mane te di 15 di kidha ta pan maare olu... maare pela Scorpio aayathi j levi ti, te di 15 di kidha ta.
+[14:30] Customer: Ha, aa 15 di... aa amna 15 di kidha ta, tame vaat karo ma.
+[14:35] Rep: 15 di kahu chhu pan tamne athwadiya ma...
+[14:38] Customer: Series nathi aa number ni, etle pachhi maandi vaadyu. Najar ni series khule to 2000 nava thi aapne levana barabar? Etle pachhi maandi vaadyu.
+[14:46] Customer's companion: Maare be Scorpio aayathi lai jaay...
+[14:48] Rep: Mane phone aavyo to tyare...
+[14:50] Customer: Joiye Scorpio N ma su, aamne vaadi ma vadhare rakhva ma chhe ne, e vadhare faave. Maare vaadi ma vadhare haale.
+[14:58] Rep: Aapne private passing...
+[14:59] Customer: Private passing. Biji vaat ka, private aamare shu kaam... rakhvani j chhe company ma have, company to aam gaadi jaava de...
+[15:17] Customer's companion: Gaadi chhe aapdi paase, be tran chhe, aapne finance nu j kariye chhiye.
+[15:23] Customer: Aapdi paase 7 gaadi padi chhe em nathi, zero ma aave.
+[15:27] Customer's companion: Te ghadiyal thi set lai aavyo, Mahindra ni 4 gaadi maari paase.
+[15:30] Customer: Cash daine aavya ta te di. Navi to ek j ghadi... Ha, ha kahu chhu.
+[15:41] Rep: Vijaybhai ne hu kahu ke loan vaalu...
+[15:44] Customer's companion: Emno ek vaar vache phone aavyo to, Scorpio laine tamaru j ke... Number lai lyo ne bapu no.
+[15:49] Rep: Chhe j emna ma, me WhatsApp karyu ne.
+[16:05] Customer: Aapne loan to su karta ta, 5 lakh ni karvani thaay to 6 lakh rokda daiye.
+[16:09] Customer's companion: Ha e hisabe maangyo to to.
+[16:11] Customer: Ene me kidhu haalo 6 lakh bharva ta. Haalo tame amne kyaik javab dyo.
+[16:15] Rep: Hu vadhi ne kalak ma tamne kahu. Bhavnagar thi mane confirm malshe ne...
+[16:20] Customer's companion: 15 di jevu to shu kyo, 15 di hu to aapne koik na...
+[16:22] Rep: Aama kevu hoy bapu, ame maximum kahiye. Have hu tamne maano em kahu 15 di...
+[16:25] Customer: Veli aavi jaay.
+[16:26] Customer's companion: Aayathi ame Rajkot peli vaar lidhi ti, amne Rajkot thi kidhi ti, mane kidhu tu pan mane 8 di aapi. Kem ke gaadi aavi gayi Bapu lai jaao.
+[16:44] Customer: Kalak ma Jashubhai ne kahi dyo.
+[16:46] Customer's companion: Kalak ma thik ne poni kalak thaay. Ke'ta hoy to rokaiye ame.
+[16:50] Rep: Tamare behvu hoy to... kai kaam hoy to tame patavi lyo.
+[16:51] Customer's companion: Na na amare behvu nathi, ha e badhu patavi...
+[16:57] Rep: Aa number ma j tamne phone kari daish.
+[17:00] Customer: Olu aapyu online te hu nath rakhto.
+[17:04] Customer's companion: Haalo Bapu, su kyo?
+[17:05] Customer: Ha haalo haalo bhai.
+[17:06] Rep: Bhaley Bapu.",car,56,162,,claude-sonnet-5-5,call,Bolero B8,other,Diesel,White,yes,no,yes,"Delivery timeline: stock unavailable, about a month",Price and offers|Loan and finance,high,decided,2026-11-14 11:04,2026-11-14 11:08,yes,"Customer wants a white Bolero B8 with a 2000 fancy number, private passing, immediate delivery and Mahindra Finance loan support.","Salesperson explained B8 has mag wheels, quoted 11,21,500 after dropping the 12,500 warranty, offered 3-year full insurance, and refused a 21,500 reduction citing no margin. Customer asked for a discount; accessories and stock timing (about a month, Bhavnagar check) were discussed.",No purchase or booking is confirmed; the customer will decide once availability is confirmed.,No white B8 is in stock locally and the price gap on discount remains unresolved.,"Salesperson will check the white B8 with Bhavnagar and the insurance premium, then update the customer within about an hour by phone; the customer will tell Jashubha to wait.","[{""t"":""Confirm white Bolero B8 availability with Bhavnagar and call customer within about an hour"",""d"":""Namaste, white Bolero B8 ni availability Bhavnagar thi confirm thai jaay etle hu tamne janavish. Tya sudhi tamari raah joiye chhiye."",""q"":""Aapdi aagad atyare nathi gaadi nikli. Bhavnagar ma stock aave ne etle hu tya jovdavi lau, jo Bhavnagar hase to aayathi tamne magavi daish. Kadach e na hoy to tamne mahina no kahu chhu, baaki jetlu velu thaay etlu velu k…"",""k"":""stock_check"",""ph"":"""",""due"":""within about an hour""},{""t"":""Get insurance premium checked for the 3-year full cover and share the figure"",""d"":"""",""q"":""Enu premium maare kadhavavu padshe karan ke gaadi nu pela hu jaani lau, jo aavi gayi hoy ne to eni engine chassis number laine hu insurance nu premium kadhavi ne pachhi hu tamne aakdo aapi dau, emnam ema kai na shakay.…"",""k"":"""",""ph"":"""",""due"":""within about an hour""}]","[{""t"":""Customer wants a discount or lower total price"",""s"":""partly"",""a"":""""},{""t"":""Delivery time, as another dealer promised 15 days and the store said about a month"",""s"":""partly"",""a"":""""},{""t"":""Insurance premium amount and the need to deduct it from the total"",""s"":""partly"",""a"":""""}]",Several people were speaking,Several phone calls interrupted the rep and the customer. A finance person (Mahindra Finance) joined the conversation.,"[{""m"":""Bolero B8, white"",""p"":1121500,""b"":""after dropping the 12,500 warranty"",""at"":""5:14""},{""m"":""Fancy number 2000"",""p"":18000,""b"":""extra"",""at"":""0:34""},{""m"":""Accessories"",""p"":""10,000 to 18,000"",""b"":""optional"",""at"":""6:15""},{""m"":""3-year full insurance (1+2 plan)"",""p"":""premium to be checked"",""b"":""to be quoted"",""at"":""6:30""}]",,"Bolero B8, white colour, 2000 number, private passing",Immediate delivery wanted,,"{""0:34"":""The fancy number costs 18,000 rupees."",""0:42"":""The 2000 number. White."",""2:17"":""And what about the loan?"",""2:40"":""We will do it that way; if your CIBIL score is good it is quick. Give me your mobile number."",""3:37"":""There is no discount from the company on this. The car is not here with us right now. Once you are final, book it and the car will come."",""4:13"":""The insurance I mentioned is a 1+2 plan, one year full and two years third party. I will arrange three years of full insurance for you."",""5:14"":""I will drop the warranty. It comes to 11,21,500."",""5:20"":""Drop that 21,500."",""5:23"":""How can I drop 21,500, sir? If there is no discount, how can I do it? There is no margin in the car, and I do not have a car in stock."",""5:38"":""About a month for the car, maybe sooner."",""6:15"":""Accessories: there are many things, I will give you the whole list. Take what you need, 18,000 or 10,000 worth."",""6:30"":""I have to get the premium worked out. First I will check if the car has arrived, then with the engine and chassis number I will get the insurance premium and give you the figure. Give me an hour and I will confirm."",""8:18"":""We do not have the car right now. I will check in Bhavnagar; if it is there I will get it here. If not, I would say a month, and I will do it as fast as I can."",""8:39"":""The 12,500 warranty I will drop, so it comes to about 11,21,500."",""14:15"":""Bolero B8, we want it in white."",""16:15"":""I will tell you within an hour. I will get confirmation from Bhavnagar."",""16:57"":""I will call you on this number.""}"
