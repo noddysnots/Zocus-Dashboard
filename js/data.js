@@ -14,6 +14,19 @@ const REASON_DEF={browse:['Just browsing, need not found',0],stock:['Lightweight
 const REASON_LABEL=Object.fromEntries(Object.entries(REASON_DEF).map(([k,v])=>[v[0].toLowerCase(),k]));
 const STAGE_CODE={talked:0,need_understood:1,product_shown:2,price_quoted:3};
 const COMP_HI={'Shree Gold Palace':'Shree Gold Palace mein making sirf 8% hai.','Nakshatra Online':'Nakshatra Online pe 1 lakh pe gold coin free mil raha hai.','Ratna Jewellers':'Ratna Jewellers mein exchange rate zyada de rahe hain.'};
+/* Display names for pilot nicknames (CSV may still say R1 / R2). */
+const REP_DISPLAY={'R1':'Sachin','R2':'Vishvaraj','Black and White Stripe':'Sachin','Lead rep':'Vishvaraj'};
+const repDisplay=n=>REP_DISPLAY[String(n||'').trim()]||String(n||'').trim();
+/* Hand-written customer_type notes → a small fixed set for charts; free text stays on the conversation for the panel. */
+function personaBucket(raw){const s=String(raw||'').trim(),low=s.toLowerCase();
+  if(!s||/^(not clear|not recorded|unknown)$/i.test(s))return 'Not clear';
+  if(/electric|switching to ev|switch.*electric|\bev\b/.test(low))return 'Switching to electric';
+  if(/7.?seater|family upgrade/.test(low))return 'Family upgrade to a 7-seater';
+  if(/\brepeat\b/.test(low))return 'Repeat visit';
+  if(/delivery|coating|dispute|after.?sale|after.?booking/.test(low))return 'Delivery or after the sale';
+  if(/^wants a\b|^looking for\b|^choosing\b/i.test(s)||/\b(bolero|scorpio|xuv|3xo|xev)\b/i.test(s))return 'Specific model in mind';
+  if(s.length>42)return 'Other';
+  return s}
 
 /* ---------- CSV ---------- */
 function parseCSV(text){
@@ -98,11 +111,11 @@ function build(text,name){
   const today=raw[0].at,todayMid=new Date(today.getFullYear(),today.getMonth(),today.getDate()).getTime();
   const CONVS=raw.map((x,i)=>{
     const r=x.r;
-    if(!repMap[x.rep]){const id=uniqueId(slug(x.rep),repUsed);const parts=x.rep.split(/\s+/);repMap[x.rep]=id;REPS.push({id,name:x.rep,tenure:get(r,'rep_tenure'),first:parts[0],ini:parts.map(p=>p[0]).join('').slice(0,2).toUpperCase()})}
+    if(!repMap[x.rep]){const shown=repDisplay(x.rep),id=uniqueId(slug(x.rep),repUsed),parts=shown.split(/\s+/);repMap[x.rep]=id;REPS.push({id,name:shown,raw:x.rep,tenure:get(r,'rep_tenure'),first:parts[0],ini:parts.map(p=>p[0]).join('').slice(0,2).toUpperCase()})}
     else if(!REPS.find(p=>p.id===repMap[x.rep]).tenure&&get(r,'rep_tenure'))REPS.find(p=>p.id===repMap[x.rep]).tenure=get(r,'rep_tenure');
     const pl=get(r,'product')||'Not recorded';
     if(!prodMap[pl]){const id=uniqueId(slug(pl),prodUsed);prodMap[pl]=id;PRODUCTS[id]={label:pl}}
-    const cl=get(r,'customer_type')||'Not recorded';
+    const clRaw=get(r,'customer_type')||'Not recorded',cl=personaBucket(clRaw);
     if(!perMap[cl]){const id=uniqueId(slug(cl),perUsed);perMap[cl]=id;PERSONAS.push({id,label:cl})}
     let comp=null;const cn=get(r,'competitor');
     if(cn){if(!compMap[cn]){const id=uniqueId(slug(cn),compUsed);compMap[cn]=id;COMPS.push({id,label:cn,offer:get(r,'competitor_offer'),hi:COMP_HI[cn]||''})}
@@ -123,7 +136,7 @@ function build(text,name){
     const due=parseDate(get(r,'followup_due'));
     return {id:i+1,ref:get(r,'conversation_id')||('row-'+(i+2)),rep:repMap[x.rep],at:x.at,d:Math.round((todayMid-new Date(x.at.getFullYear(),x.at.getMonth(),x.at.getDate()).getTime())/DAY),
       persona:perMap[cl],product:prodMap[pl],inStock:!no(get(r,'in_stock')),skills:x.sk,score:x.score,scored:x.scored,kind:get(r,'kind').toLowerCase()==='delivery'?'delivery':'sale',startSec:+get(r,'start_sec')||0,jstage:get(r,'stage').toLowerCase(),stageSrc:get(r,'stage_src'),payment:get(r,'payment_status'),resultLabel:get(r,'result_label'),competitor:comp,outcome:x.oc,reason,stage,value:x.value,
-      dur:isNaN(dur)||dur<=0?15:Math.round(dur),customer:get(r,'customer_name')||'Customer',phone:get(r,'customer_phone')||null,
+      dur:isNaN(dur)||dur<=0?15:Math.round(dur),customer:get(r,'customer_name')||'Customer',typeNote:clRaw&&clRaw!==cl?clRaw:'',phone:get(r,'customer_phone')||null,
       kw:get(r,'keywords').split('|').map(s=>s.trim()).filter(Boolean),done:false,
       cq:get(r,'customer_quote'),cqEn:get(r,'customer_quote_en'),
       sum:{wanted:get(r,'summary_wanted'),happened:get(r,'summary_happened'),why:get(r,'summary_why'),next:get(r,'summary_next')},

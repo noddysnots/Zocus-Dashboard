@@ -116,7 +116,7 @@ function paint(rep){
   document.getElementById('filters').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.rep===rep||(!rep&&b.dataset.rep===''))));
   document.getElementById('jump').innerHTML=list.map(x=>`<a href="#c-${esc(x.id)}">#${esc(x.id)} ${esc(clock(x.at))}</a>`).join('');
   document.getElementById('root').querySelectorAll('.phone').forEach(el=>{el.hidden=!!(rep&&el.dataset.rep!==rep)});
-  document.getElementById('sub').textContent=(rep?rep+' · ':'')+list.length+' sales conversation'+(list.length===1?'':'s')+' · AI-filled, read-only · empty means not said';
+  document.getElementById('sub').textContent=(rep?(ALL.find(x=>x.rep===rep)||{repShown:rep}).repShown+' · ':'')+list.length+' sales conversation'+(list.length===1?'':'s')+' · AI-filled, read-only · empty means not said';
 }
 (async()=>{
   const root=document.getElementById('root');
@@ -133,10 +133,13 @@ function paint(rep){
       if(!crm.groups||!crm.groups.length)continue;
       ALL.push({id:String(row[ix('conversation_id')]).replace(/\D/g,''),at:row[ix('captured_at')],rep:row[ix('rep_name')],model:row[ix('product')],crm});
     }
+    const REP_SHOW={'R1':'Sachin','R2':'Vishvaraj','Black and White Stripe':'Sachin','Lead rep':'Vishvaraj'};
+    const show=r=>REP_SHOW[r]||r;
+    ALL.forEach(x=>{x.repShown=show(x.rep)});
     const reps=[...new Set(ALL.map(x=>x.rep))];
     const order=['Jatin','Hardik','R1','R2',...reps.filter(r=>!['Jatin','Hardik','R1','R2'].includes(r))];
     const uniq=order.filter(r=>reps.includes(r));
-    document.getElementById('filters').innerHTML='<button type="button" data-rep="" aria-pressed="true">All</button>'+uniq.map(r=>`<button type="button" data-rep="${esc(r)}">${esc(r)}</button>`).join('');
+    document.getElementById('filters').innerHTML='<button type="button" data-rep="" aria-pressed="true">All</button>'+uniq.map(r=>`<button type="button" data-rep="${esc(r)}">${esc(show(r))}</button>`).join('');
     document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('button[data-rep]');if(!b)return;paint(b.dataset.rep||'')});
     root.innerHTML=ALL.length?ALL.map(card).join(''):'<p class="empty-page">No CRM records in the pilot file yet.</p>';
     const pick=startRep&&uniq.includes(startRep)?startRep:'';
