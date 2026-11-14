@@ -1,12 +1,19 @@
 {
  "dayNote": "From the floor (Abhishek, 11:48 am): today's traffic is mostly customers finalising the model, choosing accessories and finalising payment. On a normal day it is mostly early enquiries, so today's numbers are not typical.",
  "store": "Mahindra showroom (pilot)",
- "exportedAt": "2026-11-14T11:16:24.068Z",
- "exportedLocal": "2026-11-14 16:46",
+ "exportedAt": "2026-11-14T11:31:58.853Z",
+ "exportedLocal": "2026-11-14 17:01",
  "date": "2026-11-14",
- "recorded": 6,
+ "recorded": 7,
  "shown": 5,
- "analysing": [],
+ "analysing": [
+  {
+   "id": 274,
+   "at": "2026-11-14 15:58",
+   "rep": "Rep not tagged",
+   "min": 48
+  }
+ ],
  "failed": [],
  "unscored": [],
  "leftOut": [
