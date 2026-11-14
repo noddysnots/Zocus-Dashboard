@@ -13,10 +13,10 @@ Recomputed independently from the CSV and compared with the screen: 8 sales conv
 | # | Time | Rep | Backend analysis | Our notes | Score |
 |---|---|---|---|---|---|
 | 261 | 10:36 | Jatin | Right. Staff tag "no" against the AI's "considering"; we show Will return (your choice) | Right | 50 |
-| 262 | 10:47 | Black and White Stripe | Right, but the AI says "no booking confirmed" while the staff tag is "yes"; we show Booked by the tag | Right | 45 |
+| 262 | 10:47 | R1 | Right, but the AI says "no booking confirmed" while the staff tag is "yes"; we show Booked by the tag | Right | 45 |
 | 264 | 11:22 | Jatin | Right; "dismissive stance" flag is fair. Not scored (after the sale) | Right | – |
 | 266 | 11:54 | Hardik | Right. The line "Hardik Joshi" (23:18) is labelled Customer; it is the rep's own name | Right | 35 |
-| 272 | 3:27 pm | Lead rep (name pending) | Right | One wording slip fixed ("on WhatsApp" was not said; now "to the customer's phone") | 40 |
+| 272 | 3:27 pm | R2 (name pending) | Right | One wording slip fixed ("on WhatsApp" was not said; now "to the customer's phone") | 40 |
 | 274 | 3:58 pm | Hardik | Summary right. Speaker labels are wrong in places (for example 6:04 "2 lakh discount" labelled customer, 33:46 labelled rep) | Four slips fixed: on-road 31.07 was said at 15:06 not 13:33; "WhatsApp" was not said; the Ahmedabad wording over-claimed; "natural" meant "in person" | 35 |
 | 275 | 5:02 pm | Jatin | **Last line wrong**: "no test drive was agreed"; the floor says a test drive was lined up and done (transcript: asked 7:28, offered 8:00, 2 silent stretches, "that one is for the test drive") | Floor correction shown | 45 |
 | 276 | 5:39 pm | not noted | Right; correctly ignored the staff talk at the end. Model naming ("Z4") unclear | Right | 28 |
@@ -46,4 +46,4 @@ Recomputed independently from the CSV and compared with the screen: 8 sales conv
 | #264 "we can even cancel the whole car, but this 30,000" (17:25) | The customer is threatening to cancel a booked car over a small amount |
 
 ## 6. Still open
-Lead rep's name for #272 and the rep for #276; which recording the Apple one is and when it is re-run; the second part of #275 (test drive with Hardik; the merge is ready); whether #262's booking amount was paid; December or January for #272; the "Z4" model in #276.
+R2's name for #272 and the rep for #276; which recording the Apple one is and when it is re-run; the second part of #275 (test drive with Hardik; the merge is ready); whether #262's booking amount was paid; December or January for #272; the "Z4" model in #276.

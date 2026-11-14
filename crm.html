@@ -8,49 +8,78 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-.crm-shell{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:24px 16px 64px}
-.crm-top{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
-.crm-top h1{font-size:28px;letter-spacing:-.03em}
-.crm-top p{margin:4px 0 0;color:var(--muted);font-size:14px;max-width:52ch}
-.crm-back{display:inline-flex;align-items:center;gap:6px;color:var(--ink);text-decoration:none;font-weight:500;font-size:14px}
-.crm-back:hover{text-decoration:underline}
-.crm-jump{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
-.crm-jump a{padding:7px 12px;border-radius:99px;border:1px solid var(--line-2);background:var(--paper-solid);color:var(--ink);text-decoration:none;font-size:13px;font-weight:500}
-.crm-jump a:hover,.crm-jump a[aria-current="true"]{background:var(--ink);color:var(--accent-ink);border-color:var(--ink)}
-.crm-card{background:var(--paper-solid);border:1px solid var(--line);border-radius:18px;padding:18px 18px 8px;margin:0 0 18px;box-shadow:var(--shadow)}
-.crm-card>header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
-.crm-card>header h2{font-size:18px}
-.crm-card>header .meta{color:var(--muted);font-size:13px}
-.crm-note{margin:0 0 18px;padding:12px 14px;border-radius:12px;background:rgba(29,26,21,.04);color:var(--muted);font-size:13.5px}
-.crm-page .crmgrid{margin-top:0}
-.crm-page .crmg{margin-bottom:14px}
-.crm-empty{padding:40px 16px;text-align:center;color:var(--muted)}
-.crm-err{color:var(--bad);padding:20px}
-@media (max-width:860px){.crm-shell{padding-top:16px}.crm-top h1{font-size:22px}}
+:root{--ink:#1a1a1a;--muted:#6b6b6b;--line:#ececec;--bg:#f2f2f2;--card:#fff;--red:#E31C23;--red-soft:#fde8e9;--ok:#1a7a45}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:14.5px/1.45 Geist,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:430px;margin:0 auto;padding:14px 12px 56px}
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--card);border:1px solid var(--line);text-decoration:none;font-size:18px}
+.topbar h1{margin:0;font-size:18px;letter-spacing:-.02em;flex:1}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:99px;background:var(--red-soft);color:var(--red);font-size:11.5px;font-weight:600}
+.banner{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px}
+.banner b{display:block;font-size:14px;margin-bottom:2px}
+.banner span{color:var(--muted);font-size:13px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.filters button{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:7px 12px;font:inherit;font-weight:500;font-size:13px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--red);color:#fff;border-color:var(--red)}
+.jump{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.jump a{padding:5px 10px;border-radius:8px;background:#fff;border:1px solid var(--line);text-decoration:none;font-size:12px;font-weight:500;color:var(--muted)}
+.jump a:hover{color:var(--ink);border-color:#ccc}
+.phone{background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 8px 28px -18px rgba(0,0,0,.35);border:1px solid var(--line);margin:0 0 18px}
+.phone[hidden]{display:none}
+.ph-head{background:linear-gradient(180deg,#fff 0%,#fafafa 100%);padding:14px 14px 12px;border-bottom:1px solid var(--line)}
+.ph-brand{height:4px;background:var(--red);margin:-14px -14px 12px;border-radius:18px 18px 0 0}
+.ph-row{display:flex;gap:12px;align-items:center}
+.ph-thumb{width:56px;height:40px;border-radius:8px;background:linear-gradient(135deg,#2a2a2a,#555);flex:none;position:relative;overflow:hidden}
+.ph-thumb::after{content:"";position:absolute;inset:8px 6px;border:1.5px solid rgba(255,255,255,.35);border-radius:4px}
+.ph-main b{display:block;font-size:15px}
+.ph-main span{display:block;color:var(--muted);font-size:12.5px;margin-top:1px}
+.ph-consultant{margin-top:10px;font-size:12.5px;color:var(--muted)}
+.ph-consultant b{color:var(--ink);font-weight:600}
+.ph-tabs{display:flex;gap:18px;margin-top:12px;padding:0 2px;border-bottom:1px solid var(--line)}
+.ph-tabs span{padding:8px 0;font-size:13px;font-weight:600;color:var(--muted)}
+.ph-tabs span.on{color:var(--red);box-shadow:inset 0 -2px 0 var(--red)}
+.sec{padding:4px 0 2px}
+.sec h3{margin:0;padding:12px 14px 6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;background:#f7f7f7;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.field{display:grid;grid-template-columns:1fr 1.15fr;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);align-items:start}
+.field:last-child{border-bottom:0}
+.field dt{margin:0;color:var(--muted);font-size:12.5px;padding-top:1px}
+.field dd{margin:0;font-size:13.5px;font-weight:500;text-align:right;word-break:break-word}
+.field dd.empty{color:#b0b0b0;font-weight:400}
+.field dd small{display:block;font-size:10.5px;font-weight:400;color:#9a9a9a;margin-top:2px}
+.empty-page{padding:40px 16px;text-align:center;color:var(--muted)}
+.err{color:var(--red);padding:20px}
+@media (min-width:760px){
+  .wrap{max-width:920px;padding-top:22px}
+  #root{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:18px;align-items:start}
+  .phone{margin:0}
+}
 </style>
 </head>
-<body class="crm-page">
-<canvas id="waves" aria-hidden="true"></canvas>
-<div class="grain" aria-hidden="true"></div>
-<div class="crm-shell">
-  <div class="crm-top">
-    <div>
-      <a class="crm-back" id="backLink" href="/?dealer">← Back to dashboard</a>
-      <h1>CRM records</h1>
-      <p id="sub">Rep app fields for today’s sales conversations, filled from the recording and Zocus analysis. Empty means not said.</p>
-    </div>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="back" id="backLink" href="/?dealer" aria-label="Back to dashboard">←</a>
+    <h1>CRM records</h1>
+    <span class="badge">Filled by Zocus · read-only</span>
   </div>
-  <p class="crm-note">Layout matches the Sales.mai screens the floor shared (enquiry → product → variant → profile → owned vehicle → test drive → follow-up → lost reason). Phone screenshots with customer details are not stored in this repo. Age, gender, address, name and phone stay blank on purpose.</p>
-  <nav class="crm-jump" id="jump" aria-label="Jump to conversation"></nav>
-  <div id="root"><p class="crm-empty">Loading…</p></div>
+  <div class="banner">
+    <b>Reps do not type this</b>
+    <span id="sub">AI fills the Sales.mai fields from each recording. Empty means not said. Customer name, phone and address stay blank on purpose.</span>
+  </div>
+  <div class="filters" id="filters" role="group" aria-label="Filter by rep"></div>
+  <nav class="jump" id="jump" aria-label="Jump to conversation"></nav>
+  <div id="root"><p class="empty-page">Loading…</p></div>
 </div>
 <script>
 (function(){
 'use strict';
-const dealer=/[?&]dealer\b/.test(location.search);
+const params=new URLSearchParams(location.search);
+const dealer=params.has('dealer');
+const startRep=params.get('rep')||'';
 document.getElementById('backLink').href=dealer?'/?dealer':'/?all#conversations';
 const SRCL={recording:'from the recording',backend:'backend analysis','backend reading':'backend reading',floor:'from the floor',team:'from the team',rule:'set by rule',database:'from the data'};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -68,35 +97,51 @@ function parseCSV(text){
   return rows;
 }
 function clock(s){const m=String(s||'').match(/(\d{1,2}):(\d{2})/);if(!m)return '';const h=+m[1];return (h%12||12)+':'+m[2]+(h<12?' am':' pm')}
+function findField(crm,label){for(const g of crm.groups||[]){const f=(g.f||[]).find(x=>x[0]===label);if(f)return f[1]}return ''}
 function card(rec){
-  const crm=rec.crm,id=rec.id,t=clock(rec.at);
-  const groups=(crm.groups||[]).map(g=>`<div class="crmg"><h4>${esc(g.g)}</h4><dl>${(g.f||[]).map(f=>{const k=f[0],v=f[1],s=f[2];return `<div><dt>${esc(k)}</dt><dd class="${v?'':'empty'}">${v?esc(v):'–'}${v&&s?`<small>${esc(SRCL[s]||s)}</small>`:''}</dd></div>`}).join('')}</dl></div>`).join('');
-  return `<article class="crm-card" id="c-${esc(id)}"><header><h2>#${esc(id)} · ${esc(t||rec.at)}</h2><span class="meta">${esc(rec.rep||'Rep')} · ${esc(rec.model||'Model')} · ${esc(rec.stage||'')}</span></header><div class="crmgrid">${groups||'<p class="hint">No CRM fields for this conversation.</p>'}</div></article>`;
+  const crm=rec.crm,model=findField(crm,'Model')||rec.model||'Model',cons=findField(crm,'Sales consultant')||rec.rep;
+  const groups=(crm.groups||[]).map(g=>`<section class="sec"><h3>${esc(g.g)}</h3>${(g.f||[]).map(f=>{const k=f[0],v=f[1],s=f[2];return `<div class="field"><dt>${esc(k)}</dt><dd class="${v?'':'empty'}">${v?esc(v):'Not said'}${v&&s?`<small>${esc(SRCL[s]||s)}</small>`:''}</dd></div>`}).join('')}</section>`).join('');
+  return `<article class="phone" data-rep="${esc(rec.rep)}" id="c-${esc(rec.id)}">
+    <div class="ph-head"><div class="ph-brand"></div>
+      <div class="ph-row"><div class="ph-thumb" aria-hidden="true"></div><div class="ph-main"><b>${esc(model)}</b><span>#${esc(rec.id)} · ${esc(clock(rec.at)||rec.at)}</span></div></div>
+      <div class="ph-consultant">Sales consultant: <b>${esc(cons)}</b></div>
+      <div class="ph-tabs"><span class="on">Details</span><span>Timeline</span></div>
+    </div>
+    ${groups||'<p class="empty-page">No CRM fields for this conversation.</p>'}
+  </article>`;
+}
+let ALL=[];
+function paint(rep){
+  const list=rep?ALL.filter(x=>x.rep===rep):ALL;
+  document.getElementById('filters').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.rep===rep||(!rep&&b.dataset.rep===''))));
+  document.getElementById('jump').innerHTML=list.map(x=>`<a href="#c-${esc(x.id)}">#${esc(x.id)} ${esc(clock(x.at))}</a>`).join('');
+  document.getElementById('root').querySelectorAll('.phone').forEach(el=>{el.hidden=!!(rep&&el.dataset.rep!==rep)});
+  document.getElementById('sub').textContent=(rep?rep+' · ':'')+list.length+' sales conversation'+(list.length===1?'':'s')+' · AI-filled, read-only · empty means not said';
 }
 (async()=>{
-  const root=document.getElementById('root'),jump=document.getElementById('jump');
+  const root=document.getElementById('root');
   try{
     const r=await fetch('data/cases/pilot.csv',{cache:'no-store'});
     if(!r.ok)throw new Error('Could not load pilot.csv ('+r.status+')');
     const rows=parseCSV(await r.text());
     if(rows.length<2)throw new Error('pilot.csv is empty');
     const h=rows[0],ix=k=>h.indexOf(k);
-    const list=[];
     for(const row of rows.slice(1)){
       if(!row[ix('conversation_id')])continue;
-      const kind=String(row[ix('kind')]||'').toLowerCase();
-      if(kind==='delivery')continue;
+      if(String(row[ix('kind')]||'').toLowerCase()==='delivery')continue;
       let crm={};try{crm=JSON.parse(row[ix('crm_json')]||'{}')}catch(e){crm={}}
       if(!crm.groups||!crm.groups.length)continue;
-      const id=String(row[ix('conversation_id')]).replace(/\D/g,'');
-      list.push({id,at:row[ix('captured_at')],rep:row[ix('rep_name')],model:row[ix('product')],stage:row[ix('stage')]||'',crm});
+      ALL.push({id:String(row[ix('conversation_id')]).replace(/\D/g,''),at:row[ix('captured_at')],rep:row[ix('rep_name')],model:row[ix('product')],crm});
     }
-    document.getElementById('sub').textContent=list.length+' sales conversations · Mahindra showroom (pilot) · fields filled from the recording and analysis';
-    jump.innerHTML=list.map(x=>`<a href="#c-${esc(x.id)}">#${esc(x.id)} ${esc(clock(x.at))}</a>`).join('');
-    root.innerHTML=list.length?list.map(card).join(''):'<p class="crm-empty">No CRM records in the pilot file yet.</p>';
-    const go=()=>{const id=(location.hash||'').slice(1);jump.querySelectorAll('a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+id?'true':'false'))};
-    addEventListener('hashchange',go);go();
-  }catch(err){root.innerHTML='<p class="crm-err">'+esc(err.message||err)+'</p>'}
+    const reps=[...new Set(ALL.map(x=>x.rep))];
+    const order=['Jatin','Hardik','R1','R2',...reps.filter(r=>!['Jatin','Hardik','R1','R2'].includes(r))];
+    const uniq=order.filter(r=>reps.includes(r));
+    document.getElementById('filters').innerHTML='<button type="button" data-rep="" aria-pressed="true">All</button>'+uniq.map(r=>`<button type="button" data-rep="${esc(r)}">${esc(r)}</button>`).join('');
+    document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('button[data-rep]');if(!b)return;paint(b.dataset.rep||'')});
+    root.innerHTML=ALL.length?ALL.map(card).join(''):'<p class="empty-page">No CRM records in the pilot file yet.</p>';
+    const pick=startRep&&uniq.includes(startRep)?startRep:'';
+    paint(pick);
+  }catch(err){root.innerHTML='<p class="err">'+esc(err.message||err)+'</p>'}
 })();
 })();
 </script>

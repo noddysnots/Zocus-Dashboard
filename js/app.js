@@ -199,7 +199,8 @@ function renderNav(){const rt=routeName(),base=rt.startsWith('rep-')?(S.from==='
  document.getElementById('bnav').innerHTML=NAV.filter(n=>!(TL&&n[0]==='followups')).map(n=>item(n,true)).join('');
  document.querySelectorAll('[data-act="period"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.period)));const rs=document.getElementById('rangeSel');if(rs)rs.value=S.period;
  document.querySelectorAll('[data-act="period"],#rangeSel option').forEach(b=>{const v=b.dataset.v||b.value,hide=FLAT||(v==='all'&&ZD.spanDays<=30)||(ZD.spanDays<3&&(v==='7'||v==='30'))||(ZD.spanDays<2&&v==='yesterday');b.hidden=hide;if(b.tagName==='OPTION')b.disabled=hide});
- const seg=document.querySelector('.seg[data-tour="period"]'),one=[...document.querySelectorAll('[data-act="period"]')].filter(b=>!b.hidden).length<2;if(seg)seg.classList.toggle('solo',one);if(rs)rs.classList.toggle('solo',one)}
+ const seg=document.querySelector('.seg[data-tour="period"]'),one=[...document.querySelectorAll('[data-act="period"]')].filter(b=>!b.hidden).length<2;if(seg)seg.classList.toggle('solo',one);if(rs)rs.classList.toggle('solo',one);
+ const crmBtn=document.getElementById('crmBtn');if(crmBtn)crmBtn.hidden=!(SNAP&&!ZD.empty)}
 function phead(title,sub){return `<div class="phead"><h1>${title}</h1><p>${sub}</p></div>`}
 const periodTxt=()=>SNAP?'on '+fdate(TODAY):ALL()?'all conversations':({today:'today',yesterday:'yesterday','7':'last 7 days','30':'last 30 days'})[S.period];
 const inTxt=()=>SNAP?periodTxt():ALL()?'across all conversations':rangeDays()===1?periodTxt():'in the '+periodTxt();

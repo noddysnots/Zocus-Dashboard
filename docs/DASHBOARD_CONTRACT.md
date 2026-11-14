@@ -87,5 +87,5 @@ Price tables in the conversation panel show the exact rupee figure (for example 
 ## Added 14 Nov, evening
 
 - **Pilot count wording:** Data menu and live bar say "8 sales conversations · 1 after booking" so they match Team's "Conversations recorded" (8). Delivery-day #264 is not a sales conversation.
-- **CRM records page:** `crm.html` (from the Data menu), Sales.mai field layout filled from `crm_json`.
+- **CRM records page:** `crm.html` (top-bar CRM icon next to Data, and from the Data menu). Sales.mai-style phone forms filled from `crm_json`, read-only, filterable by rep. Pilot nicknames: R1 (was Black and White Stripe), R2 (lead, name unknown).
 

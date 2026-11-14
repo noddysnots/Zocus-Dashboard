@@ -139,7 +139,7 @@
       }
     },
     "262": {
-      "rep": "Black and White Stripe",
+      "rep": "R1",
       "models": [
         "Bolero B8"
       ],
@@ -641,7 +641,7 @@
       }
     },
     "272": {
-      "rep": "Lead rep",
+      "rep": "R2",
       "model": "XUV 3XO",
       "models": [
         "XUV 3XO"
@@ -1035,7 +1035,7 @@
       "crm": {
         "variant": "Pack Two (the older model)"
       },
-      "rep": "Lead rep"
+      "rep": "R2"
     },
     "278": {
       "model": "Scorpio N",

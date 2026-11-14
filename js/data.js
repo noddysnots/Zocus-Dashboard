@@ -205,7 +205,7 @@ document.addEventListener('click',async e=>{
   else if(a==='mclose'){document.getElementById('modalRoot').innerHTML=''}
   else if(a==='upload'){document.getElementById('zfile').click()}
   else if(a==='report'){toggleMenu(false);location.hash='#report'}
-  else if(a==='crmpage'){toggleMenu(false);location.href='crm.html'+(window.ZD&&window.ZD.locked?'?dealer':'')}
+  else if(a==='crmpage'){toggleMenu(false);const q=[];if(window.ZD&&window.ZD.locked)q.push('dealer');try{const m=(location.hash||'').match(/^#(?:rep|coach)-(.+?)(?:\/|$)/);const id=m&&decodeURIComponent(m[1]);const rep=id&&(window.ZD.REPS||[]).find(r=>r.id===id);if(rep)q.push('rep='+encodeURIComponent(rep.first||rep.name))}catch(e){}location.href='crm.html'+(q.length?'?'+q.join('&'):'')}
   else if(a==='crm'){toggleMenu(false);try{const r=await fetch('data/cases/'+window.ZD.storeId+'-crm.csv',{cache:'no-store'});if(!r.ok)throw 0;download('zocus-crm-sheet.csv',await r.text())}catch(err){toast('The CRM sheet is not ready yet.')}}
   else if(a==='export'){download((window.ZD.isSample?'zocus-sample':'zocus-data')+'.csv',window.ZD.rawText);toggleMenu(false)}
   else if(a==='template'){toggleMenu(false);try{const r=await fetch(TEMPLATE_URL);download('zocus-template.csv',await r.text())}catch(err){toast('Could not load the template.')}}

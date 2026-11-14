@@ -63,7 +63,7 @@
       "outcome": "followup"
     },
     "262": {
-      "rep_name": "Black and White Stripe",
+      "rep_name": "R1",
       "product": "Bolero",
       "models_considered": "Bolero B8",
       "fuel": "Diesel",
@@ -113,7 +113,7 @@
     },
     "272": {
       "_why": "Repeat visit to settle price and delivery of a red 3XO. Quotations were sent on WhatsApp, so no car price is said aloud; the value is the model's indicative band. 'Petrol diesel' at 0:04 is a stray opening word, not the customer's choice.",
-      "rep_name": "Lead rep",
+      "rep_name": "R2",
       "product": "XUV 3XO",
       "models_considered": "XUV 3XO",
       "fuel": "",
@@ -156,7 +156,7 @@
       "kind": "",
       "scored": "yes",
       "customer_name": "Customer 9",
-      "rep_name": "Lead rep",
+      "rep_name": "R2",
       "outcome": "followup"
     },
     "278": {
