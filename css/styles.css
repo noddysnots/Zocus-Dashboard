@@ -787,4 +787,4 @@ html,body{overflow-x:clip}
 .tbu b{font-size:17px}
 .tbu p{max-width:520px;margin:8px auto 0}
 html.locked #storeSel,html.locked .sample{display:none!important}
-html.emptyday .seg,html.emptyday #rangeSel,html.emptyday [data-act="palopen"],html.emptyday [data-act="tour"],html.emptyday #waves{display:none!important}
+html.emptyday .seg,html.emptyday #rangeSel,html.emptyday [data-act="palopen"],html.emptyday [data-act="tour"]{display:none!important}

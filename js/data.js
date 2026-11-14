@@ -163,6 +163,7 @@ function modal(title,body){const root=document.getElementById('modalRoot');
   const b=root.querySelector('button');if(b)b.focus()}
 function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function menuHtml(){const ds=window.ZD;
+  if(ds.focus)return '<div class="dm-info"><b>'+esc(ds.store)+'</b><span>'+(ds.CONVS?ds.CONVS.length:0)+' conversations</span></div>'+storeOptions().map(o=>'<button data-zact="store" data-id="'+esc(o.id)+'"'+(o.id===ds.storeId?' aria-current="true"':'')+'><span class="dm-dot"></span>'+esc(o.label)+'</button>').join('')+(ds.rawText?'<button data-zact="export">Export current data (CSV)</button>':'')+(ds.empty?'':'<button data-zact="tour">Show me around</button>');
   if(ds.locked)return '<div class="dm-info"><b>'+esc(ds.store)+'</b><span>'+(ds.CONVS?ds.CONVS.length:0)+' conversations</span></div>'+(ds.rawText?'<button data-zact="export">Export current data (CSV)</button>':'')+(ds.empty?'':'<button data-zact="tour">Show me around</button>');
   const info=ds.isSample?'Showing sample data (fictional store)':esc(ds.file)+' · '+ds.CONVS.length+' conversations';
   const so=storeOptions(),storeList=ds.stores&&ds.stores.length?[...GROUPS,['upload','Your upload']].map(([g,l])=>{const a=so.filter(x=>x.group===g);return a.length?'<div class="dm-sec">'+esc(l)+'</div>'+a.map(o=>'<button data-zact="store" data-id="'+esc(o.id)+'"'+(o.id===ds.storeId?' aria-current="true"':'')+'><span class="dm-dot"></span>'+esc(o.label)+'</button>').join(''):''}).join('')+'<div class="dm-sec">Data</div>':'';
@@ -176,7 +177,7 @@ function menuHtml(){const ds=window.ZD;
 function toggleMenu(force){const m=document.getElementById('dataMenu'),b=document.querySelector('[data-zact="menu"]');if(!m)return;
   const open=force===undefined?m.hidden:force;if(open)m.innerHTML=menuHtml();m.hidden=!open;if(b)b.setAttribute('aria-expanded',String(open))}
 async function handleFile(file){
-  if(!file||(window.ZD&&window.ZD.locked))return;toggleMenu(false);
+  if(!file||(window.ZD&&(window.ZD.locked||window.ZD.focus)))return;toggleMenu(false);
   if(file.size>25*1024*1024){modal('File too large','<p>The file is over 25 MB. Export a shorter period and try again.</p>');return}
   const text=await file.text(),res=build(text,file.name);
   if(!res.ok){modal('This file was not loaded','<p>Nothing was changed. Fix these and upload again:</p><ul class="zerr">'+res.errors.map(e=>'<li><b>Line '+e.row+'</b> '+esc(e.msg)+'</li>').join('')+'</ul>'+(res.errors.length>=25?'<p class="hint">Showing the first 25 problems.</p>':''));return}
@@ -217,7 +218,8 @@ async function loadStores(){
 function setStore(id){setChoice(id);try{sessionStorage.setItem('zocus-skip-splash','1')}catch(e){}location.reload()}
 /* For the pilot the site opens on the pilot store only (also …/?dealer); …/?all shows every store, demos and upload.
    Locked mode: no store switcher, no demo stores, no upload. It hides, it does not secure. */
-const LOCKED=(()=>{try{const q=new URLSearchParams(location.search);return q.has('dealer')||!q.has('all')}catch(e){return false}})();
+const QS=(()=>{try{return new URLSearchParams(location.search)}catch(e){return new URLSearchParams('')}})();
+const LOCKED=QS.has('dealer'),FOCUS=!LOCKED&&!QS.has('all'),FOCUS_IDS=['pilot','pilot-day'];
 const dayName=s=>{const d=parseDate(s);return d?['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()]+' '+d.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]:''};
 const clock=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})\s*$/);if(!m)return '';const h=+m[1];return (h%12||12)+':'+m[2]+(h<12?' am':' pm')};
 /* A one-day store with nothing ready yet: say so, instead of falling back to the sample store. app.js is not started. */
@@ -225,17 +227,20 @@ function emptyDay(st,stores,rec){
   const m=st.meta||{},wait=(m.analysing||[]).length,bits=[];
   if(m.recorded)bits.push(m.recorded+' recorded so far'+(wait?', '+wait+' still being analysed':''));
   if(m.exportedLocal)bits.push('last updated '+clock(m.exportedLocal));
-  window.ZD={empty:true,locked:LOCKED,isSample:false,storeId:st.id,store:st.name,file:st.id+'.csv',meta:m,CONVS:[],rawText:'',
+  window.ZD={empty:true,locked:LOCKED,focus:FOCUS,isSample:false,storeId:st.id,store:st.name,file:st.id+'.csv',meta:m,CONVS:[],rawText:'',
     stores:stores.map(x=>({id:x.id,name:x.name,vertical:x.vertical,group:x.group})),hasUpload:!!(rec&&rec.text),uploadName:rec&&rec.name||''};
   document.documentElement.classList.add('emptyday');document.title=st.name+' · Zocus AI';
-  document.getElementById('page').innerHTML='<div class="phead"><h1>'+esc(st.name)+'</h1><p>'+esc(dayName(m.date)||'Pilot day')+'</p></div>'+
+  const TABS=[['home','Overview'],['insights','Insights'],['team','Team'],['coaching','Coaching'],['conversations','Conversations'],['followups','Follow-ups']],demo=stores.find(x=>x.id==='pilot-day'&&!x.empty);
+  const nav=()=>{const h=(location.hash||'#home').slice(1),cur=TABS.some(t=>t[0]===h)?h:'home',html=TABS.map(t=>'<a href="#'+t[0]+'"'+(t[0]===cur?' aria-current="page"':'')+'><span>'+t[1]+'</span></a>').join('');document.getElementById('nav').innerHTML=html;document.getElementById('bnav').innerHTML=html;const h1=document.querySelector('#page .phead h1');if(h1)h1.textContent=TABS.find(t=>t[0]===cur)[1]};
+  addEventListener('hashchange',nav);setTimeout(nav,0);
+  document.getElementById('page').innerHTML='<div class="phead"><h1>Overview</h1><p>'+esc(st.name)+' · '+esc(dayName(m.date)||'Pilot day')+'</p></div>'+
     '<section class="card" style="text-align:center;padding:52px 20px"><b style="font-size:18px">No conversations yet today</b>'+
-    '<p class="hint" style="margin:8px auto 0;max-width:520px">Conversations appear here after they are recorded, analysed and the page is updated. Updates are planned around 12 pm, 4 pm and 8 pm.'+(bits.length?' '+esc(bits.join(' · ').replace(/^./,c=>c.toUpperCase()))+'.':'')+'</p></section>';
+    '<p class="hint" style="margin:8px auto 0;max-width:520px">Conversations appear here after they are recorded, analysed and the page is updated. Updates are planned around 12 pm, 4 pm and 8 pm.'+(bits.length?' '+esc(bits.join(' · ').replace(/^./,c=>c.toUpperCase()))+'.':'')+'</p>'+(demo&&!LOCKED?'<div class="btnrow" style="justify-content:center;margin-top:18px"><button class="btn primary" data-zact="store" data-id="pilot-day">See a sample day (fictional data)</button></div><p class="hint" style="margin:10px 0 0">Or pick it from the store menu at the top. Every tab fills in once real conversations arrive.</p>':'')+'</section>';
   fillStoreSelect();return window.ZD}
 async function load(){
   let res=null;
   if(LOCKED)document.documentElement.classList.add('locked');
-  const rec=LOCKED?null:await kvGet('csv'),stores=await loadStores(),pick=LOCKED?'':choice();
+  const rec=LOCKED||FOCUS?null:await kvGet('csv'),stores=(await loadStores()).filter(x=>!FOCUS||FOCUS_IDS.includes(x.id)),pick=LOCKED?'':FOCUS&&!FOCUS_IDS.includes(choice())?'':choice();
   const st=stores.find(x=>x.id===pick)||(!pick?stores.find(x=>x.isDefault):null);
   if(LOCKED&&!st){fatal('The pilot data is not available yet. Please try again in a little while.');throw new Error('dealer link: no pilot store')}
   if(st&&st.empty&&st.snapshot)return emptyDay(st,stores,rec);
@@ -246,7 +251,7 @@ async function load(){
     let text;try{const r=await fetch(SAMPLE_URL);if(!r.ok)throw new Error(r.status);text=await r.text()}
     catch(e){fatal('The sample data could not be read. Open this page through a web server (for example <code>npx serve</code>), not by double-clicking the file.');throw e}
     res=build(text,'sample.csv');if(!res.ok)throw new Error('sample.csv invalid: '+res.errors[0].msg);res.ds.isSample=true;res.ds.storeId='sample'}
-  res.ds.locked=LOCKED;
+  res.ds.locked=LOCKED;res.ds.focus=FOCUS;
   res.ds.stores=stores.map(x=>({id:x.id,name:x.name,vertical:x.vertical,group:x.group}));res.ds.hasUpload=!!(rec&&rec.text);res.ds.uploadName=rec&&rec.name||'';
   const days=new Set(res.ds.CONVS.map(c=>c.d));res.ds.spanDays=days.size?Math.max(...days)+1:0;
   window.ZD=res.ds;fillStoreSelect();
@@ -254,7 +259,7 @@ async function load(){
     setTimeout(()=>toast('Loaded '+m.n+' conversations from '+m.name+(m.w&&m.w.length?'. '+m.w[0]:'')),700)}}catch(e){}
   return res.ds}
 const GROUPS=[['pilot','Pilot'],['test','Real test calls (no trends)'],['demo','Demo (fictional data)']];
-function storeOptions(){const d=window.ZD,o=d.stores.map(s=>({id:s.id,label:s.name,group:s.group}));if(d.hasUpload)o.push({id:'upload',label:'Uploaded: '+d.uploadName,group:'upload'});o.push({id:'sample',label:'Sample store (fictional)',group:'demo'});return o}
+function storeOptions(){const d=window.ZD,o=d.stores.map(s=>({id:s.id,label:s.name,group:s.group}));if(d.focus)return o;if(d.hasUpload)o.push({id:'upload',label:'Uploaded: '+d.uploadName,group:'upload'});o.push({id:'sample',label:'Sample store (fictional)',group:'demo'});return o}
 function groupedOptions(sel){const o=storeOptions(),gs=[...GROUPS,['upload','Your upload']];return gs.map(([g,l])=>{const a=o.filter(x=>x.group===g);return a.length?{label:l,items:a}:null}).filter(Boolean).map(x=>'<optgroup label="'+esc(x.label)+'">'+x.items.map(i=>'<option value="'+esc(i.id)+'"'+(i.id===sel?' selected':'')+'>'+esc(i.label)+'</option>').join('')+'</optgroup>').join('')}
 function fillStoreSelect(){const sel=document.getElementById('storeSel'),d=window.ZD;if(!sel||!d||!d.stores.length||d.locked)return;
   sel.innerHTML=groupedOptions(d.storeId);sel.hidden=false}

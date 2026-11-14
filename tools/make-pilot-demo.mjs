@@ -9,7 +9,7 @@ import path from 'node:path';
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 let seed = 20261114; const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 const pick = a => a[Math.floor(rnd() * a.length)], ri = (a, b) => Math.floor(a + rnd() * (b - a + 1)), pad = n => String(n).padStart(2, '0');
-const DAY = '2026-11-14', STORE = 'Apex Motors (fictional demo)', OWNER = 'Mr. Kapoor';
+const DAY = '2026-11-14', STORE = 'Mahindra showroom: sample day (fictional data)', OWNER = 'Mr. Kapoor';
 const PL = JSON.parse(fs.readFileSync(path.join(root, 'data/price-list.json'), 'utf8'));
 const REPS = [{ n: 'Rohan Desai', sk: 80 }, { n: 'Meera Iyer', sk: 76 }, { n: 'Imran Qureshi', sk: 62 }, { n: 'Sneha Patil', sk: 58 }, { n: 'Vikram Nair', sk: 42 }];
 const MODELS = PL.models.map(m => [m.label, Math.round((m.range[0] + m.range[1]) / 2), m]);
@@ -29,7 +29,7 @@ const OBJ = [
   { code: 'exchange', q: 'This little for my old car? I am getting more outside.', a: 'I will get your car evaluated in 15 minutes, and you also get the exchange bonus.', t: 'Exchange value too low' },
 ];
 const LINES = {
-  greet: ['Good morning, welcome to Apex Motors. Looking for something specific today?', 'Hello, welcome. Have you had a look at our new arrivals?'],
+  greet: ['Good morning, welcome to the showroom. Looking for something specific today?', 'Hello, welcome. Have you had a look at our new arrivals?'],
   need: ['Tell me how you will use the car, mostly city or highway?', 'How many people usually travel with you?', 'Is this your first car or are you replacing one?'],
   needC: ['Mostly city, office and back, and long drives once a month.', 'Family of six, so space matters.', 'Replacing a seven year old hatchback.'],
   budget: ['What range are you comfortable with, including insurance?', 'Shall we talk about budget and whether you want a loan?'],

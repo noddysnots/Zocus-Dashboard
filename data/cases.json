@@ -92,7 +92,7 @@
     },
     {
       "id": "pilot-day",
-      "name": "Apex Motors: pilot day (fictional demo)",
+      "name": "Mahindra showroom: sample day (fictional data)",
       "vertical": "car",
       "group": "demo",
       "file": "data/demo/pilot-day.csv",
