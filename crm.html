@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CRM records · Zocus AI</title>
+<meta name="description" content="Rep CRM fields filled from Zocus analysis for the Mahindra pilot day.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+.crm-shell{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:24px 16px 64px}
+.crm-top{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+.crm-top h1{font-size:28px;letter-spacing:-.03em}
+.crm-top p{margin:4px 0 0;color:var(--muted);font-size:14px;max-width:52ch}
+.crm-back{display:inline-flex;align-items:center;gap:6px;color:var(--ink);text-decoration:none;font-weight:500;font-size:14px}
+.crm-back:hover{text-decoration:underline}
+.crm-jump{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.crm-jump a{padding:7px 12px;border-radius:99px;border:1px solid var(--line-2);background:var(--paper-solid);color:var(--ink);text-decoration:none;font-size:13px;font-weight:500}
+.crm-jump a:hover,.crm-jump a[aria-current="true"]{background:var(--ink);color:var(--accent-ink);border-color:var(--ink)}
+.crm-card{background:var(--paper-solid);border:1px solid var(--line);border-radius:18px;padding:18px 18px 8px;margin:0 0 18px;box-shadow:var(--shadow)}
+.crm-card>header{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.crm-card>header h2{font-size:18px}
+.crm-card>header .meta{color:var(--muted);font-size:13px}
+.crm-note{margin:0 0 18px;padding:12px 14px;border-radius:12px;background:rgba(29,26,21,.04);color:var(--muted);font-size:13.5px}
+.crm-page .crmgrid{margin-top:0}
+.crm-page .crmg{margin-bottom:14px}
+.crm-empty{padding:40px 16px;text-align:center;color:var(--muted)}
+.crm-err{color:var(--bad);padding:20px}
+@media (max-width:860px){.crm-shell{padding-top:16px}.crm-top h1{font-size:22px}}
+</style>
+</head>
+<body class="crm-page">
+<canvas id="waves" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="crm-shell">
+  <div class="crm-top">
+    <div>
+      <a class="crm-back" id="backLink" href="/?dealer">← Back to dashboard</a>
+      <h1>CRM records</h1>
+      <p id="sub">Rep app fields for today’s sales conversations, filled from the recording and Zocus analysis. Empty means not said.</p>
+    </div>
+  </div>
+  <p class="crm-note">Layout matches the Sales.mai screens the floor shared (enquiry → product → variant → profile → owned vehicle → test drive → follow-up → lost reason). Phone screenshots with customer details are not stored in this repo. Age, gender, address, name and phone stay blank on purpose.</p>
+  <nav class="crm-jump" id="jump" aria-label="Jump to conversation"></nav>
+  <div id="root"><p class="crm-empty">Loading…</p></div>
+</div>
+<script>
+(function(){
+'use strict';
+const dealer=/[?&]dealer\b/.test(location.search);
+document.getElementById('backLink').href=dealer?'/?dealer':'/?all#conversations';
+const SRCL={recording:'from the recording',backend:'backend analysis','backend reading':'backend reading',floor:'from the floor',team:'from the team',rule:'set by rule',database:'from the data'};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function parseCSV(text){
+  const rows=[];let row=[],cell='',q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i],n=text[i+1];
+    if(q){if(c==='"'&&n==='"'){cell+='"';i++}else if(c==='"')q=false;else cell+=c}
+    else if(c==='"')q=true;
+    else if(c===','){row.push(cell);cell=''}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&n==='\n')i++;row.push(cell);if(row.length>1||row[0])rows.push(row);row=[];cell=''}
+    else cell+=c;
+  }
+  if(cell.length||row.length){row.push(cell);rows.push(row)}
+  return rows;
+}
+function clock(s){const m=String(s||'').match(/(\d{1,2}):(\d{2})/);if(!m)return '';const h=+m[1];return (h%12||12)+':'+m[2]+(h<12?' am':' pm')}
+function card(rec){
+  const crm=rec.crm,id=rec.id,t=clock(rec.at);
+  const groups=(crm.groups||[]).map(g=>`<div class="crmg"><h4>${esc(g.g)}</h4><dl>${(g.f||[]).map(f=>{const k=f[0],v=f[1],s=f[2];return `<div><dt>${esc(k)}</dt><dd class="${v?'':'empty'}">${v?esc(v):'–'}${v&&s?`<small>${esc(SRCL[s]||s)}</small>`:''}</dd></div>`}).join('')}</dl></div>`).join('');
+  return `<article class="crm-card" id="c-${esc(id)}"><header><h2>#${esc(id)} · ${esc(t||rec.at)}</h2><span class="meta">${esc(rec.rep||'Rep')} · ${esc(rec.model||'Model')} · ${esc(rec.stage||'')}</span></header><div class="crmgrid">${groups||'<p class="hint">No CRM fields for this conversation.</p>'}</div></article>`;
+}
+(async()=>{
+  const root=document.getElementById('root'),jump=document.getElementById('jump');
+  try{
+    const r=await fetch('data/cases/pilot.csv',{cache:'no-store'});
+    if(!r.ok)throw new Error('Could not load pilot.csv ('+r.status+')');
+    const rows=parseCSV(await r.text());
+    if(rows.length<2)throw new Error('pilot.csv is empty');
+    const h=rows[0],ix=k=>h.indexOf(k);
+    const list=[];
+    for(const row of rows.slice(1)){
+      if(!row[ix('conversation_id')])continue;
+      const kind=String(row[ix('kind')]||'').toLowerCase();
+      if(kind==='delivery')continue;
+      let crm={};try{crm=JSON.parse(row[ix('crm_json')]||'{}')}catch(e){crm={}}
+      if(!crm.groups||!crm.groups.length)continue;
+      const id=String(row[ix('conversation_id')]).replace(/\D/g,'');
+      list.push({id,at:row[ix('captured_at')],rep:row[ix('rep_name')],model:row[ix('product')],stage:row[ix('stage')]||'',crm});
+    }
+    document.getElementById('sub').textContent=list.length+' sales conversations · Mahindra showroom (pilot) · fields filled from the recording and analysis';
+    jump.innerHTML=list.map(x=>`<a href="#c-${esc(x.id)}">#${esc(x.id)} ${esc(clock(x.at))}</a>`).join('');
+    root.innerHTML=list.length?list.map(card).join(''):'<p class="crm-empty">No CRM records in the pilot file yet.</p>';
+    const go=()=>{const id=(location.hash||'').slice(1);jump.querySelectorAll('a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+id?'true':'false'))};
+    addEventListener('hashchange',go);go();
+  }catch(err){root.innerHTML='<p class="crm-err">'+esc(err.message||err)+'</p>'}
+})();
+})();
+</script>
+</body>
+</html>

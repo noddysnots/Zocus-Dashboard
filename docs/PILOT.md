@@ -138,6 +138,8 @@ Volumes are low, so each conversation carries more, all written by hand into `da
 
 **CRM sheet.** `node tools/make-crm.mjs` (run by the refresh) writes `data/cases/pilot-crm.csv`: one row per visit, our columns filled, ten columns left for the dealer (customer name, mobile, enquiry or SalesGenie ID, need-analyzer answers, punch-in time, booking amount, booking date, promised delivery, SalesGenie follow-up result, final outcome). `data/crm-template.csv` is the same sheet empty. Mobile numbers spoken in a recording are never copied into it. Download: Data menu, "CRM sheet (CSV)".
 
+**CRM records page.** Data menu → "CRM records" opens `crm.html`: one Sales.mai-style form per sales conversation, filled from `crm_json` (same groups as the folded CRM card). Delivery-day conversations are left out. The phone screenshots that defined the field order are not stored in this public repo (they contain customer details).
+
 **Day report.** Data menu, "Day report (PDF)": the day's numbers, one table of all conversations, then every conversation in full. "Save as PDF" uses the browser's print.
 
 ### The rep's CRM record (14 Nov, 5:40 pm)

@@ -239,7 +239,8 @@ const clock=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})\s*$/);if(!m)retur
 /* One-day snapshot bar: which day, when it was last updated, what is still on its way, and the count at each earlier update. No hourly view. */
 function snapBar(){if(!SNAP)return '';const m=ZD.meta||{},bits=[`<b>${WDL[TODAY.getDay()]} ${fdate(TODAY)}</b>`];
  if(m.exportedLocal){const d=String(m.exportedLocal).slice(0,10),same=!m.date||d===String(m.date).slice(0,10);bits.push('updated '+(same?'':fdate(new Date(d+'T12:00'))+', ')+clock(m.exportedLocal))}
- bits.push(plural(CONVS.length,'conversation'));
+ const salesN=CONVS.filter(c=>c.kind!=='delivery').length,delN=CONVS.length-salesN;
+ bits.push(plural(salesN,'sales conversation')+(delN?` · ${delN} after booking`:''));
  if(m.analysing&&m.analysing.length)bits.push(`<b>${m.analysing.length} being analysed</b>`);
  const lo=ZD.locked?[]:(m.leftOut||[]);if(lo.length){const by={};lo.forEach(x=>by[x.why]=(by[x.why]||0)+1);bits.push(`${lo.length} left out (${Object.entries(by).map(([k,n])=>(n>1?n+' × ':'')+esc(lc(k))).join(', ')})`)}
  const H=(m.history||[]).filter(h=>h.shown>0);

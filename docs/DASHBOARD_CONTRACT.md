@@ -43,7 +43,7 @@ The floor asked for more detail per conversation because volumes are low. Nothin
 | Follow-ups page | Follow-ups written by hand from the recording; our own suggestions carry a "Suggested" pill and are not counted in the menu badge |
 | Coaching page | One card, "Objections today and how they were answered", per rep, with a suggested line |
 | Insights | One tab, last in the row: "Demand vs stock" |
-| Data menu | "Day report (PDF)": one long page built from the same panel sections, printed by the browser. "CRM sheet (CSV)": one row per visit, with blank columns for the dealer |
+| Data menu | "Day report (PDF)": one long page built from the same panel sections, printed by the browser. "CRM records": opens `crm.html` (Sales.mai-style forms filled from `crm_json`, sales conversations only). "CRM sheet (CSV)": one row per visit, with blank columns for the dealer. On pilot / dealer, the menu and the live bar count **sales conversations** the same way as Team (delivery-day rows are listed as "after booking", not in the sales total) |
 
 Added 14 Nov, 6 pm: a folded **CRM record** card in the conversation panel (the rep app's fields, filled from the conversation, with sources), a **Parts of this visit** card (only when one visit was recorded in several parts), and a CRM sheet laid out like the rep app. Nothing was added to the Overview or the menus.
 
@@ -83,4 +83,9 @@ Price tables in the conversation panel show the exact rupee figure (for example 
 - **Overview, same slot:** the one-line "Rupee figures" hint under the number cards is now a folded card, "How these numbers are worked out": Bookings won, Quoted not booked (every figure with the line and time it came from, or the model's typical price marked ~), and Booking conversion with the counts. Closed by default; nothing else on the Overview moved. The day report prints it open.
 - **Critical follow-up:** when the floor says a conversation needs one, it is a red "Critical" pill, the first row in "Do these next" and the first group ("Critical") on the Follow-ups page.
 - **A result is shown as Booked only when the recording or the dealer says so.** The "sale: yes/no" tag in the Zocus app is set by the recording account (Abhishek), hours after the recording; it is shown as a source, not as a booking. #262 and #266 therefore read Will return (like #261) until the dealer confirms. Every conversation's panel and the breakdown card say where its figure and its result come from.
+
+## Added 14 Nov, evening
+
+- **Pilot count wording:** Data menu and live bar say "8 sales conversations · 1 after booking" so they match Team's "Conversations recorded" (8). Delivery-day #264 is not a sales conversation.
+- **CRM records page:** `crm.html` (from the Data menu), Sales.mai field layout filled from `crm_json`.
 
