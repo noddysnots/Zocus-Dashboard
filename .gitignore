@@ -12,5 +12,17 @@ data/cases/*.calls.json
 !data/cases/pilot.csv
 !data/cases/pilot-crm.csv
 !data/cases/pilot.meta.json
+!data/cases/qwen14ic.csv
+!data/cases/qwen14ic.meta.json
+!data/cases/qwen14qa.csv
+!data/cases/qwen14qa.meta.json
+!data/cases/qwen4ic.csv
+!data/cases/qwen4ic.meta.json
 !data/demo/
 data/crm-import/
+
+# Qwen pipeline: audio-derived transcripts and outputs stay on this machine
+data/qwen/
+tools/qwen/.venv/
+__pycache__/
+tools/qwen/.ecapa/

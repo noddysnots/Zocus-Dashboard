@@ -283,7 +283,7 @@ async function load(){
   try{const m=JSON.parse(sessionStorage.getItem('zocus-loaded-msg')||'null');if(m){sessionStorage.removeItem('zocus-loaded-msg');
     setTimeout(()=>toast('Loaded '+m.n+' conversations from '+m.name+(m.w&&m.w.length?'. '+m.w[0]:'')),700)}}catch(e){}
   return res.ds}
-const GROUPS=[['pilot','Pilot'],['test','Real test calls (no trends)'],['demo','Demo (fictional data)']];
+const GROUPS=[['pilot','Pilot'],['openmodel','Open-model runs (not Argon)'],['test','Real test calls (no trends)'],['demo','Demo (fictional data)']];
 function storeOptions(){const d=window.ZD,o=d.stores.map(s=>({id:s.id,label:s.name,group:s.group}));if(d.focus)return o;if(d.hasUpload)o.push({id:'upload',label:'Uploaded: '+d.uploadName,group:'upload'});return o}
 function groupedOptions(sel){const o=storeOptions(),gs=[...GROUPS,['upload','Your upload']];return gs.map(([g,l])=>{const a=o.filter(x=>x.group===g);return a.length?{label:l,items:a}:null}).filter(Boolean).map(x=>'<optgroup label="'+esc(x.label)+'">'+x.items.map(i=>'<option value="'+esc(i.id)+'"'+(i.id===sel?' selected':'')+'>'+esc(i.label)+'</option>').join('')+'</optgroup>').join('')}
 function fillStoreSelect(){const sel=document.getElementById('storeSel'),d=window.ZD;if(!sel||!d||!d.stores.length||d.locked)return;

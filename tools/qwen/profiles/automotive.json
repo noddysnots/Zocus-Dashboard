@@ -1,0 +1,253 @@
+{
+ "vertical": "automotive",
+ "sector_label": "car dealership (showroom)",
+ "products": [
+  "XUV 7XO",
+  "Scorpio N",
+  "Scorpio Classic",
+  "Thar Roxx",
+  "Thar",
+  "XUV 3XO EV",
+  "XUV 3XO",
+  "XUV400",
+  "Bolero Neo Plus",
+  "Bolero Neo",
+  "Bolero",
+  "BE 6",
+  "XEV 9e",
+  "XEV 9S"
+ ],
+ "brand": "Mahindra",
+ "competitor_brands": [
+  "Tata",
+  "Hyundai",
+  "Maruti",
+  "Kia",
+  "Toyota",
+  "MG",
+  "Honda",
+  "Skoda",
+  "Volkswagen",
+  "Renault",
+  "Nissan",
+  "Citroen",
+  "Jeep"
+ ],
+ "product_aliases": {
+  "XEV 9e": [
+   "9 ई",
+   "9e",
+   "nine e",
+   "xev",
+   "xev 9 e",
+   "xev 9e",
+   "xev nine e",
+   "एक्सईवी",
+   "एक्सईवी नाइन ई",
+   "नाइन ई",
+   "એક્સઇવી",
+   "નાઈન ઈ"
+  ],
+  "XEV 9S": [
+   "9 एस",
+   "9s",
+   "nine s",
+   "xev 9 s",
+   "xev 9s",
+   "नाइन एस",
+   "નાઈન એસ"
+  ],
+  "BE 6": [
+   "BE 6",
+   "BE 6e",
+   "BE Six",
+   "b e 6",
+   "be 6",
+   "be six",
+   "be6",
+   "बी ई",
+   "बी ई सिक्स",
+   "बीई 6",
+   "बीई सिक्स",
+   "બી ઈ સિક્સ"
+  ],
+  "XUV 3XO": [
+   "3 एक्सओ",
+   "3xo",
+   "ax5",
+   "ax7",
+   "ax7l",
+   "three xo",
+   "xuv 3 xo",
+   "xuv 300",
+   "xuv 3xo",
+   "xuv three hundred",
+   "एएक्स 5",
+   "एएक्स फाइव",
+   "एएक्स सेवन",
+   "एक्स ओ",
+   "एक्स फाइव",
+   "एक्सओ",
+   "थ्री एक्सओ",
+   "थ्रीएक्सओ",
+   "थ्रीएक्सो"
+  ],
+  "XUV 3XO EV": [
+   "3xo electric",
+   "3xo ev",
+   "ev",
+   "ev 3xo",
+   "three xo ev",
+   "xuv 3xo ev",
+   "एक्सओ ईवी"
+  ],
+  "XUV 7XO": [
+   "7 एक्सओ",
+   "7xo",
+   "seven xo",
+   "xuv 7 xo",
+   "xuv 700",
+   "xuv 7xo",
+   "xuv seven hundred",
+   "xuv7oo",
+   "सेवन एक्सओ"
+  ],
+  "Scorpio N": [
+   "scorpio",
+   "scorpio en",
+   "scorpio n",
+   "scorpio-n",
+   "scorpion n",
+   "स्कॉर्पियो",
+   "स्कॉर्पियो एन",
+   "स्कोर्पियो",
+   "સ્કોર્પિઓ",
+   "સ્કોર્પિયો"
+  ],
+  "Scorpio Classic": [
+   "classic",
+   "scorpio classic",
+   "क्लासिक",
+   "स्कॉर्पियो क्लासिक",
+   "ક્લાસિક"
+  ],
+  "Thar Roxx": [
+   "roxx",
+   "thar rocks",
+   "thar rox",
+   "thar roxx",
+   "थार रॉक्स",
+   "रॉक्स",
+   "रोक्स"
+  ],
+  "Thar": [
+   "thar",
+   "थार",
+   "થાર"
+  ],
+  "Bolero": [
+   "bolero",
+   "बोलेरो",
+   "બોલેરો"
+  ],
+  "Bolero Neo": [
+   "bolero neo"
+  ],
+  "Bolero Neo Plus": [
+   "bolero neo plus",
+   "neo plus"
+  ],
+  "XUV400": [
+   "400",
+   "xuv 400",
+   "xuv four hundred",
+   "xuv400",
+   "फोर हंड्रेड"
+  ]
+ },
+ "terms": "on-road price, ex-showroom price, quotation, EMI, down payment, token amount, booking amount, exchange, RTO, insurance (1+3 or 3+3), extended warranty, accessories, test drive, waiting period, stock, delivery date, scheme, discount",
+ "checks": {
+  "need": "done only if the rep established the purpose, who will use or drive the car, and the preferred model, fuel or colour. Knowing only the model is partly.",
+  "budget": "done only if the REP asked for the budget or EMI. A customer who says a figure unprompted, or haggling over price, is not asking the budget (missed or partly).",
+  "decision_timing": "done only if the rep asked when and how they will decide or who else decides. A customer mentioning urgency alone is partly.",
+  "options": "done only if the rep compared more than one suitable model or version and explained the difference. Showing one car or only colours is partly.",
+  "experience": "done only if a test drive or a showroom or stock visit was offered or arranged. Only describing the car is missed.",
+  "value_proof": "done only if the rep explained why this car is worth it in terms of the customer's need, with specifics. A list of features is partly.",
+  "price_offers": "done only if one clear price (on-road or ex-showroom) was given with the offers stated. Shifting or several different figures, or a price without offers, is partly.",
+  "concerns": "done only if every concern the customer raised was answered specifically. If any concern was answered loosely or not at all, it is partly.",
+  "ask": "done only if the rep asked the customer to book or pay a token. Quoting a price is not asking.",
+  "next_step": "done only if a next step with a day or time was agreed. A promise to send details, or a phone number given, without a date is partly."
+ },
+ "check_labels": {
+  "need": "Understood what the customer wants",
+  "budget": "Asked the budget",
+  "decision_timing": "Found out when and how they decide",
+  "options": "Showed the right options",
+  "experience": "Offered a test drive or showroom visit",
+  "value_proof": "Explained why this car is worth it",
+  "price_offers": "Gave a clear price and offers",
+  "concerns": "Answered the customer's concerns",
+  "ask": "Asked for the booking",
+  "next_step": "Agreed a next step with a date"
+ },
+ "fields": {
+  "customer_type": [
+   "Switching to electric",
+   "Family upgrade",
+   "Repeat visit",
+   "Delivery or after the sale",
+   "Specific model in mind",
+   "Not clear",
+   "Other"
+  ],
+  "decision": [
+   "decided",
+   "choosing",
+   "exploring"
+  ],
+  "intent": [
+   "high",
+   "medium",
+   "low"
+  ],
+  "priorities": [
+   "Range and charging",
+   "Performance",
+   "Safety",
+   "Features",
+   "Space",
+   "Comfort",
+   "Mileage",
+   "Price and offers",
+   "Availability",
+   "Service",
+   "Loan and finance"
+  ],
+  "test_drive": [
+   "yes",
+   "offered",
+   "no",
+   "not_stated"
+  ],
+  "quotation": [
+   "yes",
+   "promised",
+   "no"
+  ],
+  "conversation_kind": [
+   "sale",
+   "after_booking"
+  ],
+  "loss_reason": [
+   "Waiting time or stock",
+   "Exchange value",
+   "Test drive or comfort",
+   "Budget, EMI or loan",
+   "Comparing with another brand",
+   "Price or discount",
+   "Family approval",
+   "Just browsing",
+   "No clear reason"
+  ]
+ }
+}

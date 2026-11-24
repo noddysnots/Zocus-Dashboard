@@ -1,0 +1,11 @@
+# Python 3.12 venv. Used only on the Mac that holds the recordings.
+torch
+torchaudio
+soundfile
+numpy
+scikit-learn
+silero-vad
+speechbrain
+onnxruntime
+transformers
+huggingface_hub

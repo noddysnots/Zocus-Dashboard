@@ -1,0 +1,96 @@
+{
+ "dayNote": "",
+ "store": "Pilot: Qwen 14B, IndicConformer audio",
+ "exportedAt": "2026-11-24T12:13:49.412Z",
+ "exportedLocal": "2026-11-24 17:43",
+ "date": "2026-11-14",
+ "recorded": 8,
+ "shown": 8,
+ "analysing": [],
+ "failed": [],
+ "unscored": [],
+ "leftOut": [],
+ "suggestDrop": [
+  {
+   "id": 261,
+   "at": "10:36",
+   "min": 11,
+   "why": "no customer voice found"
+  },
+  {
+   "id": 262,
+   "at": "10:47",
+   "min": 17,
+   "why": "no customer voice found"
+  },
+  {
+   "id": 264,
+   "at": "11:22",
+   "min": 20,
+   "why": "no customer voice found"
+  },
+  {
+   "id": 266,
+   "at": "11:54",
+   "min": 25,
+   "why": "no customer voice found"
+  },
+  {
+   "id": 272,
+   "at": "15:27",
+   "min": 8,
+   "why": "no customer voice found"
+  },
+  {
+   "id": 274,
+   "at": "15:58",
+   "min": 48,
+   "why": "no customer voice found"
+  },
+  {
+   "id": 275,
+   "at": "17:02",
+   "min": 14,
+   "why": "no customer voice found"
+  },
+  {
+   "id": 278,
+   "at": "17:51",
+   "min": 20,
+   "why": "no customer voice found"
+  }
+ ],
+ "valueSources": {
+  "budget": 2,
+  "none": 5,
+  "indicative": 1
+ },
+ "history": [
+  {
+   "at": "2026-11-24 15:30",
+   "shown": 1
+  },
+  {
+   "at": "2026-11-24 17:40",
+   "shown": 8
+  }
+ ],
+ "reps": [
+  {
+   "name": "Jatin",
+   "recorded": 4
+  },
+  {
+   "name": "R1",
+   "recorded": 1
+  },
+  {
+   "name": "Hardik",
+   "recorded": 2
+  },
+  {
+   "name": "R2",
+   "recorded": 1
+  }
+ ]
+}

@@ -1,5 +1,5 @@
 {
- "_note": "Dashboard contract (see docs/DASHBOARD_CONTRACT.md), checked by tools/check.html. 'fingerprint' = exact menu, headings and number cards recorded on the pre-pilot build; 'required' = headings that must be present; 'forbidden' = headings that must not come back. Pilot-only build: other store fingerprints removed.",
+ "_note": "Dashboard contract (see docs/DASHBOARD_CONTRACT.md), checked by tools/check.html. 'fingerprint' = exact menu, headings and number cards recorded on the pre-pilot build; 'required' = headings that must be present; 'forbidden' = headings that must not come back. Pilot-only build: other store fingerprints removed. Added 24 Nov 2026: three open-model comparison stores (qwen14ic, qwen14qa, qwen4ic), same headings as the pilot, visible only with ?all.",
  "routes": [
   "home",
   "insights",
@@ -118,6 +118,180 @@
      "Contents",
      "The day in one table",
      "How these numbers are worked out"
+    ]
+   }
+  },
+  "qwen14ic": {
+   "mode": "all",
+   "note": "Open-model run, Qwen 14B with IndicConformer: same pages and headings as the pilot; reached only with ?all, never on the dealer link.",
+   "required": {
+    "home": [
+     "Do these next",
+     "Team at a glance",
+     "The day so far",
+     "Time with customers",
+     "Latest conversations",
+     "Average skill score",
+     "Booking conversion"
+    ],
+    "insights": [
+     "Insights"
+    ],
+    "team": [
+     "Team",
+     "Skills by rep",
+     "Showroom average",
+     "Scores out of 100",
+     "3 or more conversations are needed to rank",
+     "enough conversations to compare",
+     "needs 3"
+    ],
+    "coaching": [
+     "Coaching"
+    ],
+    "conversations": [
+     "Conversations"
+    ],
+    "followups": [
+     "Follow-ups"
+    ],
+    "report": [
+     "Day report",
+     "Booking conversion",
+     "Funnel",
+     "The day so far",
+     "Models talked about",
+     "Rep performance",
+     "Impact points",
+     "Follow-ups to do tonight"
+    ],
+    "report-detailed": [
+     "Day report (detailed)",
+     "Contents",
+     "The day in one table",
+     "How these numbers are worked out"
+    ]
+   },
+   "forbidden": {
+    "home": [
+     "After the sale: needs attention",
+     "Promises to keep"
+    ]
+   }
+  },
+  "qwen14qa": {
+   "mode": "all",
+   "note": "Open-model run, Qwen 14B with Qwen3-ASR: same pages and headings as the pilot; reached only with ?all, never on the dealer link.",
+   "required": {
+    "home": [
+     "Do these next",
+     "Team at a glance",
+     "The day so far",
+     "Time with customers",
+     "Latest conversations",
+     "Average skill score",
+     "Booking conversion"
+    ],
+    "insights": [
+     "Insights"
+    ],
+    "team": [
+     "Team",
+     "Skills by rep",
+     "Showroom average",
+     "Scores out of 100",
+     "3 or more conversations are needed to rank",
+     "enough conversations to compare",
+     "needs 3"
+    ],
+    "coaching": [
+     "Coaching"
+    ],
+    "conversations": [
+     "Conversations"
+    ],
+    "followups": [
+     "Follow-ups"
+    ],
+    "report": [
+     "Day report",
+     "Booking conversion",
+     "Funnel",
+     "The day so far",
+     "Models talked about",
+     "Rep performance",
+     "Impact points",
+     "Follow-ups to do tonight"
+    ],
+    "report-detailed": [
+     "Day report (detailed)",
+     "Contents",
+     "The day in one table",
+     "How these numbers are worked out"
+    ]
+   },
+   "forbidden": {
+    "home": [
+     "After the sale: needs attention",
+     "Promises to keep"
+    ]
+   }
+  },
+  "qwen4ic": {
+   "mode": "all",
+   "note": "Open-model run, Qwen 4B with IndicConformer (reference): same pages and headings as the pilot; reached only with ?all, never on the dealer link.",
+   "required": {
+    "home": [
+     "Do these next",
+     "Team at a glance",
+     "The day so far",
+     "Time with customers",
+     "Latest conversations",
+     "Average skill score",
+     "Booking conversion"
+    ],
+    "insights": [
+     "Insights"
+    ],
+    "team": [
+     "Team",
+     "Skills by rep",
+     "Showroom average",
+     "Scores out of 100",
+     "3 or more conversations are needed to rank",
+     "enough conversations to compare",
+     "needs 3"
+    ],
+    "coaching": [
+     "Coaching"
+    ],
+    "conversations": [
+     "Conversations"
+    ],
+    "followups": [
+     "Follow-ups"
+    ],
+    "report": [
+     "Day report",
+     "Booking conversion",
+     "Funnel",
+     "The day so far",
+     "Models talked about",
+     "Rep performance",
+     "Impact points",
+     "Follow-ups to do tonight"
+    ],
+    "report-detailed": [
+     "Day report (detailed)",
+     "Contents",
+     "The day in one table",
+     "How these numbers are worked out"
+    ]
+   },
+   "forbidden": {
+    "home": [
+     "After the sale: needs attention",
+     "Promises to keep"
     ]
    }
   }

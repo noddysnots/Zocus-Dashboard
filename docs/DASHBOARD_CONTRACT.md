@@ -8,7 +8,9 @@ It is enforced by three checks you run before every push (see the end).
 
 **The six pages and the menu**: Overview, Insights, Team, Coaching, Conversations, Follow-ups. No page is added, renamed or removed.
 
-**This build is pilot-only:** the dashboard ships **Mahindra showroom (pilot)** alone. Sample, demo and other test-store CSVs were removed; `tests/contract.json` checks pilot and `pilot@dealer` only.
+**This build ships one dealer store:** **Mahindra showroom (pilot)** (Argon for transcript and speakers, Claude Sonnet 5.5 for the analysis). Sample, demo and other test-store CSVs were removed.
+
+**Accepted change, 24 Nov 2026:** three comparison stores were added to the Store dropdown under the group "Open-model runs (not Argon)": Qwen 14B with IndicConformer audio, Qwen 14B with Qwen3-ASR 1.7B audio, and Qwen 4B with IndicConformer audio (a reference run). They show the same eight conversations read by open models, with the same pages, sections and wording as the pilot. They appear only with `?all`; the dealer link (`?dealer`) and the default view show the pilot store alone. Their transcript columns are blank. They carry no Argon or Claude output. Why: to show the team, with the same analytics, how far open models get from the recordings. `tests/contract.json` checks pilot, `pilot@dealer` and the three comparison stores against the same headings.
 
 **Accepted change, 14 Nov 2026:** stores whose vertical is `car` use car-dealer wording (Booking conversion, Bookings won, showroom, booked). This applies to the Mahindra test store and the pilot.
 
@@ -94,3 +96,10 @@ Price tables in the conversation panel show the exact rupee figure (for example 
 - **Live bar (14 Nov, late):** no Updates history box; status is one line (day · updated time, plus analysing only when needed); alert is one compact row on phone (title + chevron). Day report pages stay unaffected (live bar already omitted on `#report` / `#report-detailed`).
 - **Pilot-only data (14 Nov, late):** other stores and sample/demo CSVs removed from the shipped tree; Data menu no longer offers a sample store.
 
+
+## Added 24 Nov 2026: open-model comparison stores
+
+- Files: `data/cases/qwen14ic.csv`, `qwen14qa.csv`, `qwen4ic.csv` (with `.meta.json`), listed in `data/cases.json` with `"group": "openmodel"`. Built by `tools/qwen/export-scenarios.mjs`; the numbers behind them are in `docs/QWEN_COMPARISON.md`. They are not database exports: results come from `tools/qwen/pipeline.py` and go through the same `tools/export-from-db.mjs` reading rules (`--rows-json`).
+- Written insights in these stores are English only; anything the model returned in Devanagari or Gujarati script is dropped from dropdown values, summaries and follow-ups. Evidence quotes in the conversation panel may still be in script.
+- Scores are the open model's own marks (done 100, partly 50, missed 0), not the backend's. They disagree with the pilot on purpose; that is what is being compared.
+- `tools/check.html` now marks the first-visit tour as seen, because the tour jumps to the Overview a moment after load and made the Coaching check flaky.

@@ -15,6 +15,42 @@
       "notes": "data/pilot-notes.json",
       "note": "The pilot day. Recordings are in the Zocus company; the pilot is every recording on this date minus the calls dropped in data/pilot-notes.json.",
       "repFull": true
+    },
+    {
+      "id": "qwen14ic",
+      "name": "Pilot: Qwen 14B, IndicConformer audio",
+      "org": 1,
+      "date": "2026-11-14",
+      "vertical": "car",
+      "owner": "",
+      "group": "openmodel",
+      "snapshot": true,
+      "repFull": true,
+      "note": "Open-model run on the 8 audio files: IndicConformer (Hindi/Gujarati) for the words, Qwen3 14B for the analysis. Not Argon, not Claude. Shown only with ?all."
+    },
+    {
+      "id": "qwen14qa",
+      "name": "Pilot: Qwen 14B, Qwen3-ASR audio",
+      "org": 1,
+      "date": "2026-11-14",
+      "vertical": "car",
+      "owner": "",
+      "group": "openmodel",
+      "snapshot": true,
+      "repFull": true,
+      "note": "Open-model run: Qwen3-ASR 1.7B for the words, Qwen3 14B for the analysis. Shown only with ?all."
+    },
+    {
+      "id": "qwen4ic",
+      "name": "Pilot: Qwen 4B, IndicConformer audio",
+      "org": 1,
+      "date": "2026-11-14",
+      "vertical": "car",
+      "owner": "",
+      "group": "openmodel",
+      "snapshot": true,
+      "repFull": true,
+      "note": "Reference run with the smaller Qwen3 4B for the analysis. Shown only with ?all."
     }
   ]
 }

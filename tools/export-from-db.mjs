@@ -14,11 +14,25 @@ import path from 'node:path';
 import pg from 'pg';
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const args = process.argv.slice(2), has = f => args.includes(f), val = (f, d) => { const i = args.indexOf(f); return i >= 0 ? args[i + 1] : d; };
-const env = Object.fromEntries(fs.readFileSync(path.join(root, '.env'), 'utf8').split('\n').filter(l => l.includes('=') && !l.startsWith('#')).map(l => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()]));
-// encrypted; certificate not verified because the server uses a self-signed one
-const db = new pg.Client({ connectionString: (env.DATABASE_URL || '').replace('sslmode=require', 'sslmode=require&uselibpqcompat=true') });
-await db.connect(); await db.query('SET default_transaction_read_only = on');
-const q = async (s, p) => (await db.query(s, p)).rows;
+/* --rows-json <file>: no database. Rows built by tools/qwen/make-rows.mjs from an open-model run, in the same shape the database query returns, so every reading rule below applies unchanged. */
+const rowsJson = val('--rows-json');
+let db, q;
+if (rowsJson) {
+  const R = JSON.parse(fs.readFileSync(path.resolve(root, rowsJson), 'utf8'));
+  db = { end: async () => {} };
+  q = async (s) => {
+    if (/from organizations o/.test(s)) return [{ id: 1, name: R.store || 'Open-model run', vertical: 'car', timezone: 'Asia/Kolkata', demo: false, sessions: R.rows.length, reps: 0, latest: null }];
+    if (/join analysis_runs ar/.test(s)) return R.rows;
+    if (/select s\.id, s\.captured_at, s\.ended_at, u\.name rep, s\.status/.test(s)) return R.rows.map(x => ({ id: x.id, captured_at: x.captured_at, ended_at: x.ended_at, rep: x.rep, status: 'ready', analysis_state: 'succeeded', transcription_state: 'succeeded' }));
+    return [];
+  };
+} else {
+  const env = Object.fromEntries(fs.readFileSync(path.join(root, '.env'), 'utf8').split('\n').filter(l => l.includes('=') && !l.startsWith('#')).map(l => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()]));
+  // encrypted; certificate not verified because the server uses a self-signed one
+  db = new pg.Client({ connectionString: (env.DATABASE_URL || '').replace('sslmode=require', 'sslmode=require&uselibpqcompat=true') });
+  await db.connect(); await db.query('SET default_transaction_read_only = on');
+  q = async (s, p) => (await db.query(s, p)).rows;
+}
 const quiet = process.env.ZEXPORT_QUIET;
 
 const orgs = await q(`select o.id, o.name, o.vertical, o.timezone, o.is_demo demo, (select count(*) from sessions s where s.organization_id=o.id and s.deleted_at is null and s.record_kind='interaction') sessions, (select count(distinct rep_id) from sessions s where s.organization_id=o.id) reps, (select max(captured_at)::date from sessions s where s.organization_id=o.id) latest from organizations o order by id`);

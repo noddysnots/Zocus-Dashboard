@@ -23,7 +23,7 @@ code{background:#f3f1ea;padding:1px 4px;border-radius:4px}
   const norm = s => String(s || '').replace(/\s+/g, ' ').trim().replace(/^Good (morning|afternoon|evening)\.?/, 'Good time of day.');
   const wait = ms => new Promise(r => setTimeout(r, ms));
   const rows = [], rec = {};
-  try { sessionStorage.setItem('zocus-skip-splash', '1'); } catch (e) {}
+  try { sessionStorage.setItem('zocus-skip-splash', '1'); localStorage.setItem('zocus-tour-v3', '1'); /* the first-visit tour jumps to the Overview a moment after load and made later pages flaky */ } catch (e) {}
   /* counts in the menu and customer rows on the Follow-ups page move with the date, so they are left out of the comparison */
   const fp = (doc, route) => {
     const t = e => norm(e && e.textContent);
